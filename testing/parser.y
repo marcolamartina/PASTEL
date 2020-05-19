@@ -8,7 +8,7 @@
   int yylex();
   char * substring(char * s, int start, int end );
   void send_command(char * ip, char * port, char * command);
-  void open_server(char * port);
+  void open_server_mac(char * port);
 
 %}
 
@@ -64,10 +64,11 @@ int main(int argc, char **argv)
       yyerror("Error on creating output file");
       return 1;
   }
-  open_server("8888");
-  sleep(3);
-  send_command("localhost", "8888", "ciao\nprova\nprova prova");
-  send_command("localhost", "8888", "va bene funziona");
+
+  //open_server_mac("8888");
+  //sleep(3);
+  //send_command("localhost", "8888", "ciao\nprova\nprova prova");
+  //send_command("localhost", "8888", "va bene funziona");
   yyparse();
 
   fclose(yyin);
@@ -93,7 +94,7 @@ void send_command(char * ip, char * port, char * command){
   system(string);
 }
 
-void open_server(char * port){
+void open_server_mac(char * port){
   char * string;
   asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"while true; do nc -l  %s; done\"\'", port );
   system(string);
