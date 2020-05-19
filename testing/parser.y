@@ -96,7 +96,7 @@ void send_command(char * ip, char * port, char * command){
 
 void open_server_mac(char * port){
   char * string;
-  asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"while true; do nc -l  %s; done\"\'", port );
+  asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"nc -lk %s\"\'", port );
   system(string);
 
 }
