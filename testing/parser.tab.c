@@ -70,15 +70,17 @@
 
   #define YYSTYPE char*
   #include <stdio.h>
+  #include <stdlib.h>
   #include <string.h>
   void yyerror(const char *s);
   FILE * out;
   int yylex();
   char * substring(char * s, int start, int end );
   void send_command(char * ip, char * port, char * command);
+  void open_server(char * port);
 
 
-#line 82 "parser.tab.c"
+#line 84 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -505,7 +507,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    18,    18,    19,    22,    23,    26,    27,    30,    31
+       0,    20,    20,    21,    24,    25,    28,    29,    32,    33
 };
 #endif
 
@@ -1295,31 +1297,31 @@ yyreduce:
   switch (yyn)
     {
   case 3:
-#line 19 "parser.y"
+#line 21 "parser.y"
                      { fprintf(out, "%s\n", yyvsp[-1]); }
-#line 1301 "parser.tab.c"
+#line 1303 "parser.tab.c"
     break;
 
   case 5:
-#line 23 "parser.y"
+#line 25 "parser.y"
                { asprintf(&yyval, "%s%s", yyvsp[-1], yyvsp[0]);}
-#line 1307 "parser.tab.c"
+#line 1309 "parser.tab.c"
     break;
 
   case 7:
-#line 27 "parser.y"
+#line 29 "parser.y"
             { asprintf(&yyval, "%s%s", yyvsp[-1], yyvsp[0]);}
-#line 1313 "parser.tab.c"
+#line 1315 "parser.tab.c"
     break;
 
   case 9:
-#line 31 "parser.y"
+#line 33 "parser.y"
               { asprintf(&yyval, "%s%s", yyvsp[-1], yyvsp[0]);}
-#line 1319 "parser.tab.c"
+#line 1321 "parser.tab.c"
     break;
 
 
-#line 1323 "parser.tab.c"
+#line 1325 "parser.tab.c"
 
       default: break;
     }
@@ -1551,7 +1553,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 35 "parser.y"
+#line 37 "parser.y"
 
 int main(int argc, char **argv)
 {
@@ -1582,8 +1584,10 @@ int main(int argc, char **argv)
       yyerror("Error on creating output file");
       return 1;
   }
-  //send_command("localhost", "6666", "ciao prova prova prova");
-  send_command("localhost", "6666", "ciao\nprova\nprova prova");
+  open_server("8888");
+  sleep(3);
+  send_command("localhost", "8888", "ciao\nprova\nprova prova");
+  send_command("localhost", "8888", "va bene funziona");
   yyparse();
 
   fclose(yyin);
@@ -1607,4 +1611,11 @@ void send_command(char * ip, char * port, char * command){
   char * string;
   asprintf(&string, "echo \"%s\" | nc %s %s ", command, ip, port );
   system(string);
+}
+
+void open_server(char * port){
+  char * string;
+  asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"while true; do nc -l  %s; done\"\'", port );
+  system(string);
+
 }

@@ -1,12 +1,14 @@
 %{
   #define YYSTYPE char*
   #include <stdio.h>
+  #include <stdlib.h>
   #include <string.h>
   void yyerror(const char *s);
   FILE * out;
   int yylex();
   char * substring(char * s, int start, int end );
   void send_command(char * ip, char * port, char * command);
+  void open_server(char * port);
 
 %}
 
@@ -62,8 +64,10 @@ int main(int argc, char **argv)
       yyerror("Error on creating output file");
       return 1;
   }
-  //send_command("localhost", "6666", "ciao prova prova prova");
-  send_command("localhost", "6666", "ciao\nprova\nprova prova");
+  open_server("8888");
+  sleep(3);
+  send_command("localhost", "8888", "ciao\nprova\nprova prova");
+  send_command("localhost", "8888", "va bene funziona");
   yyparse();
 
   fclose(yyin);
@@ -87,4 +91,11 @@ void send_command(char * ip, char * port, char * command){
   char * string;
   asprintf(&string, "echo \"%s\" | nc %s %s ", command, ip, port );
   system(string);
+}
+
+void open_server(char * port){
+  char * string;
+  asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"while true; do nc -l  %s; done\"\'", port );
+  system(string);
+
 }
