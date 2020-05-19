@@ -6,6 +6,7 @@
   FILE * out;
   int yylex();
   char * substring(char * s, int start, int end );
+  void send_command(char * ip, char * port, char * command);
 
 %}
 
@@ -61,7 +62,8 @@ int main(int argc, char **argv)
       yyerror("Error on creating output file");
       return 1;
   }
-
+  //send_command("localhost", "6666", "ciao prova prova prova");
+  send_command("localhost", "6666", "ciao\nprova\nprova prova");
   yyparse();
 
   fclose(yyin);
@@ -79,4 +81,10 @@ char * substring(char * s, int start, int end ){
   strncpy(result, s+start, l);
   result[l]='\0';
   return strdup(result);
+}
+
+void send_command(char * ip, char * port, char * command){
+  char * string;
+  asprintf(&string, "echo \"%s\" | nc %s %s ", command, ip, port );
+  system(string);
 }

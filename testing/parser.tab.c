@@ -75,9 +75,10 @@
   FILE * out;
   int yylex();
   char * substring(char * s, int start, int end );
+  void send_command(char * ip, char * port, char * command);
 
 
-#line 81 "parser.tab.c"
+#line 82 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -504,7 +505,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    17,    17,    18,    21,    22,    25,    26,    29,    30
+       0,    18,    18,    19,    22,    23,    26,    27,    30,    31
 };
 #endif
 
@@ -1294,31 +1295,31 @@ yyreduce:
   switch (yyn)
     {
   case 3:
-#line 18 "parser.y"
+#line 19 "parser.y"
                      { fprintf(out, "%s\n", yyvsp[-1]); }
-#line 1300 "parser.tab.c"
+#line 1301 "parser.tab.c"
     break;
 
   case 5:
-#line 22 "parser.y"
+#line 23 "parser.y"
                { asprintf(&yyval, "%s%s", yyvsp[-1], yyvsp[0]);}
-#line 1306 "parser.tab.c"
+#line 1307 "parser.tab.c"
     break;
 
   case 7:
-#line 26 "parser.y"
+#line 27 "parser.y"
             { asprintf(&yyval, "%s%s", yyvsp[-1], yyvsp[0]);}
-#line 1312 "parser.tab.c"
+#line 1313 "parser.tab.c"
     break;
 
   case 9:
-#line 30 "parser.y"
+#line 31 "parser.y"
               { asprintf(&yyval, "%s%s", yyvsp[-1], yyvsp[0]);}
-#line 1318 "parser.tab.c"
+#line 1319 "parser.tab.c"
     break;
 
 
-#line 1322 "parser.tab.c"
+#line 1323 "parser.tab.c"
 
       default: break;
     }
@@ -1550,7 +1551,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 34 "parser.y"
+#line 35 "parser.y"
 
 int main(int argc, char **argv)
 {
@@ -1581,7 +1582,8 @@ int main(int argc, char **argv)
       yyerror("Error on creating output file");
       return 1;
   }
-
+  //send_command("localhost", "6666", "ciao prova prova prova");
+  send_command("localhost", "6666", "ciao\nprova\nprova prova");
   yyparse();
 
   fclose(yyin);
@@ -1599,4 +1601,10 @@ char * substring(char * s, int start, int end ){
   strncpy(result, s+start, l);
   result[l]='\0';
   return strdup(result);
+}
+
+void send_command(char * ip, char * port, char * command){
+  char * string;
+  asprintf(&string, "echo \"%s\" | nc %s %s ", command, ip, port );
+  system(string);
 }
