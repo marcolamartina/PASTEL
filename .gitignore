@@ -59,7 +59,4 @@ dkms.conf
 
 # Binaries
 bin/*
-
-# Misc
-
 src/makefile
