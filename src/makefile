@@ -1,5 +1,9 @@
 Flex_src = lexer.l
 Bison_src = parser.y
+OS_NAME := $(shell uname -s | tr A-Z a-z)
+
+os:
+	@echo $(OS_NAME)
 
 parser.tab.c : $(Bison_src)
 	bison -d $^
@@ -9,7 +13,7 @@ compiler-lex.c : $(Flex_src)
 	mv lex.yy.c $@
 
 pcc : parser.tab.c compiler-lex.c utils.c
-	gcc -ll $^ -o pcc ;
+	if [[ "$(OS_NAME)" == "linux-gnu"* ]]; then gcc -lfl $^ -o pcc -lm; elif [[ "$(OS_NAME)" == "darwin"* ]]; then gcc -ll $^ -o pcc ; fi
 	mv parser.tab.c ../bin/;
 	mv compiler-lex.c ../bin/;
 	mv parser.tab.h ../bin/;
