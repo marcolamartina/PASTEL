@@ -4,6 +4,7 @@
 #  include <string.h>
 #  include <math.h>
 #  include "utils.h"
+int yyparse();
 
 /* symbol table */
 /* hash a symbol */
@@ -12,7 +13,7 @@ static unsigned symhash(char *sym)
   unsigned int hash = 0;
   unsigned c;
 
-  while(c = *sym++) hash = hash*9 ^ c;
+  while((c = *sym++)) hash = hash*9 ^ c;
 
   return hash;
 }
