@@ -1,45 +1,63 @@
-%option stack
-%x string_state
+/* recognize tokens for the calculator */
 
+%option noyywrap nodefault yylineno
 %{
-  #define YYSTYPE char*
-  #include "parser.tab.h"
-  #include <stdio.h>
+# include "utils.h"
+# include "parser.tab.h"
 %}
 
+/* float exponent */
+EXP	([Ee][-+]?[0-9]+)
+
 %%
+ /* single character ops */
+"+" |
+"-" |
+"*" |
+"/" |
+"=" |
+"|" |
+"," |
+";" |
+"(" |
+")"     { return yytext[0]; }
 
-"connect"/\(      { return CONNECT_FUN; }
-"disconnect"/\(   { return DISCONECT_FUN; }
-"send"/\(         { return SEND_FUN; }
-"receive"/\(      { return RECEIVE_FUN; }
-"string"  { return STRING_TYPE; }
-"integer" { return INTEGER_TYPE; }
-"real"    { return REAL_TYPE; }
-"device"  { return DEVICE_TYPE; }
-" in "      { return IN; }
-"while"/\(   { return WHILE; }
-"for"/\(     { return FOR; }
-[0-9]+\.[0-9]+ { /*yylval=atof(yytext);*/ return REAL_VAL; }
-[0-9]+         { /*yylval=atoi(yytext);*/ return INTEGER_VAL; }
-(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/(:[0-9]+) { yylval=strdup(yytext); return IP; }
-:[0-9]+ { yylval=strdup(yytext+1); return PORT;}
-"+"   { return PLUS; }
-"-"   { return MINUS; }
-"*"   { return MUL; }
-"/"   { return DIV; }
-"("   { return OP; }
-")"   { return CP; }
-"{"   { return OCB; }
-"}"   { return CCB; }
-";"   { return SEMICOLON; }
-","   { return COLON; }
-" "   {}
+ /* comparison ops */
+">"     { yylval.fn = 1; return CMP; }
+"<"     { yylval.fn = 2; return CMP; }
+"<>"    { yylval.fn = 3; return CMP; }
+"=="    { yylval.fn = 4; return CMP; }
+">="    { yylval.fn = 5; return CMP; }
+"<="    { yylval.fn = 6; return CMP; }
 
-\"                  {yy_push_state(string_state); return STRING_O;}
-<string_state>\"    {yy_pop_state(); return STRING_C;}
+ /* keywords */
 
-<*>"\n" {}
-<*>.    { yylval=strdup(yytext); return TEXT; }
+"if"    { return IF; }
+"then"  { return THEN; }
+"else"  { return ELSE; }
+"while" { return WHILE; }
+"do"    { return DO; }
+"let"   { return LET;}
 
+ /* built in functions */
+"sqrt"  { yylval.fn = B_sqrt; return FUNC; }
+"exp"   { yylval.fn = B_exp; return FUNC; }
+"log"   { yylval.fn = B_log; return FUNC; }
+"print" { yylval.fn = B_print; return FUNC; }
+
+ /* debug hack */
+"debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
+
+ /* names */
+[a-zA-Z][a-zA-Z0-9]*  { yylval.s = lookup(yytext); return NAME; }
+
+[0-9]+"."[0-9]*{EXP}? |
+"."?[0-9]+{EXP}? { yylval.d = atof(yytext); return NUMBER; }
+
+"//".*
+[ \t]   /* ignore white space */
+\\\n    printf("c> "); /* ignore line continuation */
+"\n"    { return EOL; }
+
+.	{ yyerror("Mystery character %c\n", *yytext); }
 %%

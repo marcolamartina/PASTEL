@@ -1,145 +1,87 @@
-%{
-  #define YYSTYPE char*
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <string.h>
-  void yyerror(const char *s);
-  FILE * out;
-  int yylex();
-  char * substring(char * s, int start, int end );
-  void send_command(char * ip, char * port, char * command);
-  void open_server_mac(char * port);
+/* calculator with AST */
 
+%{
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include "utils.h"
 %}
 
-%token TEXT
+%union {
+  struct ast *a;
+  double d;
+  struct symbol *s;		/* which symbol */
+  struct symlist *sl;
+  int fn;			/* which function */
+}
+
+/* declare tokens */
+%token <d> NUMBER
+%token <s> NAME
+%token <fn> FUNC
 %token EOL
-%token FOR WHILE
-%token STRING_TYPE
-%token INTEGER_TYPE
-%token REAL_TYPE
-%token DEVICE_TYPE
-%token REAL_VAL
-%token INTEGER_VAL
-%token IP
-%token PORT
-%token OP CP
-%token CONNECT_FUN DISCONECT_FUN
-%token SEND_FUN RECEIVE_FUN
-%token PLUS MINUS MUL DIV
-%token OCB CCB
-%token SEMICOLON COLON
-%token STRING_O STRING_C
-%token IN
 
-%define parse.error verbose
+%token IF THEN ELSE WHILE DO LET
+
+
+%nonassoc <fn> CMP
+%right '='
+%left '+' '-'
+%left '*' '/'
+%nonassoc '|' UMINUS
+
+%type <a> exp stmt list explist
+%type <sl> symlist
+
+%start calclist
 
 %%
 
-compiler: /* nothing */
-| compiler line { fprintf(out, "%s\n", $2); }
-| compiler multiline { fprintf(out, "%s\n", $2); }
+stmt: IF exp THEN list           { $$ = newflow('I', $2, $4, NULL); }
+   | IF exp THEN list ELSE list  { $$ = newflow('I', $2, $4, $6); }
+   | WHILE exp DO list           { $$ = newflow('W', $2, $4, NULL); }
+   | exp
 ;
 
-multiline: line
-| FOR OP testo IN list CP block { asprintf(&$$, "for %s in %s ", $3, $5); }
-| WHILE OP exp CP block { asprintf(&$$, "while %s ", $3);}
+list: /* nothing */ { $$ = NULL; }
+   | stmt ';' list { if ($3 == NULL)
+	                $$ = $1;
+                      else
+			$$ = newast('L', $1, $3);
+                    }
+   ;
+
+exp: exp CMP exp          { $$ = newcmp($2, $1, $3); }
+   | exp '+' exp          { $$ = newast('+', $1,$3); }
+   | exp '-' exp          { $$ = newast('-', $1,$3);}
+   | exp '*' exp          { $$ = newast('*', $1,$3); }
+   | exp '/' exp          { $$ = newast('/', $1,$3); }
+   | '|' exp              { $$ = newast('|', $2, NULL); }
+   | '(' exp ')'          { $$ = $2; }
+   | '-' exp %prec UMINUS { $$ = newast('M', $2, NULL); }
+   | NUMBER               { $$ = newnum($1); }
+   | FUNC '(' explist ')' { $$ = newfunc($1, $3); }
+   | NAME                 { $$ = newref($1); }
+   | NAME '=' exp         { $$ = newasgn($1, $3); }
+   | NAME '(' explist ')' { $$ = newcall($1, $3); }
 ;
 
-list: testo
+explist: exp
+ | exp ',' explist  { $$ = newast('L', $1, $3); }
+;
+symlist: NAME       { $$ = newsymlist($1, NULL); }
+ | NAME ',' symlist { $$ = newsymlist($1, $3); }
 ;
 
-block: multiline CCB
-| OCB multiline CCB {$$=$2; }
-| OCB CCB { asprintf(&$$, ""); }
-| OCB multiline block  { asprintf(&$$, "%s%s", $2, $3);}
-;
-
-line: exp SEMICOLON
-| exp line { asprintf(&$$, "%s%s", $1, $2);}
-| declaration SEMICOLON
-;
-
-
-exp: testo
-| exp exp { asprintf(&$$, "%s%s", $1, $2);}
-;
-
-declaration: REAL_TYPE testo {asprintf(&$$, "declaration of %s", $2);}
-| INTEGER_TYPE testo {asprintf(&$$, "declaration of %s", $2);}
-| STRING_TYPE testo {asprintf(&$$, "declaration of %s", $2);}
-| DEVICE_TYPE testo {asprintf(&$$, "declaration of %s", $2);}
-;
-
-
-
-testo: TEXT
-| testo testo { asprintf(&$$, "%s%s", $1, $2);}
-;
-
-
-%%
-int main(int argc, char **argv)
-{
-  extern FILE * yyin;
-  char * output_file_name="a.c";
-
-  if(argc>1){
-    if((strcmp(argv[1]+strlen(argv[1])-3,"pa")==0)){
-      fprintf(stderr, "Insert a .pa file");
-      return 1;
-    }else{
-      yyin=fopen(argv[1], "r");
-      asprintf(&output_file_name,"%s.c",substring(argv[1], 0, 3));
-      out = fopen(output_file_name, "w+");
+calclist: /* nothing */
+  | calclist stmt EOL {
+    if(debug) dumpast($2, 0);
+     printf("= %4.4g\n> ", eval($2));
+     treefree($2);
     }
-  }else{
-    yyin=stdin;
-    out=stdout;
-  }
+  | calclist LET NAME '(' symlist ')' '=' list EOL {
+                       dodef($3, $5, $8);
+                       printf("Defined %s\n> ", $3->name); }
 
-
-  if (!yyin){
-      yyerror("Error on opening source file");
-      return 1;
-  }
-
-  if (!out){
-      yyerror("Error on creating output file");
-      return 1;
-  }
-
-
-  yyparse();
-  fclose(yyin);
-  fclose(out);
-  /*char * command;
-  asprintf(&command,"make %s", substring(output_file_name,0,2));
-  system(command);*/
-  return 0;
-}
-
-void yyerror(const char *s){
-  fprintf(stderr, "error: %s\n", s);
-}
-
-char * substring(char * s, int start, int end ){
-  int l=strlen(s)-start-end;
-  char result[l];
-  strncpy(result, s+start, l);
-  result[l]='\0';
-  return strdup(result);
-}
-
-void send_command(char * ip, char * port, char * command){
-  char * string;
-  asprintf(&string, "echo \"%s\" | nc %s %s ", command, ip, port );
-  system(string);
-}
-
-void open_server_mac(char * port){
-  char * string;
-  asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"nc -lk %s\"\'", port );
-  system(string);
-
-}
+  | calclist error EOL { yyerrok; printf("> "); }
+ ;
+%%

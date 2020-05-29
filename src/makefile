@@ -8,7 +8,7 @@ compiler-lex.c : $(Flex_src)
 	flex $^;
 	mv lex.yy.c $@
 
-pcc : parser.tab.c compiler-lex.c
+pcc : parser.tab.c compiler-lex.c utils.c
 	gcc -ll $^ -o pcc;
 	mv *.c ../bin/;
 	mv *.h ../bin/;
