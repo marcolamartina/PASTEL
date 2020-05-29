@@ -56,3 +56,6 @@ dkms.conf
 *.log
 *.aux
 *.synctex.gz
+
+# Binaries
+bin/*

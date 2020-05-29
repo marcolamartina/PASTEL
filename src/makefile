@@ -9,7 +9,7 @@ compiler-lex.c : $(Flex_src)
 	mv lex.yy.c $@
 
 pcc : parser.tab.c compiler-lex.c utils.c
-	gcc -ll $^ -o pcc;
+	gcc -lfl $^ -o pcc -lm;
 	mv parser.tab.c ../bin/;
 	mv compiler-lex.c ../bin/;
 	mv parser.tab.h ../bin/;
