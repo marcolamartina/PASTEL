@@ -2,7 +2,7 @@
 struct symbol {		/* a variable name */
   char *name;
   char type;
-  void* value;
+  double value;
   struct ast *func;	/* stmt for the function */
   struct symlist *syms; /* list of dummy args */
 };
@@ -12,6 +12,7 @@ struct symbol {		/* a variable name */
 struct symbol symtab[NHASH];
 
 struct symbol *lookup(char*);
+struct symbol *insert(char*, char);
 
 /* list of symbols, for an argument list */
 struct symlist {

@@ -8,9 +8,11 @@ int yylex();
 %}
 
 %union {
+  struct ast *a;
   double d;
   int i;
-  char * s;
+  char * st;
+  struct symbol *s;		/* which symbol */
   char c;
 }
 
@@ -22,10 +24,11 @@ int yylex();
 %token DEVICE_TYPE
 %token <d> REAL_VAL
 %token <i> INTEGER_VAL
-%token <s> STRING_VAL
-%token <s> NAME
+%token <st> STRING_VAL
+%token <st> NAME
 
 %type <c> type
+%type <a> exp stmt list explist
 
 %start program
 
@@ -34,7 +37,6 @@ int yylex();
 program: /* nothing */
   | program stmt ';' { eval($2);}
   | program DEF NAME '(' symlist ')' '{' list '}' { printf("Defined %s\n> ", $3); }
-  | program error ';' { yyerrok; printf("> "); }
   | program error '\n' { yyerrok; printf("> "); }
  ;
 
@@ -54,14 +56,14 @@ list: /* nothing */ { $$ = NULL; }
 
 exp: '(' exp ')'          { $$ = $2; }
    | type NAME  { insert($2,$1);}
-   | NAME '=' value
-   | NAME '(' explist ')'
+   | NAME '=' value { }
+   | NAME '(' explist ')' { }
 ;
 
-type: STRING_TYPE { $$='s'}
-  | INTEGER_TYPE { $$='i'}
-  | REAL_TYPE { $$='r'}
-  | DEVICE_TYPE { $$='d'}
+type: STRING_TYPE { $$='s';}
+  | INTEGER_TYPE { $$='i';}
+  | REAL_TYPE { $$='r';}
+  | DEVICE_TYPE { $$='d';}
 ;
 
 value: STRING_VAL
@@ -69,14 +71,14 @@ value: STRING_VAL
   | REAL_VAL
 ;
 
-explist: NAME
- | NAME ',' explist
- | value
- | value ',' explist
+explist: NAME { }
+ | NAME ',' explist { }
+ | value { }
+ | value ',' explist { }
 ;
 
-symlist: NAME
- | NAME ',' symlist
+symlist: NAME { }
+ | NAME ',' symlist { }
 ;
 
 

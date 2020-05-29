@@ -37,7 +37,7 @@ struct symbol * insert(char* sym, char type){
   while(--scount >= 0) {
     if((sp->name && !strcmp(sp->name, sym))||(!sp->name)) {		/* new entry */
       sp->name = strdup(sym);
-      sp->value = NULL;
+      sp->value = 0;
       sp->func = NULL;
       sp->syms = NULL;
       sp->type = type;
