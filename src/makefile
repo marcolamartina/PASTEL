@@ -10,8 +10,9 @@ compiler-lex.c : $(Flex_src)
 
 pcc : parser.tab.c compiler-lex.c utils.c
 	gcc -ll $^ -o pcc;
-	mv *.c ../bin/;
-	mv *.h ../bin/;
+	mv parser.tab.c ../bin/;
+	mv compiler-lex.c ../bin/;
+	mv parser.tab.h ../bin/;
 	mv pcc ../bin/;
 
 clean:
