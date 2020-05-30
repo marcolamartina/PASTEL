@@ -291,6 +291,19 @@ struct val * division(struct val * a, struct val * b){
   return result;
 }
 
+struct val * change_sign(struct val * a){
+  struct val * result=malloc(sizeof(struct val *));
+  result->type=typeof_v(a);
+  switch (typeof_v(a)) {
+    case 'i': result->int_val=-(a->int_val);
+              break;
+    case 'r': result->real_val=-(a->real_val);
+              break;
+    default: yyerror("change of sign not supported for this types (%c)", typeof_v(a)); break;
+  }
+  return result;
+}
+
 struct val * eval(struct ast *a){
   struct val *v;
 
@@ -324,8 +337,9 @@ struct val * eval(struct ast *a){
   case '-': v = sub(eval(a->l),eval(a->r)); break;
   case '*': v = mul(eval(a->l),eval(a->r)); break;
   case '/': v = division(eval(a->l),eval(a->r)); break;
+  case 'M': v = change_sign(eval(a->l)); break;
   /*case '|': v = fabs(eval(a->l)); break;
-  case 'M': v = -eval(a->l); break;
+
 */
     /* comparisons */
   /*case '1': v = (eval(a->l) > eval(a->r))? 1 : 0; break;

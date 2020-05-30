@@ -22,6 +22,11 @@ int yylex();
 %token <c> TYPE
 %token <v> VALUE
 
+%right '='
+%left '+' '-'
+%left '*' '/'
+%nonassoc '|' UMINUS
+
 %type <a> exp stmt list explist decl
 
 %start program
@@ -55,6 +60,7 @@ exp: '(' exp ')'          { $$ = $2; }
    | exp '-' exp          { $$ = newast('-', $1,$3); }
    | exp '*' exp          { $$ = newast('*', $1,$3); }
    | exp '/' exp          { $$ = newast('/', $1,$3); }
+   | '-' exp %prec UMINUS { $$ = newast('M', $2, NULL); }
    | NAME                 { $$ = newref($1); }
 ;
 
