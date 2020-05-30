@@ -189,6 +189,17 @@ char typeof_s(struct symbol * s){
   return s->value->type;
 }
 
+char * toString(struct val * v){
+  char * result;
+  switch (typeof_v(v)) {
+    case 'i': asprintf(&result, "%d", v->int_val); break;
+    case 'r': asprintf(&result, "%f", v->real_val); break;
+    case 's': result= v->string_val; break;
+    default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); break;
+  }
+  return result;
+}
+
 struct val * sum(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val *));
   if(typeof_v(a)==typeof_v(b)){
@@ -197,10 +208,10 @@ struct val * sum(struct val * a, struct val * b){
       case 'i': result->int_val=a->int_val+b->int_val; break;
       case 's': asprintf(&result->string_val, "%s%s", a->string_val, b->string_val); break;
       case 'r': result->real_val=a->real_val+b->real_val; break;
-      default: yyerror("Operation not supported"); break;
+      default: yyerror("addiction not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else{
-    yyerror("Incompatible type");
+    yyerror("addiction of incompatible types (%c+%c)", typeof_v(a), typeof_v(b));
   }
   return result;
 }
@@ -212,10 +223,10 @@ struct val * sub(struct val * a, struct val * b){
     switch (typeof_v(a)) {
       case 'i': result->int_val=a->int_val-b->int_val; break;
       case 'r': result->real_val=a->real_val-b->real_val; break;
-      default: yyerror("Operation not supported"); break;
+      default: yyerror("subtraction not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else{
-    yyerror("Incompatible type");
+    yyerror("subtraction of incompatible types (%c-%c)", typeof_v(a), typeof_v(b));
   }
   return result;
 }
@@ -227,19 +238,30 @@ struct val * mul(struct val * a, struct val * b){
     switch (typeof_v(a)) {
       case 'i': result->int_val=a->int_val*b->int_val; break;
       case 'r': result->real_val=a->real_val*b->real_val; break;
-      default: yyerror("Operation not supported"); break;
+      default: yyerror("multiplication not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else if(typeof_v(a)=='s' && typeof_v(b)=='i'){
     if(b->int_val>0){
+      result->type=typeof_v(a);
       asprintf(&result->string_val, "%s", a->string_val);
       for(int i=0; i<b->int_val-1; i++){
-        asprintf(&result->string_val, "%s%s", result->string_val, a->string_val);
+        asprintf(&(result->string_val), "%s%s", result->string_val, a->string_val);
       }
     }else{
-      yyerror("String multiply allowed only for positive integer");
+      yyerror("string multiply allowed only for positive integer");
+    }
+  }else if(typeof_v(b)=='s' && typeof_v(a)=='i'){
+    result->type=typeof_v(b);
+    if(a->int_val>0){
+      asprintf(&result->string_val, "%s", b->string_val);
+      for(int i=0; i<a->int_val-1; i++){
+        asprintf(&result->string_val, "%s%s", result->string_val, b->string_val);
+      }
+    }else{
+      yyerror("string multiply allowed only for positive integer");
     }
   }else{
-    yyerror("Incompatible type");
+    yyerror("multiplication of incompatible types (%c*%c)", typeof_v(a), typeof_v(b));
   }
   return result;
 }
@@ -252,19 +274,19 @@ struct val * division(struct val * a, struct val * b){
       case 'i': if(b->int_val!=0){
                   result->int_val=a->int_val/b->int_val;
                 }else{
-                  yyerror("Integer division for zero");
+                  yyerror("integer division for zero");
                 }
                 break;
       case 'r': if(b->real_val!=0){
                   result->real_val=a->real_val/b->real_val;
                 }else{
-                  yyerror("Real division for zero");
+                  yyerror("real division for zero");
                 }
                 break;
-      default: yyerror("Operation not supported"); break;
+      default: yyerror("division not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else{
-    yyerror("Incompatible type");
+    yyerror("division of incompatible types (%c/%c)", typeof_v(a), typeof_v(b));
   }
   return result;
 }
@@ -293,7 +315,7 @@ struct val * eval(struct ast *a){
       if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
         v = ((struct symasgn *)a)->s->value = eval(((struct symasgn *)a)->v);
       }else{
-        yyerror("Incompatible type");
+        yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symasgn *)a)->s), typeof_v(v) );
       }
       break;
 
@@ -360,7 +382,7 @@ static struct val * callbuiltin(struct fncall *f) {
  case B_log:
    result->real_val= log(v->real_val);
  case B_print:
-   printf("= %4.4g\n", v->real_val);
+   printf("= %s\n", toString(v));
    result= v;
  default:
    yyerror("Unknown built-in function %d", functype);
@@ -440,10 +462,16 @@ void dumpast(struct ast *a, int level){
 
   switch(a->nodetype) {
     /* constant */
-  case 'K': printf("value %4.4g\n", ((struct value_val *)a)->v->real_val); break;
+  case 'K': printf("value %s\n", toString(((struct value_val *)a)->v)); break;
 
     /* name reference */
-  case 'N': printf("ref %s\n", ((struct symref *)a)->s->name); break;
+  case 'N': printf("ref %s", ((struct symref *)a)->s->name);
+            if(((struct symref *)a)->s->value){
+              printf("=%s\n", toString(((struct symref *)a)->s->value));
+            }else{
+              printf("\n");
+            }
+            break;
 
   /* name declaration */
   case 'D': printf("decl %s\n", ((struct symref *)a)->s->name); break;
