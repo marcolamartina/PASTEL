@@ -189,6 +189,86 @@ char typeof_s(struct symbol * s){
   return s->value->type;
 }
 
+struct val * sum(struct val * a, struct val * b){
+  struct val * result=malloc(sizeof(struct val *));
+  if(typeof_v(a)==typeof_v(b)){
+    result->type=typeof_v(a);
+    switch (typeof_v(a)) {
+      case 'i': result->int_val=a->int_val+b->int_val; break;
+      case 's': asprintf(&result->string_val, "%s%s", a->string_val, b->string_val); break;
+      case 'r': result->real_val=a->real_val+b->real_val; break;
+      default: yyerror("Operation not supported"); break;
+    }
+  }else{
+    yyerror("Incompatible type");
+  }
+  return result;
+}
+
+struct val * sub(struct val * a, struct val * b){
+  struct val * result=malloc(sizeof(struct val *));
+  if(typeof_v(a)==typeof_v(b)){
+    result->type=typeof_v(a);
+    switch (typeof_v(a)) {
+      case 'i': result->int_val=a->int_val-b->int_val; break;
+      case 'r': result->real_val=a->real_val-b->real_val; break;
+      default: yyerror("Operation not supported"); break;
+    }
+  }else{
+    yyerror("Incompatible type");
+  }
+  return result;
+}
+
+struct val * mul(struct val * a, struct val * b){
+  struct val * result=malloc(sizeof(struct val *));
+  if(typeof_v(a)==typeof_v(b)){
+    result->type=typeof_v(a);
+    switch (typeof_v(a)) {
+      case 'i': result->int_val=a->int_val*b->int_val; break;
+      case 'r': result->real_val=a->real_val*b->real_val; break;
+      default: yyerror("Operation not supported"); break;
+    }
+  }else if(typeof_v(a)=='s' && typeof_v(b)=='i'){
+    if(b->int_val>0){
+      asprintf(&result->string_val, "%s", a->string_val);
+      for(int i=0; i<b->int_val-1; i++){
+        asprintf(&result->string_val, "%s%s", result->string_val, a->string_val);
+      }
+    }else{
+      yyerror("String multiply allowed only for positive integer");
+    }
+  }else{
+    yyerror("Incompatible type");
+  }
+  return result;
+}
+
+struct val * division(struct val * a, struct val * b){
+  struct val * result=malloc(sizeof(struct val *));
+  if(typeof_v(a)==typeof_v(b)){
+    result->type=typeof_v(a);
+    switch (typeof_v(a)) {
+      case 'i': if(b->int_val!=0){
+                  result->int_val=a->int_val/b->int_val;
+                }else{
+                  yyerror("Integer division for zero");
+                }
+                break;
+      case 'r': if(b->real_val!=0){
+                  result->real_val=a->real_val/b->real_val;
+                }else{
+                  yyerror("Real division for zero");
+                }
+                break;
+      default: yyerror("Operation not supported"); break;
+    }
+  }else{
+    yyerror("Incompatible type");
+  }
+  return result;
+}
+
 struct val * eval(struct ast *a){
   struct val *v;
 
@@ -213,16 +293,16 @@ struct val * eval(struct ast *a){
       if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
         v = ((struct symasgn *)a)->s->value = eval(((struct symasgn *)a)->v);
       }else{
-        yyerror("Mismatched types\n");
+        yyerror("Incompatible type");
       }
       break;
 
     /* expressions */
-  /*case '+': v = eval(a->l) + eval(a->r); break;
-  case '-': v = eval(a->l) - eval(a->r); break;
-  case '*': v = eval(a->l) * eval(a->r); break;
-  case '/': v = eval(a->l) / eval(a->r); break;
-  case '|': v = fabs(eval(a->l)); break;
+  case '+': v = sum(eval(a->l),eval(a->r)); break;
+  case '-': v = sub(eval(a->l),eval(a->r)); break;
+  case '*': v = mul(eval(a->l),eval(a->r)); break;
+  case '/': v = division(eval(a->l),eval(a->r)); break;
+  /*case '|': v = fabs(eval(a->l)); break;
   case 'M': v = -eval(a->l); break;
 */
     /* comparisons */

@@ -58,10 +58,16 @@ list: /* nothing */ { $$ = NULL; }
 exp: '(' exp ')'          { $$ = $2; }
    | NAME '(' explist ')' { }
    | value { $$=newvalue($1);}
+   | exp '+' exp          { $$ = newast('+', $1,$3); }
+   | exp '-' exp          { $$ = newast('-', $1,$3);}
+   | exp '*' exp          { $$ = newast('*', $1,$3); }
+   | exp '/' exp          { $$ = newast('/', $1,$3); }
+   | NAME                 { $$ = newref($1); }
 ;
 
 decl: type NAME  { $$=newdecl($2,$1); }
-| NAME '=' exp   { $$=newasgn($1,$3);}
+| NAME '=' exp   { $$=newasgn($1,$3); }
+
 ;
 
 type: STRING_TYPE { $$='s';}
