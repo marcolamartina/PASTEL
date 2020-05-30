@@ -33,22 +33,22 @@
 " in "  { return IN; }
 "def"   { return DEF; }
 "string"  { return STRING_TYPE; }
-"integer" { return INTEGER_TYPE; }
+"int"     { return INTEGER_TYPE; }
 "real"    { return REAL_TYPE; }
 "device"  { return DEVICE_TYPE; }
 
  /* numbers */
-[0-9]+\.[0-9]+ { yylval.d=atof(yytext); return REAL_VAL; }
-[0-9]+         { yylval.i=atoi(yytext); return INTEGER_VAL; }
+[0-9]+\.[0-9]+ { yylval.v=malloc(sizeof(struct val)); yylval.v->real_val=atof(yytext); yylval.v->type='r'; return REAL_VAL; }
+[0-9]+         { yylval.v=malloc(sizeof(struct val)); yylval.v->int_val=atoi(yytext); yylval.v->type='i'; return INTEGER_VAL; }
 
  /* strings */
-\"                  {yy_push_state(string_state); }
-<string_state>\"    {yy_pop_state(); }
-<string_state>[^\"]* {yylval.st=strdup(yytext); return STRING_VAL;}
+\"                    {yy_push_state(string_state); }
+<string_state>\"      {yy_pop_state(); }
+<string_state>[^\"]*  {yylval.v=malloc(sizeof(struct val)); yylval.v->string_val=strdup(yytext); yylval.v->type='s'; return STRING_VAL;}
 
 
  /* names */
-[a-zA-Z_][a-zA-Z0-9_]*  { yylval.st = strdup(yytext); return NAME; }
+[a-zA-Z_][a-zA-Z0-9_]*  { yylval.s = lookup(yytext); return NAME; }
 
 
 "//".*  /* ignore comments */

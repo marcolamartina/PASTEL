@@ -1,10 +1,17 @@
 /* symbol table */
 struct symbol {		/* a variable name */
   char *name;
-  char type;
-  double value;
+  struct val *value;
   struct ast *func;	/* stmt for the function */
   struct symlist *syms; /* list of dummy args */
+};
+
+struct val {
+  char type;
+  char* string_val;
+  int int_val;
+  double real_val;
+  char * device_val;
 };
 
 /* simple symtab of fixed size */
@@ -12,7 +19,6 @@ struct symbol {		/* a variable name */
 struct symbol symtab[NHASH];
 
 struct symbol *lookup(char*);
-struct symbol *insert(char*, char);
 
 /* list of symbols, for an argument list */
 struct symlist {
@@ -72,9 +78,9 @@ struct flow {
   struct ast *el;		/* optional else list */
 };
 
-struct numval {
+struct value_val {
   int nodetype;			/* type K */
-  double number;
+  struct val * v;
 };
 
 struct symref {
@@ -94,15 +100,16 @@ struct ast *newcmp(int cmptype, struct ast *l, struct ast *r);
 struct ast *newfunc(int functype, struct ast *l);
 struct ast *newcall(struct symbol *s, struct ast *l);
 struct ast *newref(struct symbol *s);
+struct ast *newdecl(struct symbol *s, char type);
 struct ast *newasgn(struct symbol *s, struct ast *v);
-struct ast *newnum(double d);
+struct ast *newvalue(struct val *v);
 struct ast *newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *tr);
 
 /* define a function */
 void dodef(struct symbol *name, struct symlist *syms, struct ast *stmts);
 
 /* evaluate an AST */
-double eval(struct ast *);
+struct val * eval(struct ast *);
 
 /* delete and free an AST */
 void treefree(struct ast *);
