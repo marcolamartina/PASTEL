@@ -438,6 +438,7 @@ void yyerror(char *s, ...){
   fprintf(stderr, "%d: error: ", yylineno);
   vfprintf(stderr, s, ap);
   fprintf(stderr, "\n");
+  //exit(1);
 }
 
 int
