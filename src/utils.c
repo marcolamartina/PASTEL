@@ -333,6 +333,21 @@ struct val * change_sign(struct val * a){
   return result;
 }
 
+int compare(struct val * a, struct val * b){
+  int result;
+  if(typeof_v(a)==typeof_v(b)){
+    switch (typeof_v(a)) {
+      case 'i': result=a->int_val-b->int_val; break;
+      case 'r': result=ceil(a->real_val-b->real_val); break;
+      case 's': result=strcmp(a->string_val,b->string_val); break;
+      default: yyerror("comparison not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
+    }
+  }else{
+    yyerror("comparison of incompatible types (%c-%c)", typeof_v(a), typeof_v(b));
+  }
+  return result;
+}
+
 struct val * eval(struct ast *a){
   struct val *v;
 
@@ -370,14 +385,14 @@ struct val * eval(struct ast *a){
   case '/': v = division(eval(a->l),eval(a->r)); break;
   case 'M': v = change_sign(eval(a->l)); break;
 
-    /* comparisons *//*
-  case '1': v = compare((eval(a->l), eval(a->r)))>0; break;
-  case '2': v = compare((eval(a->l), eval(a->r)))<0; break;
-  case '3': v = compare((eval(a->l), eval(a->r)))!=0; break;
-  case '4': v = compare((eval(a->l), eval(a->r)))==0; break;
-  case '5': v = compare((eval(a->l), eval(a->r)))>=0; break;
-  case '6': v = compare((eval(a->l), eval(a->r)))<=0; break;
-*/
+    /* comparisons */
+  case '1': v = new_int(compare(eval(a->l), eval(a->r))>0); break;
+  case '2': v = new_int(compare(eval(a->l), eval(a->r))<0); break;
+  case '3': v = new_int(compare(eval(a->l), eval(a->r))!=0); break;
+  case '4': v = new_int(compare(eval(a->l), eval(a->r))==0); break;
+  case '5': v = new_int(compare(eval(a->l), eval(a->r))>=0); break;
+  case '6': v = new_int(compare(eval(a->l), eval(a->r))<=0); break;
+
   /* control flow */
   /* null if/else/do expressions allowed in the grammar, so check for them */
   case 'I':

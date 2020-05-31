@@ -22,6 +22,7 @@ int yylex();
 %token <c> TYPE
 %token <v> VALUE
 
+%nonassoc <fn> CMP
 %right '='
 %left '+' '-'
 %left '*' '/'
@@ -62,6 +63,7 @@ exp: '(' exp ')'          { $$ = $2; }
    | exp '/' exp          { $$ = newast('/', $1,$3); }
    | '-' exp %prec UMINUS { $$ = newast('M', $2, NULL); }
    | NAME                 { $$ = newref($1); }
+   | exp CMP exp          { $$ = newcmp($2, $1, $3); }
 ;
 
 decl: TYPE NAME  { $$=newdecl($2,$1); }
