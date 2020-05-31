@@ -333,15 +333,19 @@ struct val * change_sign(struct val * a){
   return result;
 }
 
-int compare(struct val * a, struct val * b){
-  int result;
+double compare(struct val * a, struct val * b){
+  double result;
   if(typeof_v(a)==typeof_v(b)){
     switch (typeof_v(a)) {
       case 'i': result=a->int_val-b->int_val; break;
-      case 'r': result=ceil(a->real_val-b->real_val); break;
+      case 'r': result=a->real_val-b->real_val; break;
       case 's': result=strcmp(a->string_val,b->string_val); break;
       default: yyerror("comparison not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
+  }else if(typeof_v(a)=='i'&&typeof_v(b)=='r'){
+    result=a->int_val-b->real_val;
+  }else if(typeof_v(a)=='r'&&typeof_v(b)=='i'){
+    result=a->real_val-b->int_val;
   }else{
     yyerror("comparison of incompatible types (%c-%c)", typeof_v(a), typeof_v(b));
   }
