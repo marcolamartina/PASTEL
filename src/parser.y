@@ -39,19 +39,19 @@ program: /* nothing */
   | program error '\n' { yyerrok; printf("> "); }
  ;
 
-stmt: IF '(' exp ')' '{' list '}'   { }
-   | IF '(' exp ')' '{' list '}' ELSE '{' list '}'  { }
-   | WHILE '(' exp ')' '{' list '}'   { }
+stmt: IF '(' exp ')' '{' list '}'                   { $$ = newflow('I', $3, $6, NULL); }
+   | IF '(' exp ')' '{' list '}' ELSE '{' list '}'  { $$ = newflow('I', $3, $6, $10); }
+   | WHILE '(' exp ')' '{' list '}'                 { $$ = newflow('W', $3, $6, NULL);}
    | exp ';'
    | decl ';'
 ;
 
 list: /* nothing */ { $$ = NULL; }
-   | stmt ';' list { if ($3 == NULL)
-	                     $$ = $1;
-                     else
-			                 $$ = $1;
-                    }
+   | stmt list { if ($2 == NULL)
+	                 $$ = $1;
+                 else
+			             $$ = newast('L', $1, $2);
+                }
    ;
 
 exp: '(' exp ')'          { $$ = $2; }
