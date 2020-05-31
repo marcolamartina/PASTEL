@@ -11,7 +11,7 @@ struct val {
   char* string_val;
   int int_val;
   double real_val;
-  char * device_val;
+  unsigned short port_val;
 };
 
 /* simple symtab of fixed size */

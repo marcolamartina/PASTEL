@@ -126,8 +126,12 @@ struct ast * newdecl(struct symbol *s, char type){
   }
   a->nodetype = 'D';
   a->s = s;
-  a->s->value->type = type ;
-  return (struct ast *)a;
+	if(a->s->value->type != 'u'){
+		yyerror("%s already has type '%c'", a->s->name, a->s->value->type);
+	} else {
+			a->s->value->type = type ;
+	}
+	return (struct ast *)a;
 }
 
 struct ast * newasgn(struct symbol *s, struct ast *v){
@@ -196,6 +200,8 @@ char * toString(struct val * v){
     case 'i': asprintf(&result, "%d", v->int_val); break;
     case 'r': asprintf(&result, "%f", v->real_val); break;
     case 's': result= v->string_val; break;
+		case 'a': result= v->string_val; break;					//IP address
+		case 'd': asprintf(&result, "%s:%hu - %sconnected", v->string_val, v->port_val, (v->int_val != -1 ? "":"not " )); break;
 		case 'u': yyerror("Cannot use a variable before type declaration"); break;
     default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); break;
   }
