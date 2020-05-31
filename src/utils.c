@@ -28,6 +28,7 @@ struct symbol * lookup(char* sym){
     if(!sp->name) {		/* new entry */
       sp->name = strdup(sym);
       sp->value = malloc(sizeof(struct val));
+			sp->value->type = 'u';
       sp->func = NULL;
       sp->syms = NULL;
       return sp;
@@ -195,6 +196,7 @@ char * toString(struct val * v){
     case 'i': asprintf(&result, "%d", v->int_val); break;
     case 'r': asprintf(&result, "%f", v->real_val); break;
     case 's': result= v->string_val; break;
+		case 'u': yyerror("Cannot use a variable before type declaration"); break;
     default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); break;
   }
   return result;
@@ -325,7 +327,9 @@ struct val * eval(struct ast *a){
     /* assignment */
   case '=':
       v=eval(((struct symasgn *)a)->v);
-      if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
+			if(typeof_s(((struct symasgn *)a)->s) == 'u'){
+				yyerror("Variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
+			} else if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
         v = ((struct symasgn *)a)->s->value = eval(((struct symasgn *)a)->v);
       }else{
         yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symasgn *)a)->s), typeof_v(v) );
