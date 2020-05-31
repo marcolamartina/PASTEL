@@ -209,7 +209,7 @@ char * toString(struct val * v){
 }
 
 struct val * sum(struct val * a, struct val * b){
-  struct val * result=malloc(sizeof(struct val *));
+  struct val * result=malloc(sizeof(struct val));
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -225,7 +225,7 @@ struct val * sum(struct val * a, struct val * b){
 }
 
 struct val * sub(struct val * a, struct val * b){
-  struct val * result=malloc(sizeof(struct val *));
+  struct val * result=malloc(sizeof(struct val));
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -240,7 +240,7 @@ struct val * sub(struct val * a, struct val * b){
 }
 
 struct val * mul(struct val * a, struct val * b){
-  struct val * result=malloc(sizeof(struct val *));
+  struct val * result=malloc(sizeof(struct val));
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -275,7 +275,7 @@ struct val * mul(struct val * a, struct val * b){
 }
 
 struct val * division(struct val * a, struct val * b){
-  struct val * result=malloc(sizeof(struct val *));
+  struct val * result=malloc(sizeof(struct val));
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -299,8 +299,29 @@ struct val * division(struct val * a, struct val * b){
   return result;
 }
 
+struct val * new_real(double a){
+  struct val * result=malloc(sizeof(struct val));
+  result->type='r';
+  result->real_val=a;
+  return result;
+}
+
+struct val * new_int(int a){
+  struct val * result=malloc(sizeof(struct val));
+  result->type='i';
+  result->int_val=a;
+  return result;
+}
+
+struct val * new_string(char * a){
+  struct val * result=malloc(sizeof(struct val));
+  result->type='s';
+  result->string_val=strdup(a);
+  return result;
+}
+
 struct val * change_sign(struct val * a){
-  struct val * result=malloc(sizeof(struct val *));
+  struct val * result=malloc(sizeof(struct val));
   result->type=typeof_v(a);
   switch (typeof_v(a)) {
     case 'i': result->int_val=-(a->int_val);
@@ -334,9 +355,9 @@ struct val * eval(struct ast *a){
   case '=':
       v=eval(((struct symasgn *)a)->v);
 			if(typeof_s(((struct symasgn *)a)->s) == 'u'){
-				yyerror("Variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
+				yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
 			} else if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
-        v = ((struct symasgn *)a)->s->value = eval(((struct symasgn *)a)->v);
+        ((struct symasgn *)a)->s->value = v;
       }else{
         yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symasgn *)a)->s), typeof_v(v) );
       }
@@ -348,16 +369,14 @@ struct val * eval(struct ast *a){
   case '*': v = mul(eval(a->l),eval(a->r)); break;
   case '/': v = division(eval(a->l),eval(a->r)); break;
   case 'M': v = change_sign(eval(a->l)); break;
-  /*case '|': v = fabs(eval(a->l)); break;
 
-*/
-    /* comparisons */
-  /*case '1': v = (eval(a->l) > eval(a->r))? 1 : 0; break;
-  case '2': v = (eval(a->l) < eval(a->r))? 1 : 0; break;
-  case '3': v = (eval(a->l) != eval(a->r))? 1 : 0; break;
-  case '4': v = (eval(a->l) == eval(a->r))? 1 : 0; break;
-  case '5': v = (eval(a->l) >= eval(a->r))? 1 : 0; break;
-  case '6': v = (eval(a->l) <= eval(a->r))? 1 : 0; break;
+    /* comparisons *//*
+  case '1': v = compare((eval(a->l), eval(a->r)))>0; break;
+  case '2': v = compare((eval(a->l), eval(a->r)))<0; break;
+  case '3': v = compare((eval(a->l), eval(a->r)))!=0; break;
+  case '4': v = compare((eval(a->l), eval(a->r)))==0; break;
+  case '5': v = compare((eval(a->l), eval(a->r)))>=0; break;
+  case '6': v = compare((eval(a->l), eval(a->r)))<=0; break;
 */
   /* control flow */
   /* null if/else/do expressions allowed in the grammar, so check for them */

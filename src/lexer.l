@@ -38,13 +38,13 @@
 "device"  { yylval.c='d'; return TYPE; }
 
  /* numbers */
-[0-9]+\.[0-9]+ { yylval.v=malloc(sizeof(struct val)); yylval.v->real_val=atof(yytext); yylval.v->type='r'; return VALUE; }
-[0-9]+         { yylval.v=malloc(sizeof(struct val)); yylval.v->int_val=atoi(yytext); yylval.v->type='i'; return VALUE; }
+[0-9]+\.[0-9]+ { yylval.v=new_real(atof(yytext)); return VALUE; }
+[0-9]+         { yylval.v=new_int(atoi(yytext)); return VALUE; }
 
  /* strings */
 \"                    {yy_push_state(string_state); }
 <string_state>\"      {yy_pop_state(); }
-<string_state>[^\"]*  {yylval.v=malloc(sizeof(struct val)); yylval.v->string_val=strdup(yytext); yylval.v->type='s'; return VALUE;}
+<string_state>[^\"]*  {yylval.v=new_string(yytext); return VALUE;}
 
 
  /* names */

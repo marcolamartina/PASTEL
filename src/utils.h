@@ -120,3 +120,16 @@ void yyerror(char *s, ...);
 
 extern int debug;
 void dumpast(struct ast *a, int level);
+
+char typeof_v(struct val * v);
+char typeof_s(struct symbol * s);
+char * toString(struct val * v);
+struct val * sum(struct val * a, struct val * b);
+struct val * sub(struct val * a, struct val * b);
+struct val * mul(struct val * a, struct val * b);
+struct val * division(struct val * a, struct val * b);
+struct val * new_real(double a);
+struct val * new_int(int a);
+struct val * new_string(char * a);
+struct val * change_sign(struct val * a);
+struct val * eval(struct ast *a);
