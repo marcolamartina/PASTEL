@@ -35,7 +35,7 @@ int yylex();
 %%
 
 program: /* nothing */
-  | program stmt { if(debug) dumpast($2, 0); eval($2);}
+  | program stmt { if(debug) dumpast($2, 0); eval($2); treefree($2);}
   | program error '\n' { yyerrok; printf("> "); }
  ;
 

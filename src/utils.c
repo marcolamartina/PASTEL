@@ -28,6 +28,7 @@ struct symbol * lookup(char* sym){
     if(!sp->name) {		/* new entry */
       sp->name = strdup(sym);
       sp->value = malloc(sizeof(struct val));
+      sp->value->aliases=1;
 			sp->value->type = 'u';
       sp->func = NULL;
       sp->syms = NULL;
@@ -118,7 +119,7 @@ struct ast * newref(struct symbol *s){
 }
 
 struct ast * newdecl(struct symbol *s, char type){
-  struct symref *a = malloc(sizeof(struct symref));
+  struct symdecl *a = malloc(sizeof(struct symdecl));
 
   if(!a) {
     yyerror("out of space");
@@ -126,11 +127,8 @@ struct ast * newdecl(struct symbol *s, char type){
   }
   a->nodetype = 'D';
   a->s = s;
-	if(a->s->value->type != 'u'){
-		yyerror("%s already has type '%c'", a->s->name, a->s->value->type);
-	} else {
-			a->s->value->type = type ;
-	}
+  a->type = type;
+
 	return (struct ast *)a;
 }
 
@@ -210,6 +208,7 @@ char * toString(struct val * v){
 
 struct val * sum(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -221,11 +220,13 @@ struct val * sum(struct val * a, struct val * b){
   }else{
     yyerror("addiction of incompatible types (%c+%c)", typeof_v(a), typeof_v(b));
   }
+
   return result;
 }
 
 struct val * sub(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -241,6 +242,7 @@ struct val * sub(struct val * a, struct val * b){
 
 struct val * mul(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -276,6 +278,7 @@ struct val * mul(struct val * a, struct val * b){
 
 struct val * division(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -301,6 +304,7 @@ struct val * division(struct val * a, struct val * b){
 
 struct val * new_real(double a){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   result->type='r';
   result->real_val=a;
   return result;
@@ -308,6 +312,7 @@ struct val * new_real(double a){
 
 struct val * new_int(int a){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   result->type='i';
   result->int_val=a;
   return result;
@@ -315,6 +320,7 @@ struct val * new_int(int a){
 
 struct val * new_string(char * a){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   result->type='s';
   result->string_val=strdup(a);
   return result;
@@ -322,6 +328,7 @@ struct val * new_string(char * a){
 
 struct val * change_sign(struct val * a){
   struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
   result->type=typeof_v(a);
   switch (typeof_v(a)) {
     case 'i': result->int_val=-(a->int_val);
@@ -354,6 +361,7 @@ double compare(struct val * a, struct val * b){
 
 struct val * eval(struct ast *a){
   struct val *v;
+  struct val *temp;
 
   if(!a) {
     yyerror("internal error, null eval");
@@ -368,7 +376,14 @@ struct val * eval(struct ast *a){
   case 'N': v = ((struct symref *)a)->s->value; break;
 
   /* name declaration */
-  case 'D': break;
+  case 'D':
+      if(((struct symdecl *)a)->s->value->type != 'u'){
+		     yyerror("%s already has type '%c'", ((struct symdecl *)a)->s->name,
+                                             ((struct symdecl *)a)->s->value->type);
+	    } else {
+			   ((struct symdecl *)a)->s->value->type = ((struct symdecl *)a)->type ;
+	    }
+      break;
 
     /* assignment */
   case '=':
@@ -376,6 +391,9 @@ struct val * eval(struct ast *a){
 			if(typeof_s(((struct symasgn *)a)->s) == 'u'){
 				yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
 			} else if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
+        v->aliases++;
+        ((struct symasgn *)a)->s->value->aliases--;
+        free_lost(((struct symasgn *)a)->s->value);
         ((struct symasgn *)a)->s->value = v;
       }else{
         yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symasgn *)a)->s), typeof_v(v) );
@@ -400,7 +418,8 @@ struct val * eval(struct ast *a){
   /* control flow */
   /* null if/else/do expressions allowed in the grammar, so check for them */
   case 'I':
-    if( (eval( ((struct flow *)a)->cond))->int_val != 0) {
+    temp=(eval( ((struct flow *)a)->cond));
+    if( temp->int_val != 0) {
       if( ((struct flow *)a)->tl) {
 	       v = eval( ((struct flow *)a)->tl);
       } else
@@ -411,14 +430,20 @@ struct val * eval(struct ast *a){
       } else
 	     v = NULL;		/* a default value */
     }
+    free_lost(temp);
     break;
 
   case 'W':
     v = NULL;		/* a default value */
 
     if( ((struct flow *)a)->tl) {
-      while( (eval( ((struct flow *)a)->cond))->int_val != 0)
-	       v = eval(((struct flow *)a)->tl);
+      temp=(eval( ((struct flow *)a)->cond));
+      while( temp->int_val != 0){
+        free_lost(temp);
+	      v = eval(((struct flow *)a)->tl);
+        temp=(eval( ((struct flow *)a)->cond));
+      }
+      free_lost(temp);
     }
     break;			/* last value is value */
 
@@ -453,6 +478,11 @@ static struct val * callbuiltin(struct fncall *f) {
  return result;
 }
 
+void free_lost(struct val * v){
+  if(v->aliases==0){
+    free(v);
+  }
+}
 
 
 void treefree(struct ast *a){
@@ -462,18 +492,24 @@ void treefree(struct ast *a){
   case '+':
   case '-':
   case '*':
-  case '/':
-  case '1':  case '2':  case '3':  case '4':  case '5':  case '6':
+  case '/': treefree(a->r); treefree(a->l); break;
+  case '1': case '2':  case '3':  case '4':  case '5':  case '6':
   case 'L':
     treefree(a->r);
+    break;
 
     /* one subtree */
   case '|':
   case 'M': case 'C': case 'F':
     treefree(a->l);
+    break;
 
     /* no subtree */
-  case 'K': case 'N': case 'D':
+  case 'N': case 'D':
+    break;
+
+  case 'K':
+    free_lost(((struct value_val *)a)->v);
     break;
 
   case '=':
@@ -514,7 +550,7 @@ main()
 int debug = 1;
 
 void dumpast(struct ast *a, int level){
-
+  char * string;
   printf("%*s", 2*level, "");	/* indent to this level */
   level++;
 
@@ -525,15 +561,19 @@ void dumpast(struct ast *a, int level){
 
   switch(a->nodetype) {
     /* constant */
-  case 'K': printf("value %s\n", toString(((struct value_val *)a)->v)); break;
+  case 'K': string=toString(((struct value_val *)a)->v);
+    printf("value %s\n", string); free(string); break;
 
     /* name reference */
-  case 'N': printf("ref %s", ((struct symref *)a)->s->name);
+  case 'N': string =toString(((struct symref *)a)->s->value);
+            printf("ref %s", ((struct symref *)a)->s->name);
             if(((struct symref *)a)->s->value){
-              printf("=%s\n", toString(((struct symref *)a)->s->value));
+              printf("=%s\n", string );
+              free(string);
             }else{
               printf("\n");
             }
+
             break;
 
   /* name declaration */
@@ -541,7 +581,7 @@ void dumpast(struct ast *a, int level){
 
     /* assignment */
   case '=': printf("= %s\n", ((struct symref *)a)->s->name);
-    dumpast( ((struct symasgn *)a)->v, level); return;
+    dumpast( ((struct symasgn *)a)->v, level); break;
 
     /* expressions */
   case '+': case '-': case '*': case '/': case 'L':
@@ -550,12 +590,12 @@ void dumpast(struct ast *a, int level){
     printf("binop %c\n", a->nodetype);
     dumpast(a->l, level);
     dumpast(a->r, level);
-    return;
+    break;
 
   case '|': case 'M':
     printf("unop %c\n", a->nodetype);
     dumpast(a->l, level);
-    return;
+    break;
 
   case 'I': case 'W':
     printf("flow %c\n", a->nodetype);
@@ -564,15 +604,16 @@ void dumpast(struct ast *a, int level){
       dumpast( ((struct flow *)a)->tl, level);
     if( ((struct flow *)a)->el)
       dumpast( ((struct flow *)a)->el, level);
-    return;
+    break;
 
   case 'F':
     printf("builtin %d\n", ((struct fncall *)a)->functype);
     dumpast(a->l, level);
-    return;
+    break;
 
 
   default: printf("bad %c\n", a->nodetype);
-    return;
+    break;
   }
+
 }

@@ -12,6 +12,7 @@ struct val {
   int int_val;
   double real_val;
   unsigned short port_val;
+  size_t aliases;
 };
 
 /* simple symtab of fixed size */
@@ -88,6 +89,12 @@ struct symref {
   struct symbol *s;
 };
 
+struct symdecl {
+  int nodetype;			/* type D */
+  struct symbol *s;
+  char type;
+};
+
 struct symasgn {
   int nodetype;			/* type = */
   struct symbol *s;
@@ -120,6 +127,7 @@ void yyerror(char *s, ...);
 
 extern int debug;
 void dumpast(struct ast *a, int level);
+void free_lost(struct val * v);
 
 char typeof_v(struct val * v);
 char typeof_s(struct symbol * s);
