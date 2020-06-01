@@ -1,9 +1,8 @@
 
-
 %{
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include "utils.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "utils.h"
 int yylex();
 %}
 
@@ -41,7 +40,6 @@ int yylex();
 program: /* nothing */
   | program stmt { if(debug) dumpast($2, 0);
 					eval($2);
-
 					treefree($2);}
   | program error '\n' { yyerrok; printf("> "); }
  ;
@@ -75,7 +73,7 @@ exp: '(' exp ')'          { $$ = $2; }
    | exp CMP exp          { $$ = newcmp($2, $1, $3); }
 ;
 
-decl: TYPE NAME  { $$=newdecl($2,$1); }
+decl: TYPE NAME    { $$=newdecl($2,$1); }
   | NAME '=' exp   { $$=newasgn($1,$3); }
 ;
 
