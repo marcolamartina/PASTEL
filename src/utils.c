@@ -182,7 +182,7 @@ void symlistfree(struct symlist *sl){
 }
 
 
-static struct val * callbuiltin(struct fncall *);
+
 
 char typeof_v(struct val * v){
   return v->type;
@@ -197,9 +197,9 @@ char * toString(struct val * v){
   switch (typeof_v(v)) {
     case 'i': asprintf(&result, "%d", v->int_val); break;
     case 'r': asprintf(&result, "%f", v->real_val); break;
-    case 's': result= v->string_val; break;
-		case 'a': result= v->string_val; break;					//IP address
-		case 'd': asprintf(&result, "%s:%hu - %sconnected", v->string_val, v->port_val, (v->int_val != -1 ? "":"not " )); break;
+    case 's': result= strdup(v->string_val); break;
+		case 'a': result= strdup(v->string_val); break;					//IP address
+		case 'd': asprintf(&result, "%s:%d - %sconnected", v->string_val, v->int_val, (v->real_val == 1 ? "":"not " )); break;
 		case 'u': yyerror("Cannot use a variable before type declaration"); break;
     default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); break;
   }
@@ -352,6 +352,20 @@ struct val * new_string(char * a){
   return result;
 }
 
+struct val * new_device(char * a){
+  struct val * result=malloc(sizeof(struct val));
+  char * ip;
+  int port;
+  char * end;
+  result->aliases=0;
+  result->type='d';
+  ip = strtok_r(a, ":", &end);
+  result->string_val=strdup(ip);
+  port = atoi(strtok_r(NULL, ":", &end));
+  result->int_val=port;
+  return result;
+}
+
 struct val * change_sign(struct val * a){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
@@ -480,35 +494,29 @@ struct val * eval(struct ast *a){
     }
     break;			/* last value is value */
 
-  case 'L': eval(a->l); v = eval(a->r); break;
+  case 'L': eval(a->l); v = eval(a->r);  break;
 
-  case 'F': v = callbuiltin((struct fncall *)a); break;
+  case 'F': callbuiltin((struct fncall *)a); v=NULL; break;
 
   default: printf("internal error: bad node %c\n", a->nodetype);
   }
   return v;
 }
 
-static struct val * callbuiltin(struct fncall *f) {
+void callbuiltin(struct fncall *f) {
   enum bifs functype = f->functype;
   struct val * v = eval(f->l);
-  struct val * result= malloc(sizeof(struct val));
+  char * temp;
 
- switch(functype) {
- case B_sqrt:
-   result->real_val= sqrt(v->real_val);
- case B_exp:
-   result->real_val= exp(v->real_val);
- case B_log:
-   result->real_val= log(v->real_val);
- case B_print:
-   printf("= %s\n", toString(v));
-   result= v;
- default:
-   yyerror("Unknown built-in function %d", functype);
-   return NULL;
- }
- return result;
+  switch(functype) {
+  case B_print:
+    temp=toString(v);
+    printf("%s\n", temp);
+    free(temp);
+    break;
+  default:
+    yyerror("Unknown built-in function %d", functype);
+  }
 }
 
 void free_lost(struct val * v){
@@ -575,15 +583,13 @@ void yyerror(const char *s, ...){
   //exit(1);
 }
 
-int
-main()
-{
+int main(int argc, char ** argv){
   printf("> ");
   return yyparse();
 }
 
 /* debugging: dump out an AST */
-int debug = 1;
+int debug = 0;
 
 void dumpast(struct ast *a, int level){
   char * string;

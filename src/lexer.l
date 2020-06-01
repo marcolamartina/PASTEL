@@ -40,7 +40,7 @@
 "else"  { return ELSE; }
 "while" { return WHILE; }
 "for"   { return FOR; }
-" in "  { return IN; }
+"in"    { return IN; }
 "def"   { return DEF; }
 "and"   { return AND; }
 "or"    { return OR; }
@@ -48,6 +48,9 @@
 "int"     { yylval.c='i'; return TYPE; }
 "real"    { yylval.c='r'; return TYPE; }
 "device"  { yylval.c='d'; return TYPE; }
+"print"   { yylval.fn = B_print; return FUNC; }
+
+"debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
 
  /* numbers */
 [0-9]+\.[0-9]+ { yylval.v=new_real(atof(yytext)); return VALUE; }
@@ -61,6 +64,9 @@
 
  /* names */
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.s = lookup(yytext); return NAME; }
+
+ /* device */
+ (([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+ { yylval.v=new_device(yytext); return VALUE; }
 
 
 "//".*  /* ignore comments */

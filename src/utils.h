@@ -45,10 +45,7 @@ void symlistfree(struct symlist *sl);
  */
 
 enum bifs {			/* built-in functions */
-  B_sqrt = 1,
-  B_exp,
-  B_log,
-  B_print
+  B_print = 1
 };
 
 /* nodes in the Abstract Syntax Tree */
@@ -128,6 +125,7 @@ void yyerror(const char *s, ...);
 extern int debug;
 void dumpast(struct ast *a, int level);
 void free_lost(struct val * v);
+void callbuiltin(struct fncall *);
 
 char typeof_v(struct val * v);
 char typeof_s(struct symbol * s);
@@ -138,6 +136,7 @@ struct val * mul(struct val * a, struct val * b);
 struct val * division(struct val * a, struct val * b);
 struct val * new_real(double a);
 struct val * new_int(int a);
+struct val * new_device(char * a);
 struct val * new_string(char * a);
 struct val * change_sign(struct val * a);
 struct val * eval(struct ast *a);
