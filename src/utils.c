@@ -383,6 +383,7 @@ struct val * eval(struct ast *a){
 	    } else {
 			   ((struct symdecl *)a)->s->value->type = ((struct symdecl *)a)->type ;
 	    }
+			v = NULL;
       break;
 
     /* assignment */
