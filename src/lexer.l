@@ -42,6 +42,8 @@
 "for"   { return FOR; }
 " in "  { return IN; }
 "def"   { return DEF; }
+"and"   { return AND; }
+"or"    { return OR; }
 "string"  { yylval.c='s'; return TYPE; }
 "int"     { yylval.c='i'; return TYPE; }
 "real"    { yylval.c='r'; return TYPE; }

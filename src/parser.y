@@ -22,22 +22,26 @@ int yylex();
 %token <c> TYPE
 %token <v> VALUE
 
-%nonassoc <fn> CMP
+
 %right '='
 %left '+' '-'
 %left '*' '/'
-%nonassoc '|' UMINUS
+%left <fn> CMP
+%left AND OR
+%nonassoc UMINUS
+
 
 %type <a> exp stmt list explist decl
 
+%define parse.error verbose
 %start program
 
 %%
 
 program: /* nothing */
-  | program stmt { if(debug) dumpast($2, 0); 
-					struct val* v = eval($2);
-					if(v!=NULL){free(v);};
+  | program stmt { if(debug) dumpast($2, 0);
+					eval($2);
+
 					treefree($2);}
   | program error '\n' { yyerrok; printf("> "); }
  ;
@@ -59,11 +63,13 @@ list: /* nothing */ { $$ = NULL; }
 
 exp: '(' exp ')'          { $$ = $2; }
    | NAME '(' explist ')' { }
-   | VALUE { $$=newvalue($1);}
+   | VALUE                { $$ = newvalue($1);}
    | exp '+' exp          { $$ = newast('+', $1,$3); }
    | exp '-' exp          { $$ = newast('-', $1,$3); }
    | exp '*' exp          { $$ = newast('*', $1,$3); }
    | exp '/' exp          { $$ = newast('/', $1,$3); }
+   | exp AND exp          { $$ = newast('&', $1,$3); }
+   | exp OR exp           { $$ = newast('|', $1,$3); }
    | '-' exp %prec UMINUS { $$ = newast('M', $2, NULL); }
    | NAME                 { $$ = newref($1); }
    | exp CMP exp          { $$ = newcmp($2, $1, $3); }

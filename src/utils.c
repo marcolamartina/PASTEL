@@ -224,6 +224,32 @@ struct val * sum(struct val * a, struct val * b){
   return result;
 }
 
+struct val * or_logic(struct val * a, struct val * b){
+  struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
+  if(typeof_v(a)=='i' && typeof_v(b)=='i' ){
+    result->type=typeof_v(a);
+    result->int_val=a->int_val || b->int_val;
+  }else{
+    yyerror("logic or is not supported for types (%c || %c)", typeof_v(a), typeof_v(b));
+  }
+  return result;
+}
+
+
+struct val * and_logic(struct val * a, struct val * b){
+  struct val * result=malloc(sizeof(struct val));
+  result->aliases=0;
+  if(typeof_v(a)=='i' && typeof_v(b)=='i' ){
+    result->type=typeof_v(a);
+    result->int_val=a->int_val && b->int_val;
+  }else{
+    yyerror("logic and is not supported for types (%c && %c)", typeof_v(a), typeof_v(b));
+  }
+  return result;
+}
+
+
 struct val * sub(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
@@ -383,7 +409,7 @@ struct val * eval(struct ast *a){
 	    } else {
 			   ((struct symdecl *)a)->s->value->type = ((struct symdecl *)a)->type ;
 	    }
-			v = NULL;
+
       break;
 
     /* assignment */
@@ -408,6 +434,10 @@ struct val * eval(struct ast *a){
   case '/': v = division(eval(a->l),eval(a->r)); break;
   case 'M': v = change_sign(eval(a->l)); break;
 
+  /* logic operations */
+  case '&': v = and_logic(eval(a->l),eval(a->r)); break;
+  case '|': v = or_logic(eval(a->l),eval(a->r)); break;
+
     /* comparisons */
   case '1': v = new_int(compare(eval(a->l), eval(a->r))>0); break;
   case '2': v = new_int(compare(eval(a->l), eval(a->r))<0); break;
@@ -415,6 +445,8 @@ struct val * eval(struct ast *a){
   case '4': v = new_int(compare(eval(a->l), eval(a->r))==0); break;
   case '5': v = new_int(compare(eval(a->l), eval(a->r))>=0); break;
   case '6': v = new_int(compare(eval(a->l), eval(a->r))<=0); break;
+
+
 
   /* control flow */
   /* null if/else/do expressions allowed in the grammar, so check for them */
@@ -493,7 +525,9 @@ void treefree(struct ast *a){
   case '+':
   case '-':
   case '*':
-  case '/': 
+  case '/':
+  case '|':
+  case '&':
   case '1': case '2':  case '3':  case '4':  case '5':  case '6': treefree(a->r); treefree(a->l); break;
 
   case 'L':
@@ -501,7 +535,7 @@ void treefree(struct ast *a){
     break;
 
     /* one subtree */
-  case '|':
+
   case 'M': case 'C': case 'F':
     treefree(a->l);
     break;
@@ -531,7 +565,7 @@ void treefree(struct ast *a){
 
 }
 
-void yyerror(char *s, ...){
+void yyerror(const char *s, ...){
   va_list ap;
   va_start(ap, s);
 
@@ -586,6 +620,7 @@ void dumpast(struct ast *a, int level){
     dumpast( ((struct symasgn *)a)->v, level); break;
 
     /* expressions */
+  case '|': case '&':
   case '+': case '-': case '*': case '/': case 'L':
   case '1': case '2': case '3':
   case '4': case '5': case '6':
@@ -594,7 +629,7 @@ void dumpast(struct ast *a, int level){
     dumpast(a->r, level);
     break;
 
-  case '|': case 'M':
+  case 'M':
     printf("unop %c\n", a->nodetype);
     dumpast(a->l, level);
     break;

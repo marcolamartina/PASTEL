@@ -123,7 +123,7 @@ void treefree(struct ast *);
 
 /* interface to the lexer */
 extern int yylineno; /* from lexer */
-void yyerror(char *s, ...);
+void yyerror(const char *s, ...);
 
 extern int debug;
 void dumpast(struct ast *a, int level);
@@ -141,3 +141,5 @@ struct val * new_int(int a);
 struct val * new_string(char * a);
 struct val * change_sign(struct val * a);
 struct val * eval(struct ast *a);
+struct val * and_logic(struct val * a, struct val * b);
+struct val * or_logic(struct val * a, struct val * b);
