@@ -492,8 +492,9 @@ void treefree(struct ast *a){
   case '+':
   case '-':
   case '*':
-  case '/': treefree(a->r); treefree(a->l); break;
-  case '1': case '2':  case '3':  case '4':  case '5':  case '6':
+  case '/': 
+  case '1': case '2':  case '3':  case '4':  case '5':  case '6': treefree(a->r); treefree(a->l); break;
+
   case 'L':
     treefree(a->r);
     break;
@@ -513,7 +514,7 @@ void treefree(struct ast *a){
     break;
 
   case '=':
-    free( ((struct symasgn *)a)->v);
+    treefree( ((struct symasgn *)a)->v);
     break;
 
   case 'I': case 'W':
