@@ -3,11 +3,15 @@
 #  include <stdarg.h>
 #  include <string.h>
 #  include <math.h>
+#  include <arpa/inet.h>
 #  include "utils.h"
 int yyparse();
 
 /* symbol table */
 /* hash a symbol */
+static void start_connection(struct val * v);
+static void close_connection(struct val * v);
+
 static unsigned symhash(char *sym)
 {
   unsigned int hash = 0;
@@ -199,7 +203,7 @@ char * toString(struct val * v){
     case 'r': asprintf(&result, "%f", v->real_val); break;
     case 's': result= strdup(v->string_val); break;
 		case 'a': result= strdup(v->string_val); break;					//IP address
-		case 'd': asprintf(&result, "%s:%d - %sconnected", v->string_val, v->int_val, (v->real_val == 1 ? "":"not " )); break;
+		case 'd': asprintf(&result, "%s:%d - %sconnected", v->string_val, v->port_val, (v->int_val != 0 ? "":"not " )); break;
 		case 'u': yyerror("Cannot use a variable before type declaration"); break;
     default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); break;
   }
@@ -218,7 +222,17 @@ struct val * sum(struct val * a, struct val * b){
       default: yyerror("addiction not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else{
-    yyerror("addiction of incompatible types (%c+%c)", typeof_v(a), typeof_v(b));
+		if(typeof_v(a)=='a' && typeof_v(b)=='i'){
+			result->type = 'a';
+			int temp ;
+			result->string_val = malloc(sizeof(char)*15);
+
+			inet_pton(AF_INET, a->string_val, &temp);
+			temp += htonl(b->int_val);
+			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
+		} else {
+				yyerror("addiction of incompatible types (%c+%c)", typeof_v(a), typeof_v(b));
+		}
   }
 
   return result;
@@ -261,7 +275,17 @@ struct val * sub(struct val * a, struct val * b){
       default: yyerror("subtraction not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else{
-    yyerror("subtraction of incompatible types (%c-%c)", typeof_v(a), typeof_v(b));
+		if(typeof_v(a)=='a' && typeof_v(b)=='i'){
+			result->type = 'a';
+			int temp ;
+			result->string_val = malloc(sizeof(char)*15);
+
+			inet_pton(AF_INET, a->string_val, &temp);
+			temp -= htonl(b->int_val);
+			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
+		} else {
+    	yyerror("subtraction of incompatible types (%c-%c)", typeof_v(a), typeof_v(b));
+		}
   }
   return result;
 }
@@ -352,19 +376,27 @@ struct val * new_string(char * a){
   return result;
 }
 
-struct val * new_device(char * a){
+struct val * new_address(char * a){
   struct val * result=malloc(sizeof(struct val));
-  char * ip;
-  int port;
-  char * end;
   result->aliases=0;
-  result->type='d';
-  ip = strtok_r(a, ":", &end);
-  result->string_val=strdup(ip);
-  port = atoi(strtok_r(NULL, ":", &end));
-  result->int_val=port;
+  result->type='a';
+  result->string_val=strdup(a);
   return result;
 }
+
+struct val * new_device(struct val * addr, struct val * port){
+  struct val * result=malloc(sizeof(struct val));
+	if(typeof_v(addr) != 'a' || typeof_v(port) != 'i'){
+		yyerror("Wrong types for address/port");
+		return NULL;
+	}
+  result->aliases=0;
+  result->type='d';
+  result->string_val=strdup(addr->string_val);
+  result->port_val = port->int_val;
+	result->int_val = 0;
+  return result;
+} 
 
 struct val * change_sign(struct val * a){
   struct val * result=malloc(sizeof(struct val));
@@ -442,6 +474,7 @@ struct val * eval(struct ast *a){
       break;
 
     /* expressions */
+  case ':': v = new_device(eval(a->l),eval(a->r)); break;
   case '+': v = sum(eval(a->l),eval(a->r)); break;
   case '-': v = sub(eval(a->l),eval(a->r)); break;
   case '*': v = mul(eval(a->l),eval(a->r)); break;
@@ -514,6 +547,12 @@ void callbuiltin(struct fncall *f) {
     printf("%s\n", temp);
     free(temp);
     break;
+	case B_connect:
+		start_connection(v);
+		break;
+	case B_disconnect:
+		close_connection(v);
+		break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
@@ -525,11 +564,61 @@ void free_lost(struct val * v){
   }
 }
 
+void start_connection(struct val * v){
+	if(typeof_v(v) != 'd'){
+		yyerror("Cannot connect to something that is not a device!");
+		return;
+	}
+	if(v->int_val != 0){
+		yyerror("There is already an active connection to the selected device");
+		return;
+	}
+	struct sockaddr_in device_addr; 
+	int sock ;
+
+	if((sock = socket(AF_INET, SOCK_STREAM, 0))<0){
+		yyerror("Socket creation error");
+		return;
+	}
+
+	device_addr.sin_family = AF_INET; 
+	device_addr.sin_port = htons(v->port_val);
+
+	if(inet_pton(AF_INET, (!strcmp(v->string_val,"localhost")?"127.0.0.1":v->string_val), &device_addr.sin_addr)<=0)  
+	{ 
+			yyerror("Invalid address/ Address not supported"); 
+			return ; 
+	} 
+
+	if (connect(sock, (struct sockaddr *)&device_addr, sizeof(device_addr)) < 0) 
+	{ 
+			yyerror("Connection Failed"); 
+			return ; 
+	}
+
+	v->int_val = sock;
+}
+
+void close_connection(struct val * v){
+	if(typeof_v(v) != 'd'){
+		yyerror("Cannot disconnect from something that is not a device!");
+		return;
+	}
+	if(v->int_val == 0){
+		yyerror("There is no active connection to the selected device");
+		return;
+	}
+
+	close(v->int_val);
+	v->int_val=0;
+
+}
 
 void treefree(struct ast *a){
   switch(a->nodetype) {
 
     /* two subtrees */
+  case ':':
   case '+':
   case '-':
   case '*':

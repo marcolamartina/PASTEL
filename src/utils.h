@@ -45,7 +45,8 @@ void symlistfree(struct symlist *sl);
  */
 
 enum bifs {			/* built-in functions */
-  B_print = 1
+  B_print = 1,
+  B_connect, B_disconnect, B_send, B_listen
 };
 
 /* nodes in the Abstract Syntax Tree */
@@ -136,8 +137,9 @@ struct val * mul(struct val * a, struct val * b);
 struct val * division(struct val * a, struct val * b);
 struct val * new_real(double a);
 struct val * new_int(int a);
-struct val * new_device(char * a);
+struct val * new_device(struct val * addr, struct val * port);
 struct val * new_string(char * a);
+struct val * new_address(char * a);
 struct val * change_sign(struct val * a);
 struct val * eval(struct ast *a);
 struct val * and_logic(struct val * a, struct val * b);

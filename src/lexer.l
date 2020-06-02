@@ -21,6 +21,7 @@
 "|" |
 "," |
 ";" |
+":" |
 "{" |
 "}" |
 "(" |
@@ -44,11 +45,14 @@
 "def"   { return DEF; }
 "and"   { return AND; }
 "or"    { return OR; }
-"string"  { yylval.c='s'; return TYPE; }
-"int"     { yylval.c='i'; return TYPE; }
-"real"    { yylval.c='r'; return TYPE; }
-"device"  { yylval.c='d'; return TYPE; }
-"print"   { yylval.fn = B_print; return FUNC; }
+"string"  		{ yylval.c='s'; return TYPE; }
+"int"     		{ yylval.c='i'; return TYPE; }
+"real"    		{ yylval.c='r'; return TYPE; }
+"device" 		{ yylval.c='d'; return TYPE; }
+"address"		{ yylval.c='a'; return TYPE; }
+"print"  		{ yylval.fn = B_print; return FUNC; }
+"connect" 		{ yylval.fn = B_connect; return FUNC; }
+"disconnect"	{ yylval.fn = B_disconnect; return FUNC; }
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
 
@@ -62,11 +66,11 @@
 <string_state>[^\"]*  {yylval.v=new_string(yytext); return VALUE;}
 
 
+ /* device */
+((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|"localhost" { yylval.v=new_address(yytext); return VALUE; }
+
  /* names */
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.s = lookup(yytext); return NAME; }
-
- /* device */
- (([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+ { yylval.v=new_device(yytext); return VALUE; }
 
 
 "//".*  /* ignore comments */

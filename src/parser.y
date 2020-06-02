@@ -24,7 +24,7 @@ int yylex();
 
 
 %right '='
-%left AND OR
+%left AND OR ':'
 %left '+' '-'
 %left '*' '/'
 %left <fn> CMP
@@ -63,6 +63,7 @@ list: /* nothing */ { $$ = NULL; }
 exp: '(' exp ')'          { $$ = $2; }
    | FUNC '(' explist ')' { $$ = newfunc($1, $3); }
    | VALUE                { $$ = newvalue($1);}
+   | exp ':' exp          { $$ = newast(':', $1,$3); }
    | exp '+' exp          { $$ = newast('+', $1,$3); }
    | exp '-' exp          { $$ = newast('-', $1,$3); }
    | exp '*' exp          { $$ = newast('*', $1,$3); }
