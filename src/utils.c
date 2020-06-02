@@ -597,10 +597,13 @@ int main(int argc, char **argv){
 				return 1;
 		}
 		yyrestart(yyin);
+		yylineno = 1;
 		yyparse();
 		fclose(yyin);
 	}
 	yyin=stdin;
+	yyrestart(yyin);
+	yylineno = 1;
   printf("> ");
   return yyparse();
 }
