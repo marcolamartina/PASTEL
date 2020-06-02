@@ -12,6 +12,7 @@ int yyparse();
 static void start_connection(struct val * v);
 static void close_connection(struct val * v);
 static void listen_from_connection(struct val * device, struct val * string);
+static void send_to_connection(struct val * device, struct val * string);
 
 static unsigned symhash(char *sym)
 {
@@ -558,6 +559,9 @@ void callbuiltin(struct fncall *f) {
 	case B_listen:
 		listen_from_connection(eval(f->l->l),v);
 		break;
+	case B_send:
+		send_to_connection(eval(f->l->l),v);
+		break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
@@ -619,9 +623,30 @@ void close_connection(struct val * v){
 
 }
 
+void send_to_connection(struct val * device, struct val * string){
+	if(typeof_v(device) != 'd'){
+		yyerror("Cannot write to something that is not a device!");
+		return;
+	}
+	if(typeof_v(string) != 's'){
+		yyerror("Can't write to something that is not a string");
+		return;
+	}
+	if(device->int_val == 0){
+		yyerror("There is no active connection to the selected device");
+		return;
+	}
+
+	if(! string->string_val){
+		yyerror("Cannot send an uninstantiated string");
+		return;
+	}
+		send(device->int_val, string->string_val, sizeof(char)*strlen(string->string_val), 0);
+}
+
 void listen_from_connection(struct val * device, struct val * string){
 	if(typeof_v(device) != 'd'){
-		yyerror("Cannot disconnect from something that is not a device!");
+		yyerror("Cannot listen from something that is not a device!");
 		return;
 	}
 	if(device->int_val == 0){
@@ -640,7 +665,6 @@ void listen_from_connection(struct val * device, struct val * string){
 		exit(1);
 	}
 }
-
 void treefree(struct ast *a){
   switch(a->nodetype) {
 
