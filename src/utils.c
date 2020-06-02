@@ -586,7 +586,7 @@ void yyerror(const char *s, ...){
 int main(int argc, char **argv){
 	extern FILE * yyin;
 	for(int i = 1; i<argc; i++){
-		if((strcmp(argv[i]+strlen(argv[i])-3,"pa")==0)){
+		if((strcmp(strchr(argv[i],'.'),".pa"))){
       fprintf(stderr, "Insert a .pa file");
       return 1;
     }else{
