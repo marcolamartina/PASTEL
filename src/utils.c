@@ -596,7 +596,9 @@ int main(int argc, char **argv){
 				yyerror("Error on opening source file");
 				return 1;
 		}
+		yyrestart(yyin);
 		yyparse();
+		fclose(yyin);
 	}
 	yyin=stdin;
   printf("> ");
