@@ -575,9 +575,22 @@ void yyerror(const char *s, ...){
   //exit(1);
 }
 
-int
-main()
-{
+int main(int argc, char **argv){
+	extern FILE * yyin;
+	for(int i = 1; i<argc; i++){
+		if((strcmp(argv[i]+strlen(argv[i])-3,"pa")==0)){
+      fprintf(stderr, "Insert a .pa file");
+      return 1;
+    }else{
+      yyin=fopen(argv[i], "r");
+    }   
+		if (!yyin){
+				yyerror("Error on opening source file");
+				return 1;
+		}
+		yyparse();
+	}
+	yyin=stdin;
   printf("> ");
   return yyparse();
 }
