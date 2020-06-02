@@ -17,6 +17,7 @@ int yylex();
 
 /* declare tokens */
 %token IF ELSE WHILE FOR IN DEF
+%token <fn> FUNC
 %token <s> NAME
 %token <c> TYPE
 %token <v> VALUE
@@ -60,7 +61,7 @@ list: /* nothing */ { $$ = NULL; }
    ;
 
 exp: '(' exp ')'          { $$ = $2; }
-   | NAME '(' explist ')' { }
+   | FUNC '(' explist ')' { $$ = newfunc($1, $3); }
    | VALUE                { $$ = newvalue($1);}
    | exp '+' exp          { $$ = newast('+', $1,$3); }
    | exp '-' exp          { $$ = newast('-', $1,$3); }
@@ -77,13 +78,9 @@ decl: TYPE NAME    { $$=newdecl($2,$1); }
   | NAME '=' exp   { $$=newasgn($1,$3); }
 ;
 
-
-explist: NAME { }
- | NAME ',' explist { }
- | VALUE { }
- | VALUE ',' explist { }
+explist: exp
+ | exp ',' explist  { $$ = newast('L', $1, $3); }
 ;
-
 
 
 %%
