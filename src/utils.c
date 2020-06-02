@@ -658,7 +658,7 @@ void listen_from_connection(struct val * device, struct val * string){
 		free(string->string_val);
 	}
 
-	if(string->string_val = malloc(sizeof(char)*1024)){
+	if(string->string_val = calloc(1024,sizeof(char))){
 		recv(device->int_val, string->string_val, sizeof(char)*1024, 0);
 	} else {
 		yyerror("Out of space");
