@@ -45,14 +45,18 @@
 "def"   { return DEF; }
 "and"   { return AND; }
 "or"    { return OR; }
-"string"  		{ yylval.c='s'; return TYPE; }
-"int"     		{ yylval.c='i'; return TYPE; }
-"real"    		{ yylval.c='r'; return TYPE; }
+"string"  	{ yylval.c='s'; return TYPE; }
+"int"     	{ yylval.c='i'; return TYPE; }
+"real"    	{ yylval.c='r'; return TYPE; }
 "device" 		{ yylval.c='d'; return TYPE; }
 "address"		{ yylval.c='a'; return TYPE; }
-"print"  		{ yylval.fn = B_print; return FUNC; }
+
+	/* Built-in functions */
+"print"  			{ yylval.fn = B_print; return FUNC; }
 "connect" 		{ yylval.fn = B_connect; return FUNC; }
 "disconnect"	{ yylval.fn = B_disconnect; return FUNC; }
+"listen"			{ yylval.fn = B_listen; return FUNC; }
+"send"				{ yylval.fn = B_send; return FUNC; }
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
 

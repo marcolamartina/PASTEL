@@ -11,6 +11,7 @@ int yyparse();
 /* hash a symbol */
 static void start_connection(struct val * v);
 static void close_connection(struct val * v);
+static void listen_from_connection(struct val * device, struct val * string);
 
 static unsigned symhash(char *sym)
 {
@@ -34,6 +35,7 @@ struct symbol * lookup(char* sym){
       sp->value = malloc(sizeof(struct val));
       sp->value->aliases=1;
 			sp->value->type = 'u';
+			sp->value->string_val = NULL;
       sp->func = NULL;
       sp->syms = NULL;
       return sp;
@@ -553,6 +555,9 @@ void callbuiltin(struct fncall *f) {
 	case B_disconnect:
 		close_connection(v);
 		break;
+	case B_listen:
+		listen_from_connection(eval(f->l->l),v);
+		break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
@@ -612,6 +617,28 @@ void close_connection(struct val * v){
 	close(v->int_val);
 	v->int_val=0;
 
+}
+
+void listen_from_connection(struct val * device, struct val * string){
+	if(typeof_v(device) != 'd'){
+		yyerror("Cannot disconnect from something that is not a device!");
+		return;
+	}
+	if(device->int_val == 0){
+		yyerror("There is no active connection to the selected device");
+		return;
+	}
+
+	if(string->string_val){
+		free(string->string_val);
+	}
+
+	if(string->string_val = malloc(sizeof(char)*1024)){
+		recv(device->int_val, string->string_val, sizeof(char)*1024, 0);
+	} else {
+		yyerror("Out of space");
+		exit(1);
+	}
 }
 
 void treefree(struct ast *a){
