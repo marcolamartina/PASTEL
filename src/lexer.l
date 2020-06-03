@@ -23,6 +23,8 @@
 ":" |
 "{" |
 "}" |
+"[" |
+"]" |
 "(" |
 ")"     { return yytext[0]; }
 
@@ -49,13 +51,15 @@
 "real"    	{ yylval.c='r'; return TYPE; }
 "device" 		{ yylval.c='d'; return TYPE; }
 "address"		{ yylval.c='a'; return TYPE; }
+"list"		  { yylval.c='l'; return TYPE; }
 
 	/* Built-in functions */
 "print"  			{ yylval.fn = B_print; return FUNC; }
 "connect" 		{ yylval.fn = B_connect; return FUNC; }
 "disconnect"	{ yylval.fn = B_disconnect; return FUNC; }
-"listen"			{ yylval.fn = B_listen; return FUNC; }
+"receive"			{ yylval.fn = B_receive; return FUNC; }
 "send"				{ yylval.fn = B_send; return FUNC; }
+"append"			{ yylval.fn = B_append; return FUNC; }
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
 

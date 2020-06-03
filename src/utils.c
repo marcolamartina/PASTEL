@@ -15,8 +15,9 @@ extern int file_mod;
 /* hash a symbol */
 static void start_connection(struct val * v);
 static void close_connection(struct val * v);
-static void listen_from_connection(struct val * device, struct val * string);
+static void receive_from_connection(struct val * device, struct val * string);
 static void send_to_connection(struct val * device, struct val * string);
+static void list_append(struct val * list, struct val * value);
 
 static unsigned symhash(char *sym)
 {
@@ -170,6 +171,20 @@ struct ast * newasgn(struct symbol *s, struct ast *v){
   return (struct ast *)a;
 }
 
+struct ast * newasgn_l(struct symbol *s, struct ast *i, struct ast *v){
+  struct symasgn_l *a = malloc(sizeof(struct symasgn_l));
+
+  if(!a) {
+    yyerror("out of space");
+    exit(0);
+  }
+  a->nodetype = '#';
+  a->s = s;
+  a->i = i;
+  a->v = v;
+  return (struct ast *)a;
+}
+
 struct ast * newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *el){
   struct flow *a = malloc(sizeof(struct flow));
 
@@ -221,12 +236,13 @@ char * toString(struct val * v){
   char * result;
   switch (typeof_v(v)) {
     case 'i': asprintf(&result, "%d", v->int_val); break;
+    case 'l': asprintf(&result, "list"); break;
     case 'r': asprintf(&result, "%f", v->real_val); break;
     case 's': result= strdup(v->string_val); break;
 		case 'a': result= strdup(v->string_val); break;					//IP address
 		case 'd': asprintf(&result, "%s:%d - %sconnected", v->string_val, v->port_val, (v->int_val != 0 ? "":"not " )); break;
-		case 'u': yyerror("Cannot use a variable before type declaration"); break;
-    default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); break;
+		case 'u': yyerror("Cannot use a variable before type declaration"); result=strdup(""); break;
+    default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); result=strdup(""); break;
   }
   return result;
 }
@@ -461,6 +477,8 @@ double compare(struct val * a, struct val * b){
 struct val * eval(struct ast *a){
   struct val *v;
   struct val *temp;
+  struct val *temp2;
+  char * string;
 	v = NULL;
 
   if(!a) {
@@ -473,25 +491,33 @@ struct val * eval(struct ast *a){
   case 'K': v = ((struct value_val *)a)->v; break;
 
     /* name reference */
-	case 'n': 
-		temp = eval(((struct symref_l *)a)->i);
-		if(typeof_v(temp) != 'i'){
-			yyerror("List index must be an integer, %c found", typeof_v(temp));
-			free_lost(temp);
-			return NULL;
-		}
-		for(int i = temp->int_val; i > 0; i--){
-			v = (struct val *)((struct symref_l *) a)->next; /* auxiliary var */
-			if(v == NULL){
-				yyerror("Index out of bounds");
-				free_lost(temp);
-				return NULL;
-			}
-		}
-		v = ((struct symref_l *) a)->s->value;
-		free_lost(temp);
-		break;
-	case 'N': 
+	case 'n':
+    v=((struct symref_l *)a)->s->value;
+    temp=eval(((struct symref_l *)a)->i);
+    if(typeof_s(((struct symref_l *)a)->s) == 'u'){
+      yyerror("variable %s uninstantiated.", ((struct symref_l *)a)->s->name);
+    } else if(typeof_s(((struct symref_l *)a)->s)!='l'){
+      yyerror("variable is not a list, found %c", typeof_s(((struct symref_l *)a)->s));
+    }else{
+      if(typeof_v(temp)=='i' && temp->int_val>=0){
+        v = ((struct symref_l *) a)->s->value;
+        for(int i = temp->int_val; i > 0 && v->next != NULL; i--){
+          v = v->next; /* auxiliary var */
+        }
+        if(v->next == NULL){
+          yyerror("Index out of bounds");
+          free_lost(temp);
+          return NULL;
+        }
+        v=v->next;
+      } else {
+        string = toString(temp);
+        yyerror("index is not a positive integer, found %c=%s", typeof_v(temp), string);
+        free(string);
+      }
+    }
+    break;
+	case 'N':
 		if(typeof_s(((struct symasgn *)a)->s) == 'u'){
 			yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
 			v = ((struct symref *)a)->s->value; break;
@@ -522,6 +548,36 @@ struct val * eval(struct ast *a){
         ((struct symasgn *)a)->s->value = v;
       }else{
         yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symasgn *)a)->s), typeof_v(v) );
+      }
+      break;
+
+  case '#':
+      temp=eval(((struct symasgn_l *)a)->v);
+      temp2=eval(((struct symasgn_l *)a)->i);
+			if(typeof_s(((struct symasgn_l *)a)->s) == 'u'){
+				yyerror("variable %s uninstantiated.", ((struct symasgn_l *)a)->s->name);
+			} else if(typeof_s(((struct symasgn_l *)a)->s)!='l'){
+        yyerror("variable is not a list, found %c", typeof_s(((struct symasgn_l *)a)->s));
+      }else{
+        if(typeof_v(temp2)=='i' && temp2->int_val>=0){
+          v = ((struct symasgn_l *) a)->s->value;
+          for(int i = temp2->int_val; i > 0 && v->next != NULL; i--){
+        		v = v->next; /* auxiliary var */
+        	}
+          if(v->next == NULL){
+            yyerror("Index out of bounds");
+            free_lost(temp);
+            return NULL;
+          }
+          temp->aliases++;
+          v->next->aliases--;
+          free_lost(v->next);
+          v->next = temp;
+        } else {
+          string = toString(temp2);
+          yyerror("index is not a positive integer, found %c=%s", typeof_v(temp2), string);
+          free(string);
+        }
       }
       break;
 
@@ -588,6 +644,8 @@ struct val * eval(struct ast *a){
   return v;
 }
 
+
+
 void callbuiltin(struct fncall *f) {
   enum bifs functype = f->functype;
   struct val * v = eval(f->l);
@@ -605,12 +663,15 @@ void callbuiltin(struct fncall *f) {
 	case B_disconnect:
 		close_connection(v);
 		break;
-	case B_listen:
-		listen_from_connection(eval(f->l->l),v);
+	case B_receive:
+		receive_from_connection(eval(f->l->l),v);
 		break;
 	case B_send:
 		send_to_connection(eval(f->l->l),v);
 		break;
+  case B_append:
+  	list_append(eval(f->l->l),v);
+  	break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
@@ -694,9 +755,9 @@ void send_to_connection(struct val * device, struct val * string){
 		send(device->int_val, string->string_val, sizeof(char)*strlen(string->string_val), 0);
 }
 
-void listen_from_connection(struct val * device, struct val * string){
+void receive_from_connection(struct val * device, struct val * string){
 	if(typeof_v(device) != 'd'){
-		yyerror("Cannot listen from something that is not a device!");
+		yyerror("Cannot receive from something that is not a device!");
 		return;
 	}
 	if(device->int_val == 0){
@@ -715,6 +776,18 @@ void listen_from_connection(struct val * device, struct val * string){
 		exit(1);
 	}
 }
+
+static void list_append(struct val * list, struct val * value){
+  if(typeof_v(list)!='l'){
+    yyerror("Function append is defined only for list, not for %c", typeof_v(list));
+  } else {
+    value->next=list->next;
+    list->next=value;
+    value->aliases++;
+  }
+}
+
+
 void treefree(struct ast *a){
   switch(a->nodetype) {
 
@@ -740,6 +813,15 @@ void treefree(struct ast *a){
 
     /* no subtree */
   case 'N': case 'D':
+    break;
+
+  case 'n':
+    treefree(((struct symref_l *)a)->i);
+    break;
+
+  case '#':
+    treefree(((struct symasgn_l *)a)->i);
+    treefree(((struct symasgn_l *)a)->v);
     break;
 
   case 'K':

@@ -47,7 +47,11 @@ void symlistfree(struct symlist *sl);
 
 enum bifs {			/* built-in functions */
   B_print = 1,
-  B_connect, B_disconnect, B_send, B_listen
+  B_connect,
+  B_disconnect,
+  B_send,
+  B_receive,
+  B_append
 };
 
 /* nodes in the Abstract Syntax Tree */
@@ -105,6 +109,13 @@ struct symasgn {
   struct ast *v;		/* value */
 };
 
+struct symasgn_l {
+  int nodetype;			/* type = */
+  struct symbol *s;
+  struct ast *i;
+  struct ast *v;		/* value */
+};
+
 /* build an AST */
 struct ast *newast(int nodetype, struct ast *l, struct ast *r);
 struct ast *newcmp(int cmptype, struct ast *l, struct ast *r);
@@ -115,6 +126,8 @@ struct ast *newdecl(struct symbol *s, char type);
 struct ast *newasgn(struct symbol *s, struct ast *v);
 struct ast *newvalue(struct val *v);
 struct ast *newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *tr);
+struct ast * newref_l(struct symbol *s, struct ast *i);
+struct ast * newasgn_l(struct symbol *s, struct ast *i, struct ast *v);
 
 /* define a function */
 void dodef(struct symbol *name, struct symlist *syms, struct ast *stmts);
