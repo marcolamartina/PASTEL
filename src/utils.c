@@ -38,6 +38,7 @@ struct symbol * lookup(char* sym){
     if(!sp->name) {		/* new entry */
       sp->name = strdup(sym);
       sp->value = malloc(sizeof(struct val));
+			sp->value->next = NULL;
       sp->value->aliases=1;
 			sp->value->type = 'u';
 			sp->value->string_val = NULL;
@@ -114,6 +115,19 @@ struct ast * newcall(struct symbol *s, struct ast *l) {
   a->nodetype = 'C';
   a->l = l;
   a->s = s;
+  return (struct ast *)a;
+}
+
+struct ast * newref_l(struct symbol *s, struct ast *i){
+  struct symref_l *a = malloc(sizeof(struct symref_l));
+
+  if(!a) {
+    yyerror("out of space");
+    exit(0);
+  }
+  a->nodetype = 'n';
+  a->s = s;
+	a->i = i;
   return (struct ast *)a;
 }
 
@@ -361,6 +375,7 @@ struct val * division(struct val * a, struct val * b){
 
 struct val * new_real(double a){
   struct val * result=malloc(sizeof(struct val));
+	result->next = NULL;
   result->aliases=0;
   result->type='r';
   result->real_val=a;
@@ -369,6 +384,7 @@ struct val * new_real(double a){
 
 struct val * new_int(int a){
   struct val * result=malloc(sizeof(struct val));
+	result->next = NULL;
   result->aliases=0;
   result->type='i';
   result->int_val=a;
@@ -377,6 +393,7 @@ struct val * new_int(int a){
 
 struct val * new_string(char * a){
   struct val * result=malloc(sizeof(struct val));
+	result->next = NULL;
   result->aliases=0;
   result->type='s';
   result->string_val=strdup(a);
@@ -385,6 +402,7 @@ struct val * new_string(char * a){
 
 struct val * new_address(char * a){
   struct val * result=malloc(sizeof(struct val));
+	result->next = NULL;
   result->aliases=0;
   result->type='a';
   result->string_val=strdup(a);
@@ -397,6 +415,7 @@ struct val * new_device(struct val * addr, struct val * port){
 		yyerror("Wrong types for address/port");
 		return NULL;
 	}
+	result->next = NULL;
   result->aliases=0;
   result->type='d';
   result->string_val=strdup(addr->string_val);
@@ -407,6 +426,7 @@ struct val * new_device(struct val * addr, struct val * port){
 
 struct val * change_sign(struct val * a){
   struct val * result=malloc(sizeof(struct val));
+	result->next = NULL;
   result->aliases=0;
   result->type=typeof_v(a);
   switch (typeof_v(a)) {
@@ -441,6 +461,7 @@ double compare(struct val * a, struct val * b){
 struct val * eval(struct ast *a){
   struct val *v;
   struct val *temp;
+	v = NULL;
 
   if(!a) {
     yyerror("internal error, null eval");
@@ -452,7 +473,31 @@ struct val * eval(struct ast *a){
   case 'K': v = ((struct value_val *)a)->v; break;
 
     /* name reference */
-  case 'N': v = ((struct symref *)a)->s->value; break;
+	case 'n': 
+		temp = eval(((struct symref_l *)a)->i);
+		if(typeof_v(temp) != 'i'){
+			yyerror("List index must be an integer, %c found", typeof_v(temp));
+			free_lost(temp);
+			return NULL;
+		}
+		for(int i = temp->int_val; i > 0; i--){
+			v = (struct val *)((struct symref_l *) a)->next; /* auxiliary var */
+			if(v == NULL){
+				yyerror("Index out of bounds");
+				free_lost(temp);
+				return NULL;
+			}
+		}
+		v = ((struct symref_l *) a)->s->value;
+		free_lost(temp);
+		break;
+	case 'N': 
+		if(typeof_s(((struct symasgn *)a)->s) == 'u'){
+			yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
+			v = ((struct symref *)a)->s->value; break;
+		} else {
+			v = ((struct symref *)a)->s->value; break;
+		}
 
   /* name declaration */
   case 'D':
@@ -534,7 +579,7 @@ struct val * eval(struct ast *a){
     }
     break;			/* last value is value */
 
-  case 'L': eval(a->l); v = eval(a->r);  break;
+  case 'L': temp=eval(a->l); v = eval(a->r); free_lost(temp);  break;
 
   case 'F': callbuiltin((struct fncall *)a); v=NULL; break;
 
@@ -572,7 +617,8 @@ void callbuiltin(struct fncall *f) {
 }
 
 void free_lost(struct val * v){
-  if(v->aliases==0){
+  if(v && v->aliases==0){
+		free_lost(v->next);
     free(v);
   }
 }

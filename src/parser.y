@@ -73,12 +73,14 @@ exp: '(' exp ')'          { $$ = $2; }
    | exp AND exp          { $$ = newast('&', $1,$3); }
    | exp OR exp           { $$ = newast('|', $1,$3); }
    | '-' exp %prec UMINUS { $$ = newast('M', $2, NULL); }
+	 | NAME'[' exp ']'			{ $$ = newref_l($1,$3); }
    | NAME                 { $$ = newref($1); }
    | exp CMP exp          { $$ = newcmp($2, $1, $3); }
 ;
 
-decl: TYPE NAME    { $$=newdecl($2,$1); }
-  | NAME '=' exp   { $$=newasgn($1,$3); }
+decl: TYPE NAME    					{ $$=newdecl($2,$1); }
+  | NAME '=' exp  					{ $$=newasgn($1,$3); }
+	| NAME'[' exp ']''=' exp	{	$$=newasgn_l($1,$3,$6);	}
 ;
 
 explist: exp

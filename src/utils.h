@@ -1,13 +1,14 @@
 /* symbol table */
-struct symbol {		/* a variable name */
+struct symbol {					/* a variable name */
   char *name;
   struct val *value;
-  struct ast *func;	/* stmt for the function */
+  struct ast *func;			/* stmt for the function */
   struct symlist *syms; /* list of dummy args */
 };
 
 struct val {
   char type;
+	struct val * next;		/* next element if list */
   char* string_val;
   int int_val;
   double real_val;
@@ -72,7 +73,7 @@ struct ufncall {		/* user function */
 
 struct flow {
   int nodetype;			/* type I or W */
-  struct ast *cond;		/* condition */
+  struct ast *cond;	/* condition */
   struct ast *tl;		/* then or do list */
   struct ast *el;		/* optional else list */
 };
@@ -82,6 +83,11 @@ struct value_val {
   struct val * v;
 };
 
+struct symref_l {
+  int nodetype;			/* type n */
+  struct ast *i;		/* index*/
+  struct symbol *s;
+};
 struct symref {
   int nodetype;			/* type N */
   struct symbol *s;
