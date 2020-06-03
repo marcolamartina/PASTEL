@@ -1,0 +1,11 @@
+device a;
+string b;
+a = localhost:1234;
+connect(a);
+while(1>0){
+	listen(a,b);
+	print(b);
+	send(a,b);
+}
+
+disconnect(a);
