@@ -122,6 +122,7 @@ void treefree(struct ast *);
 /* interface to the lexer */
 extern int yylineno; /* from lexer */
 void yyerror(const char *s, ...);
+void yyrestart  (FILE * input_file );
 
 extern int debug;
 void dumpast(struct ast *a, int level);

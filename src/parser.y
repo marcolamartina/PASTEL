@@ -24,10 +24,11 @@ int yylex();
 
 
 %right '='
-%left AND OR ':'
+%left ':'
+%left AND OR
+%nonassoc <fn> CMP
 %left '+' '-'
 %left '*' '/'
-%left <fn> CMP
 %nonassoc UMINUS
 
 

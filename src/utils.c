@@ -399,7 +399,7 @@ struct val * new_device(struct val * addr, struct val * port){
   result->port_val = port->int_val;
 	result->int_val = 0;
   return result;
-} 
+}
 
 struct val * change_sign(struct val * a){
   struct val * result=malloc(sizeof(struct val));
@@ -582,7 +582,7 @@ void start_connection(struct val * v){
 		yyerror("There is already an active connection to the selected device");
 		return;
 	}
-	struct sockaddr_in device_addr; 
+	struct sockaddr_in device_addr;
 	int sock ;
 
 	if((sock = socket(AF_INET, SOCK_STREAM, 0))<0){
@@ -590,19 +590,19 @@ void start_connection(struct val * v){
 		return;
 	}
 
-	device_addr.sin_family = AF_INET; 
+	device_addr.sin_family = AF_INET;
 	device_addr.sin_port = htons(v->port_val);
 
-	if(inet_pton(AF_INET, (!strcmp(v->string_val,"localhost")?"127.0.0.1":v->string_val), &device_addr.sin_addr)<=0)  
-	{ 
-			yyerror("Invalid address/ Address not supported"); 
-			return ; 
-	} 
+	if(inet_pton(AF_INET, (!strcmp(v->string_val,"localhost")?"127.0.0.1":v->string_val), &device_addr.sin_addr)<=0)
+	{
+			yyerror("Invalid address/ Address not supported");
+			return ;
+	}
 
-	if (connect(sock, (struct sockaddr *)&device_addr, sizeof(device_addr)) < 0) 
-	{ 
-			yyerror("Connection Failed"); 
-			return ; 
+	if (connect(sock, (struct sockaddr *)&device_addr, sizeof(device_addr)) < 0)
+	{
+			yyerror("Connection Failed");
+			return ;
 	}
 
 	v->int_val = sock;
@@ -658,7 +658,7 @@ void listen_from_connection(struct val * device, struct val * string){
 		free(string->string_val);
 	}
 
-	if(string->string_val = calloc(1024,sizeof(char))){
+	if((string->string_val = calloc(1024,sizeof(char)))){
 		recv(device->int_val, string->string_val, sizeof(char)*1024, 0);
 	} else {
 		yyerror("Out of space");
@@ -731,7 +731,7 @@ int main(int argc, char **argv){
       return 1;
     }else{
       yyin=fopen(argv[i], "r");
-    }   
+    }
 		if (!yyin){
 				yyerror("Error on opening source file");
 				return 1;
