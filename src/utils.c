@@ -1,11 +1,15 @@
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include <stdarg.h>
-#  include <string.h>
-#  include <math.h>
-#  include <arpa/inet.h>
-#  include "utils.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#include <unistd.h>
+#include <math.h>
+#include <arpa/inet.h>
+#include "utils.h"
 int yyparse();
+
+extern int file_mod;
+
 
 /* symbol table */
 /* hash a symbol */
@@ -725,11 +729,13 @@ void yyerror(const char *s, ...){
 
 int main(int argc, char **argv){
 	extern FILE * yyin;
+  file_mod=0;
 	for(int i = 1; i<argc; i++){
-		if((strcmp(strchr(argv[i],'.'),".pa"))){
+		if((strcmp(argv[1]+strlen(argv[1])-3,".pa")!=0)){
       fprintf(stderr, "Insert a .pa file");
       return 1;
     }else{
+      file_mod++;
       yyin=fopen(argv[i], "r");
     }
 		if (!yyin){
@@ -740,11 +746,12 @@ int main(int argc, char **argv){
 		yylineno = 1;
 		yyparse();
 		fclose(yyin);
+    file_mod--;
 	}
 	yyin=stdin;
 	yyrestart(yyin);
 	yylineno = 1;
-  printf("> ");
+  printf("%s", file_mod ? "" : "> ");
   return yyparse();
 }
 

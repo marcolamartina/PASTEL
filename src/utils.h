@@ -123,6 +123,7 @@ void treefree(struct ast *);
 extern int yylineno; /* from lexer */
 void yyerror(const char *s, ...);
 void yyrestart  (FILE * input_file );
+int file_mod;
 
 extern int debug;
 void dumpast(struct ast *a, int level);

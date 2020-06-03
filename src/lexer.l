@@ -29,7 +29,7 @@
  /* comparison ops */
 ">"     { yylval.fn = 1; return CMP; }
 "<"     { yylval.fn = 2; return CMP; }
-"<>"    { yylval.fn = 3; return CMP; }
+"!="    { yylval.fn = 3; return CMP; }
 "=="    { yylval.fn = 4; return CMP; }
 ">="    { yylval.fn = 5; return CMP; }
 "<="    { yylval.fn = 6; return CMP; }
@@ -65,8 +65,10 @@
 
  /* strings */
 \"                    {yy_push_state(string_state); }
-<string_state>\"      {yy_pop_state(); }
+\"\"                  {yylval.v=new_string(""); return VALUE;}
 <string_state>[^\"]*  {yylval.v=new_string(yytext); return VALUE;}
+<string_state>\"      {yy_pop_state(); }
+
 
 
  /* device */
@@ -78,7 +80,7 @@
 
 "//".*  /* ignore comments */
 [ \t]   /* ignore white space */
-"\n"    { printf("> "); }
+"\n"    { printf("%s", file_mod ? "" : "> "); }
 
 .	{ yyerror("Mystery character %c\n", *yytext); }
 %%

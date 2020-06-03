@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "utils.h"
 int yylex();
+extern int file_mod;
 %}
 
 %union {
@@ -43,7 +44,7 @@ program: /* nothing */
   | program stmt { if(debug) dumpast($2, 0);
 					eval($2);
 					treefree($2);}
-  | program error '\n' { yyerrok; printf("> "); }
+  | program error '\n' { yyerrok; printf("%s", file_mod ? "" : "> "); }
  ;
 
 stmt: IF '(' exp ')' '{' list '}'                   { $$ = newflow('I', $3, $6, NULL); }
