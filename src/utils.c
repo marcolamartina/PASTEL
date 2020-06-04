@@ -235,7 +235,44 @@ void symlistfree(struct symlist *sl){
   }
 }
 
+struct val * get_element(struct val * list, int index){
+  struct val * result=list;
+  if(list){
+    if(typeof_v(list)=='l'){
+      for(int i=0; i<index && result->next; i++){
+        result=result->next;
+      }
+      if(result->next == NULL){
+        yyerror("Index out of bounds");
+      }
+    } else {
+      yyerror("variable is not a list, found %c", list->type);
+      return NULL;
+    }
+  } else {
+    yyerror("list not initialized");
+    return NULL;
+  }
+  return result->next;
+}
 
+int length(struct val * list){
+  int len=0;
+  if(list){
+    if(typeof_v(list)=='l'){
+      while((list=list->next)){
+        len++;
+      }
+    } else {
+      yyerror("variable is not a list, found %c", list->type);
+      return 0;
+    }
+  } else {
+    yyerror("list not initialized");
+    return 0;
+  }
+  return len;
+}
 
 
 char typeof_v(struct val * v){
@@ -248,9 +285,24 @@ char typeof_s(struct symbol * s){
 
 char * toString(struct val * v){
   char * result;
+  char * temp1;
+  char * temp2;
   switch (typeof_v(v)) {
     case 'i': asprintf(&result, "%d", v->int_val); break;
-    case 'l': asprintf(&result, "list"); break;
+    case 'l':
+      asprintf(&result, "[ ");
+      for(int i=0; i<length(v); i++){
+        temp1=toString(get_element(v,i));
+        temp2=result;
+        asprintf(&result, "%s%s%s,", temp2, (i==0?"":" ") ,temp1);
+        free(temp1);
+        free(temp2);
+      }
+      result[strlen(result)-1]=' ';
+      temp2=result;
+      asprintf(&result, "%s%s", temp2, "]");
+      free(temp2);
+      break;
     case 'r': asprintf(&result, "%f", v->real_val); break;
     case 's': result= strdup(v->string_val); break;
 		case 'a': result= strdup(v->string_val); break;					//IP address
@@ -264,6 +316,7 @@ char * toString(struct val * v){
 struct val * sum(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
+  result->next=NULL;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -277,7 +330,6 @@ struct val * sum(struct val * a, struct val * b){
 			result->type = 'a';
 			int temp ;
 			result->string_val = malloc(sizeof(char)*15);
-
 			inet_pton(AF_INET, a->string_val, &temp);
 			temp += htonl(b->int_val);
 			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
@@ -292,6 +344,7 @@ struct val * sum(struct val * a, struct val * b){
 struct val * or_logic(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
+  result->next=NULL;
   if(typeof_v(a)=='i' && typeof_v(b)=='i' ){
     result->type=typeof_v(a);
     result->int_val=a->int_val || b->int_val;
@@ -305,6 +358,7 @@ struct val * or_logic(struct val * a, struct val * b){
 struct val * and_logic(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
+  result->next=NULL;
   if(typeof_v(a)=='i' && typeof_v(b)=='i' ){
     result->type=typeof_v(a);
     result->int_val=a->int_val && b->int_val;
@@ -318,6 +372,7 @@ struct val * and_logic(struct val * a, struct val * b){
 struct val * sub(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
+  result->next=NULL;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -344,6 +399,7 @@ struct val * sub(struct val * a, struct val * b){
 struct val * mul(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
+  result->next=NULL;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -380,6 +436,7 @@ struct val * mul(struct val * a, struct val * b){
 struct val * division(struct val * a, struct val * b){
   struct val * result=malloc(sizeof(struct val));
   result->aliases=0;
+  result->next=NULL;
   if(typeof_v(a)==typeof_v(b)){
     result->type=typeof_v(a);
     switch (typeof_v(a)) {
@@ -449,7 +506,11 @@ struct val * new_device(struct val * addr, struct val * port){
   result->aliases=0;
   result->type='d';
   result->string_val=strdup(addr->string_val);
-  result->port_val = port->int_val;
+  if(port->int_val>0 && port->int_val<((2<<16)-1)){
+    result->port_val = port->int_val;
+  } else {
+    yyerror("invalid port number, found %d", port->int_val);
+  }
 	result->int_val = 0;
   return result;
 }
@@ -677,18 +738,33 @@ struct val * eval(struct ast *a){
   return v;
 }
 
+int arg_len(struct ast * list){
+  int len=1;
+  if(!list) return 0;
+  while(list->nodetype=='L'){
+    len++;
+    list=list->r;
+  }
+  return len;
+}
 
 
 void callbuiltin(struct fncall *f) {
   enum bifs functype = f->functype;
   struct val * v = eval(f->l);
+  struct val * v_temp;
   char * temp;
+  int num_arg=arg_len(f->l);
 
   switch(functype) {
   case B_print:
-    temp=toString(v);
-    printf("%s\n", temp);
-    free(temp);
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      temp=toString(v);
+      printf("%s\n", temp);
+      free(temp);
+    }
     break;
 	case B_connect:
 		start_connection(v);
@@ -697,13 +773,19 @@ void callbuiltin(struct fncall *f) {
 		close_connection(v);
 		break;
 	case B_receive:
-		receive_from_connection(eval(f->l->l),v);
+    v_temp=eval(f->l->l);
+    receive_from_connection(v_temp,v);
+    free_lost(v_temp);
 		break;
 	case B_send:
-		send_to_connection(eval(f->l->l),v);
+    v_temp=eval(f->l->l);
+    send_to_connection(v_temp,v);
+    free_lost(v_temp);
 		break;
   case B_append:
-  	list_append(eval(f->l->l),v);
+    v_temp=eval(f->l->l);
+  	list_append(v_temp,v);
+    free_lost(v_temp);
   	break;
   default:
     yyerror("Unknown built-in function %d", functype);
@@ -836,6 +918,7 @@ void treefree(struct ast *a){
 
   case 'L':
     treefree(a->r);
+    //treefree(a->l);
     break;
 
     /* one subtree */
@@ -870,9 +953,9 @@ void treefree(struct ast *a){
     break;
 
   case 'I': case 'W':
-    free( ((struct flow *)a)->cond);
-    if( ((struct flow *)a)->tl) free( ((struct flow *)a)->tl);
-    if( ((struct flow *)a)->el) free( ((struct flow *)a)->el);
+    treefree( ((struct flow *)a)->cond);
+    if( ((struct flow *)a)->tl) treefree( ((struct flow *)a)->tl);
+    if( ((struct flow *)a)->el) treefree( ((struct flow *)a)->el);
     break;
 
   default: printf("internal error: free bad node %c\n", a->nodetype);
@@ -963,6 +1046,7 @@ void dumpast(struct ast *a, int level){
     /* expressions */
   case '|': case '&':
   case '+': case '-': case '*': case '/': case 'L':
+  case ':':
   case '1': case '2': case '3':
   case '4': case '5': case '6':
     printf("binop %c\n", a->nodetype);

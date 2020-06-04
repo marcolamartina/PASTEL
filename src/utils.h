@@ -177,3 +177,6 @@ struct val * change_sign(struct val * a);
 struct val * eval(struct ast *a);
 struct val * and_logic(struct val * a, struct val * b);
 struct val * or_logic(struct val * a, struct val * b);
+struct val * get_element(struct val * list, int index);
+int length(struct val * list);
+int arg_len(struct ast * l);

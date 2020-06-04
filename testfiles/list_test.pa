@@ -1,3 +1,4 @@
+debug1
 list a;
 append(a,1);
 print(a);
@@ -7,3 +8,17 @@ print(a[0]);
 append(a,1);
 print(a[0]);
 print(a[1]);
+if(3>0){
+  int f;
+  f=9;
+  print(f);
+} else {
+  print(5);
+  print(4);
+}
+int b=1+1+1+1+1;
+print(b);
+
+address c = 1.2.3.4;
+device d=c+270:7+3;
+print(d);
