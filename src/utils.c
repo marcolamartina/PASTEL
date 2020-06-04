@@ -171,6 +171,20 @@ struct ast * newasgn(struct symbol *s, struct ast *v){
   return (struct ast *)a;
 }
 
+struct ast * newdeclasgn(struct symbol *s, char type, struct ast *v){
+  struct symdeclasgn *a = malloc(sizeof(struct symdeclasgn));
+
+  if(!a) {
+    yyerror("out of space");
+    exit(0);
+  }
+  a->nodetype = 'd';
+  a->s = s;
+  a->v = v;
+  a->type = type;
+  return (struct ast *)a;
+}
+
 struct ast * newasgn_l(struct symbol *s, struct ast *i, struct ast *v){
   struct symasgn_l *a = malloc(sizeof(struct symasgn_l));
 
@@ -536,6 +550,25 @@ struct val * eval(struct ast *a){
 
       break;
 
+  case 'd':
+      if(((struct symdeclasgn *)a)->s->value->type != 'u'){
+		     yyerror("%s already has type '%c'", ((struct symdeclasgn *)a)->s->name,
+                                             ((struct symdeclasgn *)a)->s->value->type);
+	    } else {
+         v=eval(((struct symdeclasgn *)a)->v);
+         if(typeof_v(v)==((struct symdeclasgn *)a)->type){
+           v->aliases++;
+           ((struct symdeclasgn *)a)->s->value->aliases--;
+           free_lost(((struct symdeclasgn *)a)->s->value);
+           ((struct symdeclasgn *)a)->s->value = v;
+         }else{
+           yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symdeclasgn *)a)->s), typeof_v(v) );
+         }
+	    }
+
+      break;
+
+
     /* assignment */
   case '=':
       v=eval(((struct symasgn *)a)->v);
@@ -832,6 +865,10 @@ void treefree(struct ast *a){
     treefree( ((struct symasgn *)a)->v);
     break;
 
+  case 'd':
+    treefree( ((struct symdeclasgn *)a)->v);
+    break;
+
   case 'I': case 'W':
     free( ((struct flow *)a)->cond);
     if( ((struct flow *)a)->tl) free( ((struct flow *)a)->tl);
@@ -902,7 +939,7 @@ void dumpast(struct ast *a, int level){
     printf("value %s\n", string); free(string); break;
 
     /* name reference */
-  case 'N': string =toString(((struct symref *)a)->s->value);
+  case 'N': string=toString(((struct symref *)a)->s->value);
             printf("ref %s", ((struct symref *)a)->s->name);
             if(((struct symref *)a)->s->value){
               printf("=%s\n", string );
@@ -917,8 +954,11 @@ void dumpast(struct ast *a, int level){
   case 'D': printf("decl %s\n", ((struct symref *)a)->s->name); break;
 
     /* assignment */
-  case '=': printf("= %s\n", ((struct symref *)a)->s->name);
+  case '=': printf("= %s\n", ((struct symasgn *)a)->s->name);
     dumpast( ((struct symasgn *)a)->v, level); break;
+
+  case 'd': printf("= %s\n", ((struct symdeclasgn *)a)->s->name);
+    dumpast( ((struct symdeclasgn *)a)->v, level); break;
 
     /* expressions */
   case '|': case '&':
@@ -947,6 +987,22 @@ void dumpast(struct ast *a, int level){
   case 'F':
     printf("builtin %d\n", ((struct fncall *)a)->functype);
     dumpast(a->l, level);
+    break;
+
+  case '#':
+    printf("%s[index]=\n", ((struct symasgn_l *)a)->s->name);
+    printf("%*s", 2*level, "");
+    printf("index =\n");
+    dumpast(((struct symasgn_l *)a)->v, level);
+    dumpast(((struct symasgn_l *)a)->i, level+1);
+
+    break;
+
+  case 'n':
+    printf("%s[index]\n", ((struct symref_l *)a)->s->name);
+    printf("%*s", 2*level, "");
+    printf("index =\n");
+    dumpast(((struct symref_l *)a)->i, level+1);
     break;
 
 

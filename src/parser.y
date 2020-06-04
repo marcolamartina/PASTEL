@@ -81,7 +81,7 @@ exp: '(' exp ')'          { $$ = $2; }
 decl: TYPE NAME    					{ $$=newdecl($2,$1); }
   | NAME '=' exp  					{ $$=newasgn($1,$3); }
 	| NAME'[' exp ']''=' exp	{	$$=newasgn_l($1,$3,$6);	}
-  | TYPE NAME '=' exp       { eval(newdecl($2,$1)); $$=newasgn($2,$4); }
+  | TYPE NAME '=' exp       { $$=newdeclasgn($2,$1,$4); }
 ;
 
 explist: exp

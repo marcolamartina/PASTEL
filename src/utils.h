@@ -43,6 +43,10 @@ void symlistfree(struct symlist *sl);
  *  S list of symbols
  *  F built in function call
  *  C user function call
+ *  d type declaration and assignement
+ *  # assignement to list position
+ *  n list element ref
+ *
  */
 
 enum bifs {			/* built-in functions */
@@ -109,8 +113,15 @@ struct symasgn {
   struct ast *v;		/* value */
 };
 
+struct symdeclasgn {
+  int nodetype;			/* type d */
+  struct symbol *s;
+  struct ast *v;		/* value */
+  char type;
+};
+
 struct symasgn_l {
-  int nodetype;			/* type = */
+  int nodetype;			/* type # */
   struct symbol *s;
   struct ast *i;
   struct ast *v;		/* value */
@@ -124,6 +135,7 @@ struct ast *newcall(struct symbol *s, struct ast *l);
 struct ast *newref(struct symbol *s);
 struct ast *newdecl(struct symbol *s, char type);
 struct ast *newasgn(struct symbol *s, struct ast *v);
+struct ast *newdeclasgn(struct symbol *s, char type, struct ast *v);
 struct ast *newvalue(struct val *v);
 struct ast *newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *tr);
 struct ast * newref_l(struct symbol *s, struct ast *i);
