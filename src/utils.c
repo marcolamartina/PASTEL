@@ -13,6 +13,7 @@ extern int file_mod;
 
 /* symbol table */
 /* hash a symbol */
+static void remove_symbol(struct symbol * s);
 static void start_connection(struct val * v);
 static void close_connection(struct val * v);
 static void receive_from_connection(struct val * device, struct val * string);
@@ -27,6 +28,27 @@ static unsigned symhash(char *sym)
   while((c = *sym++)) hash = hash*9 ^ c;
 
   return hash;
+}
+
+void remove_symbol(struct symbol * s){
+  struct symbol *sp = &symtab[symhash(s->name)%NHASH];
+  int scount = NHASH;		/* how many have we looked at */
+
+  while(--scount >= 0) {
+    if(sp->name && !strcmp(sp->name, s->name)) { 
+			sp->value->aliases--;
+			free_lost(sp->value);
+			sp->name=NULL;
+			return;
+		}
+
+    if(!sp->name) {		/* new entry */
+			yyerror("Trying to delete a non existent symbol.");
+			return;
+    }
+    if(++sp >= symtab+NHASH) sp = symtab; /* try the next entry */
+  }
+  yyerror("Trying to delete a non existent symbol.");
 }
 
 struct symbol * lookup(char* sym){
@@ -785,7 +807,7 @@ struct val * eval(struct ast *a){
         ((struct foreach *)a)->i->value=temp;
 	      v = eval(((struct foreach *)a)->l);
       }
-      // remove i from symbol table
+			remove_symbol(((struct foreach *)a)->i);
     }
     break;			/* last value is value */
 
