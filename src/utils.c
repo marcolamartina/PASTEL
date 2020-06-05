@@ -358,7 +358,22 @@ char * toString(struct val * v){
   }
   return result;
 }
- 		
+
+struct val * listdup(struct val * v){
+  struct val *v2=NULL;
+  if(typeof_v(v)=='l'){
+    v2=malloc(sizeof(struct val));
+    v2->aliases=0;
+    v2->type='l';
+    v2->next=valuedup(get_element(v,0));
+
+    for(int i=0; i<length(v)-1; i++){
+      get_element(v2,i)->next=valuedup(get_element(v,i+1));
+    }
+  }
+  return v2;
+}
+
 struct val * valuedup(struct val * v){
 	struct val *v2;
 	switch (typeof_v(v)){
@@ -366,6 +381,7 @@ struct val * valuedup(struct val * v){
 		case 'r': v2 = new_real(v->real_val); break;
 		case 's': v2 = new_string(v->string_val); break;
 		case 'a': v2 = new_address(v->string_val); break;
+    //case 'l': v2 = listdup(v); break;
 		default:
 			v2=v;
 			break;
@@ -383,6 +399,15 @@ struct val * sum(struct val * a, struct val * b){
       case 'i': result->int_val=a->int_val+b->int_val; break;
       case 's': asprintf(&result->string_val, "%s%s", a->string_val, b->string_val); break;
       case 'r': result->real_val=a->real_val+b->real_val; break;
+      case 'l':
+        result=valuedup(a);
+        if(length(result)>0){
+          (get_element(result,length(result)-1))->next=listdup(b)->next;
+        } else {
+          result->next=listdup(b)->next;
+        }
+        result->next=a->next;
+        break;
       default: yyerror("addiction not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else{

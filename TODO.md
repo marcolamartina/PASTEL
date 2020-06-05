@@ -1,5 +1,5 @@
 TODO
-* [ ] sum of lists (concatentation)
+* [x] sum of lists (concatentation)
 * [ ] insert into list
 * [ ] remove from list
 * [x] builtin length

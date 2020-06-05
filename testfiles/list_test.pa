@@ -11,3 +11,5 @@ print(a);
 [[3],3];
 int g=length(a);
 int h=length([1,4,6]);
+
+print([1,2]+[3,4]);
