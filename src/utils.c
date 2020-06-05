@@ -785,7 +785,6 @@ struct val * eval(struct ast *a){
         ((struct foreach *)a)->i->value=temp;
 	      v = eval(((struct foreach *)a)->l);
       }
-      free_lost(temp2);
       // remove i from symbol table
     }
     break;			/* last value is value */
