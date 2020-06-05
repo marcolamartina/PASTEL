@@ -8,3 +8,5 @@ for (h in [1+1]){
   print(h);
 }
 [[3],3];
+int g=length(a);
+int h=length([1,4,6]);

@@ -907,7 +907,7 @@ struct val * callbuiltin(struct fncall *f) {
     if (num_arg != 1) {
       yyerror("Wrong argument number, expected 1, found %d", num_arg);
     } else{
-      new_int(length(v));
+      result=new_int(length(v));
     }
     break;
   default:
