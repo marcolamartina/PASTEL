@@ -951,9 +951,9 @@ struct val * callbuiltin(struct fncall *f) {
     if (num_arg != 3) {
       yyerror("Wrong argument number, expected 3, found %d", num_arg);
     } else{
+      v_temp2=eval(f->l->r->l);
       v_temp=eval(f->l->l);
-      v_temp2=eval(f->l->l->l);
-      list_insert(v_temp2, v_temp, v);
+      list_insert(v_temp, v_temp2, v);
       free_lost(v_temp);
       free_lost(v_temp2);
     }
@@ -1088,6 +1088,7 @@ void receive_from_connection(struct val * device, struct val * string){
 }
 
 void list_insert(struct val * list, struct val * value, struct val * index){
+  struct val * v=valuedup(value);
   struct val * temp;
   if(typeof_v(list)!='l'){
     yyerror("Function insert is defined only for list, not for %c", typeof_v(list));
@@ -1095,15 +1096,18 @@ void list_insert(struct val * list, struct val * value, struct val * index){
     yyerror("Cannot have nested lists");
   } else if(typeof_v(index)!='i' || index->int_val<0){
     yyerror("index is not a positive integer, found %c", typeof_v(index));
+  } else if(list && index->int_val>length(list)){
+    yyerror("index out of bounds, found index=%d length=%d", index->int_val, length(list));
   } else {
     if(index->int_val==0){
-      value->next=list->next;
-      list->next=value;
-      value->aliases++;
+      v->next=list->next;
+      list->next=v;
+      v->aliases++;
     } else {
-      temp=get_element(list,index->int_val-1)->next;
-      value->next=temp;
-      temp=value;
+      temp=get_element(list,index->int_val-1);
+      v->aliases++;
+      v->next=temp->next;
+      temp->next=v;
     }
 
   }

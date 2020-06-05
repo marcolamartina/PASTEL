@@ -1,15 +1,14 @@
-debug1
+//debug1
 list a;
-a=[1,2,3];
-for (i in a){
-  print(i);
-}
-for (h in [1+1]){
-  print(h);
-}
-print(a);
-[[3],3];
-int g=length(a);
-int h=length([1,4,6]);
 
-print([1,2]+[3,4]);
+
+insert(a,1,0);
+print(a);
+insert(a,2,1);
+insert(a,3,2);
+print(a);
+list b;
+for(i in [ 0,1,2,3,4,5,6] ){
+  insert(b,i,i);
+}
+print(b);
