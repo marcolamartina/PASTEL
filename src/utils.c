@@ -35,7 +35,7 @@ void remove_symbol(struct symbol * s){
   int scount = NHASH;		/* how many have we looked at */
 
   while(--scount >= 0) {
-    if(sp->name && !strcmp(sp->name, s->name)) { 
+    if(sp->name && !strcmp(sp->name, s->name)) {
 			sp->value->aliases--;
 			free_lost(sp->value);
 			sp->name=NULL;
@@ -850,26 +850,47 @@ void callbuiltin(struct fncall *f) {
     }
     break;
 	case B_connect:
-		start_connection(v);
-		break;
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      start_connection(v);
+    }
+    break;
 	case B_disconnect:
-		close_connection(v);
-		break;
+  if (num_arg != 1) {
+    yyerror("Wrong argument number, expected 1, found %d", num_arg);
+  } else{
+    close_connection(v);
+  }
+  break;
 	case B_receive:
-    v_temp=eval(f->l->l);
-    receive_from_connection(v_temp,v);
-    free_lost(v_temp);
-		break;
+    if (num_arg != 2) {
+      yyerror("Wrong argument number, expected 2, found %d", num_arg);
+    } else{
+      v_temp=eval(f->l->l);
+      receive_from_connection(v_temp,v);
+      free_lost(v_temp);
+    }
+    break;
+
 	case B_send:
-    v_temp=eval(f->l->l);
-    send_to_connection(v_temp,v);
-    free_lost(v_temp);
-		break;
+    if (num_arg != 2) {
+      yyerror("Wrong argument number, expected 2, found %d", num_arg);
+    } else{
+      v_temp=eval(f->l->l);
+      send_to_connection(v_temp,v);
+      free_lost(v_temp);
+    }
+    break;
   case B_append:
-    v_temp=eval(f->l->l);
-  	list_append(v_temp,v);
-    free_lost(v_temp);
-  	break;
+    if (num_arg != 2) {
+      yyerror("Wrong argument number, expected 2, found %d", num_arg);
+    } else{
+      v_temp=eval(f->l->l);
+      list_append(v_temp,v);
+      free_lost(v_temp);
+    }
+    break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
