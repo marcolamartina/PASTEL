@@ -812,8 +812,11 @@ struct val * eval(struct ast *a){
 
       while( (temp=temp->next) ){
         ((struct foreach *)a)->i->value=temp;
+				temp->aliases++;
 	      v = eval(((struct foreach *)a)->l);
+				temp->aliases--;
       }
+			((struct foreach *)a)->i->value->aliases++;	/* the remove_symbol will decrement the aliases */
 			remove_symbol(((struct foreach *)a)->i);
     }
     break;			/* last value is value */
@@ -904,7 +907,7 @@ void callbuiltin(struct fncall *f) {
 }
 
 void free_lost(struct val * v){
-  if(v && v->aliases==0){
+  if(v &&	v->aliases && v->aliases==0){
 		free_lost(v->next);
     free(v);
   }
