@@ -7,7 +7,7 @@ exit="exit
 ";
 connect(a);
 while(b!=exit){
-	listen(a,b);
+	receive(a,b);
 	print(b);
 	send(a,b);
 }
