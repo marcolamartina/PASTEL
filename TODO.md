@@ -1,6 +1,6 @@
 TODO
 * [x] sum of lists (concatentation)
-* [ ] insert into list
+* [x] insert into list
 * [x] remove from list
 * [x] builtin length
 * [ ] .port
