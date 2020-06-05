@@ -127,6 +127,13 @@ struct symasgn_l {
   struct ast *v;		/* value */
 };
 
+struct foreach {
+  int nodetype;			/* type f */
+  struct symbol *i;
+  struct ast *list;
+  struct ast *l;		/* command list */
+};
+
 /* build an AST */
 struct ast *newast(int nodetype, struct ast *l, struct ast *r);
 struct ast *newcmp(int cmptype, struct ast *l, struct ast *r);
@@ -138,6 +145,7 @@ struct ast *newasgn(struct symbol *s, struct ast *v);
 struct ast *newdeclasgn(struct symbol *s, char type, struct ast *v);
 struct ast *newvalue(struct val *v);
 struct ast *newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *tr);
+struct ast *newforeach(int nodetype, struct symbol *i, struct ast *list, struct ast *l);
 struct ast * newref_l(struct symbol *s, struct ast *i);
 struct ast * newasgn_l(struct symbol *s, struct ast *i, struct ast *v);
 
@@ -173,6 +181,7 @@ struct val * new_int(int a);
 struct val * new_device(struct val * addr, struct val * port);
 struct val * new_string(char * a);
 struct val * new_address(char * a);
+struct val * new_list(struct ast * list);
 struct val * change_sign(struct val * a);
 struct val * eval(struct ast *a);
 struct val * and_logic(struct val * a, struct val * b);

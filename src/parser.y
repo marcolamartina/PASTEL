@@ -34,6 +34,7 @@ extern int file_mod;
 
 
 %type <a> exp stmt list explist decl
+%type <v> value
 
 %define parse.error verbose
 %start program
@@ -47,9 +48,11 @@ program: /* nothing */
   | program error '\n' { yyerrok; printf("%s", file_mod ? "" : "> "); }
  ;
 
-stmt: IF '(' exp ')' '{' list '}'                   { $$ = newflow('I', $3, $6, NULL); }
-   | IF '(' exp ')' '{' list '}' ELSE '{' list '}'  { $$ = newflow('I', $3, $6, $10); }
-   | WHILE '(' exp ')' '{' list '}'                 { $$ = newflow('W', $3, $6, NULL);}
+
+stmt: IF '(' exp ')' '{' list '}'                   { $$ = newflow('I', $3, $6, NULL);  }
+   | IF '(' exp ')' '{' list '}' ELSE '{' list '}'  { $$ = newflow('I', $3, $6, $10);   }
+   | WHILE '(' exp ')' '{' list '}'                 { $$ = newflow('W', $3, $6, NULL);  }
+   | FOR '(' NAME IN exp ')' '{' list '}'           { $$ = newforeach('f', $3, $5, $8); }
    | exp ';'
    | decl ';'
 ;
@@ -62,9 +65,10 @@ list: /* nothing */ { $$ = NULL; }
                 }
    ;
 
+
 exp: '(' exp ')'          { $$ = $2; }
    | FUNC '(' explist ')' { $$ = newfunc($1, $3); }
-   | VALUE                { $$ = newvalue($1);}
+   | value                { $$ = newvalue($1);}
    | exp ':' exp          { $$ = newast(':', $1,$3); }
    | exp '+' exp          { $$ = newast('+', $1,$3); }
    | exp '-' exp          { $$ = newast('-', $1,$3); }
@@ -84,6 +88,9 @@ decl: TYPE NAME    					{ $$=newdecl($2,$1); }
   | TYPE NAME '=' exp       { $$=newdeclasgn($2,$1,$4); }
 ;
 
+value: VALUE
+  | '[' explist ']' { $$=new_list($2); }
+;
 explist: exp
  | exp ',' explist  { $$ = newast('L', $1, $3); }
 ;

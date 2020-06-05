@@ -213,6 +213,20 @@ struct ast * newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast 
   return (struct ast *)a;
 }
 
+struct ast * newforeach(int nodetype, struct symbol *i, struct ast *list, struct ast *l){
+  struct foreach *a = malloc(sizeof(struct foreach));
+
+  if(!a) {
+    yyerror("out of space");
+    exit(0);
+  }
+  a->nodetype = nodetype;
+  a->i = i;
+  a->list = list;
+  a->l = l;
+  return (struct ast *)a;
+}
+
 struct symlist * newsymlist(struct symbol *sym, struct symlist *next){
   struct symlist *sl = malloc(sizeof(struct symlist));
 
@@ -307,7 +321,7 @@ char * toString(struct val * v){
     case 's': result= strdup(v->string_val); break;
 		case 'a': result= strdup(v->string_val); break;					//IP address
 		case 'd': asprintf(&result, "%s:%d - %sconnected", v->string_val, v->port_val, (v->int_val != 0 ? "":"not " )); break;
-		case 'u': yyerror("Cannot use a variable before type declaration"); result=strdup(""); break;
+		case 'u': result=strdup("uninstantiated variable"); break;
     default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); result=strdup(""); break;
   }
   return result;
@@ -457,6 +471,24 @@ struct val * division(struct val * a, struct val * b){
   }else{
     yyerror("division of incompatible types (%c/%c)", typeof_v(a), typeof_v(b));
   }
+  return result;
+}
+
+struct val * new_list(struct ast * list){
+  struct val * result=malloc(sizeof(struct val));
+  struct val * temp=result;
+	result->next = NULL;
+  result->aliases=0;
+  result->type='l';
+  if(!list || !list->l){
+    return result;
+  }
+  do {
+    temp->next=list->nodetype=='L' ? eval(list->l) : eval(list);
+    temp=temp->next;
+    temp->aliases=0;
+
+  } while(list->nodetype=='L' && (list=list->r));
   return result;
 }
 
@@ -637,6 +669,10 @@ struct val * eval(struct ast *a){
 				yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
 			} else if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
         v->aliases++;
+        temp=v;
+        while((temp=temp->next)){
+          temp->aliases++;
+        }
         ((struct symasgn *)a)->s->value->aliases--;
         free_lost(((struct symasgn *)a)->s->value);
         ((struct symasgn *)a)->s->value = v;
@@ -665,6 +701,7 @@ struct val * eval(struct ast *a){
           }
           temp->aliases++;
           v->next->aliases--;
+          temp->next=v->next->next;
           free_lost(v->next);
           v->next = temp;
         } else {
@@ -728,6 +765,31 @@ struct val * eval(struct ast *a){
       free_lost(temp);
     }
     break;			/* last value is value */
+
+  case 'f':
+    v = NULL;		/* a default value */
+
+    if( ((struct foreach *)a)->l) {
+      temp=(eval( ((struct foreach *)a)->list));
+      if(!temp || typeof_v(temp)!='l'){
+        yyerror("No valid list specified");
+        return NULL;
+      }
+      if(typeof_s(((struct foreach *)a)->i)!='u'){
+        yyerror("Variable %s already declared", ((struct foreach *)a)->i->name);
+        return NULL;
+      }
+      temp2=temp;
+
+      while( (temp=temp->next) ){
+        ((struct foreach *)a)->i->value=temp;
+	      v = eval(((struct foreach *)a)->l);
+      }
+      free_lost(temp2);
+      // remove i from symbol table
+    }
+    break;			/* last value is value */
+
 
   case 'L': temp=eval(a->l); v = eval(a->r); free_lost(temp);  break;
 
@@ -931,6 +993,7 @@ void treefree(struct ast *a){
   case 'N': case 'D':
     break;
 
+
   case 'n':
     treefree(((struct symref_l *)a)->i);
     break;
@@ -956,6 +1019,11 @@ void treefree(struct ast *a){
     treefree( ((struct flow *)a)->cond);
     if( ((struct flow *)a)->tl) treefree( ((struct flow *)a)->tl);
     if( ((struct flow *)a)->el) treefree( ((struct flow *)a)->el);
+    break;
+
+  case 'f':
+    if( ((struct foreach *)a)->list) treefree( ((struct foreach *)a)->list);
+    if( ((struct foreach *)a)->l) treefree( ((struct foreach *)a)->l);
     break;
 
   default: printf("internal error: free bad node %c\n", a->nodetype);
@@ -1068,6 +1136,14 @@ void dumpast(struct ast *a, int level){
       dumpast( ((struct flow *)a)->el, level);
     break;
 
+  case 'f':
+    printf("foreach %c\n", a->nodetype);
+    if( ((struct foreach *)a)->list)
+      dumpast( ((struct foreach *)a)->list, level);
+    if( ((struct foreach *)a)->l)
+      dumpast( ((struct foreach *)a)->l, level);
+    break;
+
   case 'F':
     printf("builtin %d\n", ((struct fncall *)a)->functype);
     dumpast(a->l, level);
@@ -1077,8 +1153,9 @@ void dumpast(struct ast *a, int level){
     printf("%s[index]=\n", ((struct symasgn_l *)a)->s->name);
     printf("%*s", 2*level, "");
     printf("index =\n");
-    dumpast(((struct symasgn_l *)a)->v, level);
     dumpast(((struct symasgn_l *)a)->i, level+1);
+    dumpast(((struct symasgn_l *)a)->v, level);
+
 
     break;
 
