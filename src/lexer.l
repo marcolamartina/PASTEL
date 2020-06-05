@@ -60,6 +60,7 @@
 "receive"			{ yylval.fn = B_receive; return FUNC; }
 "send"				{ yylval.fn = B_send; return FUNC; }
 "append"			{ yylval.fn = B_append; return FUNC; }
+"length"			{ yylval.fn = B_length; return FUNC; }
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
 

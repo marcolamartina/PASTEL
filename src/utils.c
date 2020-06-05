@@ -839,7 +839,8 @@ int arg_len(struct ast * list){
 }
 
 
-void callbuiltin(struct fncall *f) {
+struct val * callbuiltin(struct fncall *f) {
+  struct val * result=NULL;
   enum bifs functype = f->functype;
   struct val * v = eval(f->l);
   struct val * v_temp;
@@ -898,9 +899,18 @@ void callbuiltin(struct fncall *f) {
       free_lost(v_temp);
     }
     break;
+
+  case B_length:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      new_int(length(v));
+    }
+    break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
+  return result;
 }
 
 void free_lost(struct val * v){

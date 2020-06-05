@@ -55,7 +55,8 @@ enum bifs {			/* built-in functions */
   B_disconnect,
   B_send,
   B_receive,
-  B_append
+  B_append,
+  B_length
 };
 
 /* nodes in the Abstract Syntax Tree */
@@ -167,7 +168,7 @@ int file_mod;
 extern int debug;
 void dumpast(struct ast *a, int level);
 void free_lost(struct val * v);
-void callbuiltin(struct fncall *);
+struct val * callbuiltin(struct fncall *);
 
 char typeof_v(struct val * v);
 char typeof_s(struct symbol * s);
