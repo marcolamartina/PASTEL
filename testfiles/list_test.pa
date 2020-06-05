@@ -7,3 +7,4 @@ for (i in a){
 for (h in [1+1]){
   print(h);
 }
+[[3],3];

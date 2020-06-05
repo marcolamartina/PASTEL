@@ -5,3 +5,4 @@ TODO
 * [ ] .port
 * [ ] .address
 * [ ] atoi atof toString atod
+* [x] no nested list

@@ -507,6 +507,11 @@ struct val * new_list(struct ast * list){
   }
   do {
     temp->next=list->nodetype=='L' ? eval(list->l) : eval(list);
+    if(typeof_v(temp->next)=='l'){
+      yyerror("Cannot have nested lists");
+      temp->next=NULL;
+      return result;
+    }
     temp=temp->next;
     temp->aliases=0;
 
@@ -708,6 +713,8 @@ struct val * eval(struct ast *a){
       temp2=eval(((struct symasgn_l *)a)->i);
 			if(typeof_s(((struct symasgn_l *)a)->s) == 'u'){
 				yyerror("variable %s uninstantiated.", ((struct symasgn_l *)a)->s->name);
+			} else if(typeof_v(temp) == 'l'){
+				yyerror("Cannot have nested lists");
 			} else if(typeof_s(((struct symasgn_l *)a)->s)!='l'){
         yyerror("variable is not a list, found %c", typeof_s(((struct symasgn_l *)a)->s));
       }else{
@@ -999,6 +1006,8 @@ void receive_from_connection(struct val * device, struct val * string){
 static void list_append(struct val * list, struct val * value){
   if(typeof_v(list)!='l'){
     yyerror("Function append is defined only for list, not for %c", typeof_v(list));
+  } else if(typeof_v(value)=='l'){
+    yyerror("Cannot have nested lists");
   } else {
     value->next=list->next;
     list->next=value;
