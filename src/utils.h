@@ -173,6 +173,7 @@ struct val * callbuiltin(struct fncall *);
 char typeof_v(struct val * v);
 char typeof_s(struct symbol * s);
 char * toString(struct val * v);
+struct val * valuedup(struct val * v);
 struct val * sum(struct val * a, struct val * b);
 struct val * sub(struct val * a, struct val * b);
 struct val * mul(struct val * a, struct val * b);

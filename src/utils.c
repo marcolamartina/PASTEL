@@ -37,7 +37,7 @@ void remove_symbol(struct symbol * s){
   while(--scount >= 0) {
     if(sp->name && !strcmp(sp->name, s->name)) {
 			sp->value->aliases--;
-			free_lost(sp->value);
+		//	free_lost(sp->value);
 			sp->name=NULL;
 			return;
 		}
@@ -312,11 +312,21 @@ int length(struct val * list){
 
 
 char typeof_v(struct val * v){
-  return v->type;
+	if(v){
+  	return v->type;
+	} else {
+		yyerror("NULL value detected");
+		return 'u';
+	}
 }
 
 char typeof_s(struct symbol * s){
-  return s->value->type;
+	if(s){
+  	return s->value->type;
+	} else {
+		yyerror("NULL value detected");
+		return 'u';
+	}
 }
 
 char * toString(struct val * v){
@@ -347,6 +357,20 @@ char * toString(struct val * v){
     default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); result=strdup(""); break;
   }
   return result;
+}
+ 		
+struct val * valuedup(struct val * v){
+	struct val *v2;
+	switch (typeof_v(v)){
+		case 'i': v2 = new_int(v->int_val); break;
+		case 'r': v2 = new_real(v->real_val); break;
+		case 's': v2 = new_string(v->string_val); break;
+		case 'a': v2 = new_address(v->string_val); break;
+		default:
+			v2=v;
+			break;
+	}
+	return v2;
 }
 
 struct val * sum(struct val * a, struct val * b){
@@ -622,7 +646,7 @@ struct val * eval(struct ast *a){
 
   switch(a->nodetype) {
     /* constant */
-  case 'K': v = ((struct value_val *)a)->v; break;
+  case 'K': v = valuedup(((struct value_val *)a)->v); break;
 
     /* name reference */
 	case 'n':
@@ -675,13 +699,17 @@ struct val * eval(struct ast *a){
 		     yyerror("%s already has type '%c'", ((struct symdeclasgn *)a)->s->name,
                                              ((struct symdeclasgn *)a)->s->value->type);
 	    } else {
-         v=eval(((struct symdeclasgn *)a)->v);
-         if(typeof_v(v)==((struct symdeclasgn *)a)->type){
-           v->aliases++;
-           ((struct symdeclasgn *)a)->s->value->aliases--;
-           free_lost(((struct symdeclasgn *)a)->s->value);
-           ((struct symdeclasgn *)a)->s->value = v;
-         }else{
+        v=eval(((struct symdeclasgn *)a)->v);
+				if(!v){
+					yyerror("Cannot assign NULL value");
+					return NULL;
+				}
+        if(typeof_v(v)==((struct symdeclasgn *)a)->type){
+          v->aliases++;
+          ((struct symdeclasgn *)a)->s->value->aliases--;
+          free_lost(((struct symdeclasgn *)a)->s->value);
+          ((struct symdeclasgn *)a)->s->value = v;
+        }else{
            yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symdeclasgn *)a)->s), typeof_v(v) );
          }
 	    }
@@ -824,7 +852,7 @@ struct val * eval(struct ast *a){
 
   case 'L': temp=eval(a->l); v = eval(a->r); free_lost(temp);  break;
 
-  case 'F': callbuiltin((struct fncall *)a); v=NULL; break;
+  case 'F': v=callbuiltin((struct fncall *)a); break;
 
   default: printf("internal error: bad node %c\n", a->nodetype);
   }
@@ -917,8 +945,13 @@ struct val * callbuiltin(struct fncall *f) {
 }
 
 void free_lost(struct val * v){
-  if(v &&	v->aliases && v->aliases==0){
-		free_lost(v->next);
+	if(!v){
+		return;
+	}
+  if(v->aliases<=0){
+		if(v->next){
+				free_lost(v->next);
+		}
     free(v);
   }
 }
