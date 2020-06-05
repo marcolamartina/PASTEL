@@ -900,6 +900,7 @@ struct val * callbuiltin(struct fncall *f) {
   enum bifs functype = f->functype;
   struct val * v = eval(f->l);
   struct val * v_temp;
+  struct val * v_temp2;
   char * temp;
   int num_arg=arg_len(f->l);
 
@@ -946,12 +947,24 @@ struct val * callbuiltin(struct fncall *f) {
       free_lost(v_temp);
     }
     break;
-  case B_append:
+  case B_insert:
+    if (num_arg != 3) {
+      yyerror("Wrong argument number, expected 3, found %d", num_arg);
+    } else{
+      v_temp=eval(f->l->l);
+      v_temp2=eval(f->l->l->l);
+      list_insert(v_temp2, v_temp, v);
+      free_lost(v_temp);
+      free_lost(v_temp2);
+    }
+    break;
+
+  case B_remove:
     if (num_arg != 2) {
       yyerror("Wrong argument number, expected 2, found %d", num_arg);
     } else{
       v_temp=eval(f->l->l);
-      list_append(v_temp,v);
+      list_remove(v_temp,v);
       free_lost(v_temp);
     }
     break;
@@ -1074,15 +1087,52 @@ void receive_from_connection(struct val * device, struct val * string){
 	}
 }
 
-static void list_append(struct val * list, struct val * value){
+void list_insert(struct val * list, struct val * value, struct val * index){
+  struct val * temp;
   if(typeof_v(list)!='l'){
-    yyerror("Function append is defined only for list, not for %c", typeof_v(list));
+    yyerror("Function insert is defined only for list, not for %c", typeof_v(list));
   } else if(typeof_v(value)=='l'){
     yyerror("Cannot have nested lists");
+  } else if(typeof_v(index)!='i' || index->int_val<0){
+    yyerror("index is not a positive integer, found %c", typeof_v(index));
   } else {
-    value->next=list->next;
-    list->next=value;
-    value->aliases++;
+    if(index->int_val==0){
+      value->next=list->next;
+      list->next=value;
+      value->aliases++;
+    } else {
+      temp=get_element(list,index->int_val-1)->next;
+      value->next=temp;
+      temp=value;
+    }
+
+  }
+}
+
+void list_remove(struct val * list, struct val * index){
+  struct val * temp;
+  struct val * temp2;
+  if(typeof_v(list)!='l'){
+    yyerror("Function remove is defined only for list, not for %c", typeof_v(list));
+  } else if(typeof_v(index)!='i' || index->int_val<0){
+    yyerror("index is not a positive integer, found %c", typeof_v(index));
+  } else if(list && index->int_val>=length(list)){
+    yyerror("index out of bounds, found index=%d length=%d", index->int_val, length(list));
+  } else {
+    if(index->int_val==0){
+      temp=list->next->next;
+      list->next->next=NULL;
+      list->next->aliases--;
+      free_lost(list->next);
+      list->next=temp;
+    } else {
+      temp=get_element(list,index->int_val-1);
+      temp2=get_element(list,index->int_val-1)->next;
+      temp->next=temp2->next;
+      temp2->next=NULL;
+      temp2->aliases--;
+      free_lost(temp2);
+    }
   }
 }
 

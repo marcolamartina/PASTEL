@@ -55,7 +55,8 @@ enum bifs {			/* built-in functions */
   B_disconnect,
   B_send,
   B_receive,
-  B_append,
+  B_insert,
+  B_remove,
   B_length
 };
 
@@ -174,6 +175,7 @@ char typeof_v(struct val * v);
 char typeof_s(struct symbol * s);
 char * toString(struct val * v);
 struct val * valuedup(struct val * v);
+struct val * listdup(struct val * v);
 struct val * sum(struct val * a, struct val * b);
 struct val * sub(struct val * a, struct val * b);
 struct val * mul(struct val * a, struct val * b);
@@ -191,3 +193,5 @@ struct val * or_logic(struct val * a, struct val * b);
 struct val * get_element(struct val * list, int index);
 int length(struct val * list);
 int arg_len(struct ast * l);
+void list_remove(struct val * list, struct val * index);
+void list_insert(struct val * list, struct val * value, struct val * index);

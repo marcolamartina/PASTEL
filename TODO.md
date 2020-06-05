@@ -1,7 +1,7 @@
 TODO
 * [x] sum of lists (concatentation)
 * [ ] insert into list
-* [ ] remove from list
+* [x] remove from list
 * [x] builtin length
 * [ ] .port
 * [ ] .address
