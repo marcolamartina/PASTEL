@@ -4,6 +4,7 @@
 %option stack
 %x string_state
 
+
 %{
 # include "utils.h"
 # include "parser.tab.h"
@@ -88,6 +89,7 @@
 
 
 
+
  /* device */
 ((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|"localhost" { yylval.v=new_address(yytext); return VALUE; }
 
@@ -96,6 +98,8 @@
 
 
 "//".*  /* ignore comments */
+
+
 [ \t]   /* ignore white space */
 "\n"    { printf("%s", file_mod ? "" : "> "); }
 

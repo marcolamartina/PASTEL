@@ -6,6 +6,15 @@
 #include <math.h>
 #include <arpa/inet.h>
 #include "utils.h"
+
+#if defined(__linux__)
+    #define OS 2
+#elif defined(__APPLE__) && defined(__MACH__)
+    #define OS 1
+#else
+    #define OS 0
+#endif
+
 int yyparse();
 
 extern int file_mod;
@@ -18,6 +27,23 @@ static void start_connection(struct val * v);
 static void close_connection(struct val * v);
 static void receive_from_connection(struct val * device, struct val * string);
 static void send_to_connection(struct val * device, struct val * string);
+
+void open_terminal(char * port){
+  char * string;
+  switch(OS){
+    case 1:
+      asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"nc -lk %s\"\'", port );
+      break;
+    case 2:
+      asprintf(&string, "gnome-terminal -- sh -c \"nc -lk %s; bash", port);
+      break;
+    default:
+      yyerror("Function not supported in this OS");
+      return;
+  }
+  system(string);
+  free(string);
+}
 
 static unsigned symhash(char *sym)
 {
@@ -1365,6 +1391,7 @@ void yyerror(const char *s, ...){
 int main(int argc, char **argv){
 	extern FILE * yyin;
   file_mod=0;
+  open_terminal("123");
 	for(int i = 1; i<argc; i++){
 		if((strcmp(argv[1]+strlen(argv[1])-3,".pa")!=0)){
       fprintf(stderr, "Insert a .pa file");
