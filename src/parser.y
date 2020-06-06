@@ -18,13 +18,14 @@ extern int file_mod;
 
 /* declare tokens */
 %token IF ELSE WHILE FOR IN DEF
-%token <fn> FUNC
+%token <fn> FUNC ADDR PORT
 %token <s> NAME
 %token <c> TYPE
 %token <v> VALUE
 
 
 %right '='
+%nonassoc ADDR PORT
 %left ':'
 %left AND OR
 %nonassoc <fn> CMP
@@ -80,19 +81,21 @@ exp: '(' exp ')'          { $$ = $2; }
 	 | NAME'[' exp ']'			{ $$ = newref_l($1,$3); }
    | NAME                 { $$ = newref($1); }
    | exp CMP exp          { $$ = newcmp($2, $1, $3); }
+   | exp ADDR             { $$ = newfunc($2, $1); }
+   | exp PORT             { $$ = newfunc($2, $1); }
 ;
 
-decl: TYPE NAME    					{ $$=newdecl($2,$1); }
-  | NAME '=' exp  					{ $$=newasgn($1,$3); }
-	| NAME'[' exp ']''=' exp	{	$$=newasgn_l($1,$3,$6);	}
-  | TYPE NAME '=' exp       { $$=newdeclasgn($2,$1,$4); }
+decl: TYPE NAME    					{ $$ = newdecl($2,$1); }
+  | NAME '=' exp  					{ $$ = newasgn($1,$3); }
+	| NAME'[' exp ']''=' exp	{	$$ = newasgn_l($1,$3,$6);	}
+  | TYPE NAME '=' exp       { $$ = newdeclasgn($2,$1,$4); }
 ;
 
 value: VALUE
-  | '[' explist ']' { $$=new_list($2); }
+  | '[' explist ']'   { $$ = new_list($2); }
 ;
 explist: exp
- | exp ',' explist  { $$ = newast('L', $1, $3); }
+ | exp ',' explist    { $$ = newast('L', $1, $3); }
 ;
 
 

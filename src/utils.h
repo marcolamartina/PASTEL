@@ -57,7 +57,9 @@ enum bifs {			/* built-in functions */
   B_receive,
   B_insert,
   B_remove,
-  B_length
+  B_length,
+  B_port,
+  B_address
 };
 
 /* nodes in the Abstract Syntax Tree */
@@ -191,6 +193,8 @@ struct val * eval(struct ast *a);
 struct val * and_logic(struct val * a, struct val * b);
 struct val * or_logic(struct val * a, struct val * b);
 struct val * get_element(struct val * list, int index);
+struct val * get_port(struct val * v);
+struct val * get_address(struct val * v);
 int length(struct val * list);
 int arg_len(struct ast * l);
 void list_remove(struct val * list, struct val * index);

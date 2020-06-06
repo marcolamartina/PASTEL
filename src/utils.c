@@ -129,6 +129,7 @@ struct ast * newfunc(int functype, struct ast *l){
   return (struct ast *)a;
 }
 
+
 struct ast * newcall(struct symbol *s, struct ast *l) {
   struct ufncall *a = malloc(sizeof(struct ufncall));
 
@@ -977,6 +978,21 @@ struct val * callbuiltin(struct fncall *f) {
       result=new_int(length(v));
     }
     break;
+
+  case B_port:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      result=get_port(v);
+    }
+    break;
+	case B_address:
+  if (num_arg != 1) {
+    yyerror("Wrong argument number, expected 1, found %d", num_arg);
+  } else{
+    result=get_address(v);
+  }
+  break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
@@ -992,6 +1008,25 @@ void free_lost(struct val * v){
 				free_lost(v->next);
 		}
     free(v);
+  }
+}
+
+
+struct val * get_port(struct val * v){
+  if(typeof_v(v)!='d'){
+    yyerror("Attribute port is only for type device, found %c", typeof_v(v));
+    return NULL;
+  } else {
+    return new_int(v->port_val);
+  }
+}
+
+struct val * get_address(struct val * v){
+  if(typeof_v(v)!='d'){
+    yyerror("Attribute address is only for type device, found %c", typeof_v(v));
+    return NULL;
+  } else {
+    return new_address(v->string_val);
   }
 }
 

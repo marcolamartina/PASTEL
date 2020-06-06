@@ -46,6 +46,10 @@
 "def"   { return DEF; }
 "and"   { return AND; }
 "or"    { return OR; }
+
+".port"    { yylval.fn = B_port; return PORT; }
+".address" { yylval.fn = B_address; return ADDR; }
+
 "string"  	{ yylval.c='s'; return TYPE; }
 "int"     	{ yylval.c='i'; return TYPE; }
 "real"    	{ yylval.c='r'; return TYPE; }
@@ -62,6 +66,7 @@
 "insert"			{ yylval.fn = B_insert; return FUNC; }
 "remove"			{ yylval.fn = B_remove; return FUNC; }
 "length"			{ yylval.fn = B_length; return FUNC; }
+
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
 
