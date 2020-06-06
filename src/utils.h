@@ -59,7 +59,12 @@ enum bifs {			/* built-in functions */
   B_remove,
   B_length,
   B_port,
-  B_address
+  B_address,
+  B_s2i,
+  B_s2r,
+  B_s2d,
+  B_s2a,
+  B_toString
 };
 
 /* nodes in the Abstract Syntax Tree */
@@ -199,3 +204,7 @@ int length(struct val * list);
 int arg_len(struct ast * l);
 void list_remove(struct val * list, struct val * index);
 void list_insert(struct val * list, struct val * value, struct val * index);
+struct val * s2a(struct val * v);
+struct val * s2d(struct val * v);
+struct val * s2r(struct val * v);
+struct val * s2i(struct val * v);

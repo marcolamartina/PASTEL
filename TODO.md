@@ -5,6 +5,6 @@ TODO
 * [x] builtin length
 * [x] .port
 * [x] .address
-* [ ] atoi atof toString atod
+* [x] atoi atof toString atod
 * [x] no nested list
 * [ ] user defined functions

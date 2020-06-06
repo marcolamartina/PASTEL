@@ -66,6 +66,12 @@
 "insert"			{ yylval.fn = B_insert; return FUNC; }
 "remove"			{ yylval.fn = B_remove; return FUNC; }
 "length"			{ yylval.fn = B_length; return FUNC; }
+"s2i"			    { yylval.fn = B_s2i; return FUNC; }
+"s2r"			    { yylval.fn = B_s2r; return FUNC; }
+"s2d"			    { yylval.fn = B_s2d; return FUNC; }
+"s2a"			    { yylval.fn = B_s2a; return FUNC; }
+"toString"		{ yylval.fn = B_toString; return FUNC; }
+
 
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }

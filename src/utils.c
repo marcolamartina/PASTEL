@@ -993,6 +993,43 @@ struct val * callbuiltin(struct fncall *f) {
     result=get_address(v);
   }
   break;
+  case B_s2i:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      result=s2i(v);
+    }
+    break;
+  case B_s2r:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      result=s2r(v);
+    }
+    break;
+  case B_s2d:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      result=s2d(v);
+    }
+    break;
+  case B_s2a:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      result=s2a(v);
+    }
+    break;
+  case B_toString:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      temp=toString(v);
+      result=new_string(temp);
+      free(temp);
+    }
+    break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
@@ -1011,6 +1048,76 @@ void free_lost(struct val * v){
   }
 }
 
+
+struct val * s2i(struct val * v){
+  char * end;
+  int number;
+  if(typeof_v(v)!='s'){
+    yyerror("s2i is defined only for string, found %c", typeof_v(v));
+    return NULL;
+  } else {
+    number=strtol(v->string_val,&end,10);
+    if(strlen(end)){
+      yyerror("%s is not a valid number", v->string_val);
+      return NULL;
+    }
+    return new_int(number);
+  }
+}
+
+struct val * s2d(struct val * v){
+  char * ip;
+  int port;
+
+  if(typeof_v(v)!='s'){
+    yyerror("s2d is defined only for string, found %c", typeof_v(v));
+    return NULL;
+  } else {
+
+    ip = strtok(v->string_val, ":");
+    port = atoi(strtok(NULL, ":"));
+
+    struct val * result=malloc(sizeof(struct val));
+  	result->next = NULL;
+    result->aliases=0;
+    result->type='d';
+    result->string_val=strdup(ip);
+    if(port>0 && port<((2<<16)-1)){
+      result->port_val = port;
+    } else {
+      yyerror("invalid port number, found %d", port);
+    }
+  	result->int_val = 0;
+    return result;
+
+  }
+}
+
+
+struct val * s2r(struct val * v){
+  char * end;
+  double number;
+  if(typeof_v(v)!='s'){
+    yyerror("s2r is defined only for string, found %c", typeof_v(v));
+    return NULL;
+  } else {
+    number=strtod(v->string_val,&end);
+    if(strlen(end)){
+      yyerror("%s is not a valid number", v->string_val);
+      return NULL;
+    }
+    return new_real(number);
+  }
+}
+
+struct val * s2a(struct val * v){
+  if(typeof_v(v)!='s'){
+    yyerror("s2a is defined only for string, found %c", typeof_v(v));
+    return NULL;
+  } else {
+    return new_address(v->string_val);
+  }
+}
 
 struct val * get_port(struct val * v){
   if(typeof_v(v)!='d'){
