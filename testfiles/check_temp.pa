@@ -1,0 +1,19 @@
+device a = localhost:1234;
+device b = localhost:1235;
+string message = "";
+int temp = 0;
+
+connect(a);
+
+while( temp <= 27){
+	send(a, "response temp @ tell: ~ :tell ");
+	receive(a,message);
+	temp = s2i(message);
+	//wait(10);
+}
+disconnect(a);
+
+connect(b);
+send(b, "COLD HVAC !");
+
+disconnect(b);

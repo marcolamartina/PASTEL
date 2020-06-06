@@ -1,0 +1,20 @@
+device a = localhost:1234;
+device b = localhost:1235;
+string end_msg = "bye
+";
+string message = "";
+
+connect(a);
+connect(b);
+
+while(message != end_msg){
+	receive(a,message);
+	send(b,message);
+	if(message!=end_msg){
+		receive(b,message);
+		send(a,message);
+	}
+}
+
+disconnect(a);
+disconnect(b);
