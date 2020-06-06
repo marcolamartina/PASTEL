@@ -18,7 +18,6 @@ static void start_connection(struct val * v);
 static void close_connection(struct val * v);
 static void receive_from_connection(struct val * device, struct val * string);
 static void send_to_connection(struct val * device, struct val * string);
-static void list_append(struct val * list, struct val * value);
 
 static unsigned symhash(char *sym)
 {
@@ -37,8 +36,10 @@ void remove_symbol(struct symbol * s){
   while(--scount >= 0) {
     if(sp->name && !strcmp(sp->name, s->name)) {
 			sp->value->aliases--;
+			free(sp->name);
 		//	free_lost(sp->value);
 			sp->name=NULL;
+			//free(s);
 			return;
 		}
 
@@ -1156,7 +1157,7 @@ void treefree(struct ast *a){
 
   case 'L':
     treefree(a->r);
-    //treefree(a->l);
+    treefree(a->l);
     break;
 
     /* one subtree */
