@@ -1391,7 +1391,6 @@ void yyerror(const char *s, ...){
 int main(int argc, char **argv){
 	extern FILE * yyin;
   file_mod=0;
-  open_terminal("1234");
 	for(int i = 1; i<argc; i++){
 		if((strcmp(argv[1]+strlen(argv[1])-3,".pa")!=0)){
       fprintf(stderr, "Insert a .pa file");
