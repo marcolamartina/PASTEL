@@ -35,7 +35,7 @@ void open_terminal(char * port){
       asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"nc -lk %s\"\'", port );
       break;
     case 2:
-      asprintf(&string, "gnome-terminal -- sh -c \"nc -lk %s; bash", port);
+      asprintf(&string, "gnome-terminal -- sh -c \"nc -lk %s; bash\"", port);
       break;
     default:
       yyerror("Function not supported in this OS");
@@ -1391,7 +1391,7 @@ void yyerror(const char *s, ...){
 int main(int argc, char **argv){
 	extern FILE * yyin;
   file_mod=0;
-  open_terminal("123");
+  open_terminal("1234");
 	for(int i = 1; i<argc; i++){
 		if((strcmp(argv[1]+strlen(argv[1])-3,".pa")!=0)){
       fprintf(stderr, "Insert a .pa file");
