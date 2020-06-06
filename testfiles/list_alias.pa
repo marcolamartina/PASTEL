@@ -1,0 +1,10 @@
+list a = [1,2,3];
+list b = a;
+print(a);
+print(b);
+insert(b,0,0);
+print(a);
+print(b);
+a = [3,2,1];
+print(a);
+print(b);
