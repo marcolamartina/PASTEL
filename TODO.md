@@ -7,5 +7,6 @@ TODO
 * [x] .address
 * [x] atoi atof toString atod
 * [x] no nested list
+* [ ] include directives
 * [ ] builtin open terminal
 * [ ] user defined functions
