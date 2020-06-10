@@ -1399,7 +1399,7 @@ int main(int argc, char **argv){
       file_mod++;
       yyin=fopen(argv[i], "r");
     }
-    
+
 		if (!yyin){
 				yyerror("Error on opening source file");
 				return 1;
