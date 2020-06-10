@@ -9,3 +9,4 @@ TODO
 * [x] no nested list
 * [ ] builtin open terminal
 * [ ] user defined functions
+* [ ] error port number > max value 
