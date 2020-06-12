@@ -1,5 +1,10 @@
+% !TeX spellcheck = it_IT
 \documentclass[]{article}
-\usepackage{lipsum}  
+\usepackage{color, soul}
+\newcommand{\hlc}[2][yellow]{ {\sethlcolor{#1} \hl{#2}} }
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
 
 
 % Title Page
@@ -12,16 +17,20 @@
 
 \section{Introduzione}
 
-{[...]} linguaggio per gestire le interazioni tra dispositivi IoT [...] sistemi ciberfisici complessi che necessitano una conoscenza dello stato globale del sistema per coordinarsi. Infatti is sitema potrebbe includere dispositivi con risorse limitate e scarse capacità computazionali, che quindi non sono in grado di memorizzare lo stato del resto dei sensori ed effettuare decisioni complesse.
+{[...]} linguaggio per gestire e coordinare le interazioni tra dispositivi IoT [...] sistemi ciberfisici complessi che necessitano una conoscenza dello stato globale del sistema per coordinarsi. Infatti il sitema potrebbe includere dispositivi con risorse limitate e scarse capacità computazionali, che quindi non sono in grado di memorizzare lo stato del resto dei sensori ed effettuare decisioni complesse. 
 
-\nocite{gaglio2017dc4cd}
+Un altro contesto in cui PASTEL può essere utile è testare in modo replicabile il corretto comportamento interattivo di un sistema ciberfisico: il linguaggio proposto infatti può facilmente simulare l'output di molti sensori ed inviarlo agli attuatori.
+
 
 \section{Stato dell'arte}
-\lipsum[2]
-\nocite{libes1991expect, libes1990expect}
+
+I dispositivi IoT comunemente eseguono protocolli semplici come CoAP, REST e MQTT~\cite{tandale2017empirical}. \hlc[cyan]{[Inserire descrizione dei protocolli, magari qualche altra citazione]}
+
+Il linguaggio proposto può facilmente essere utilizzato con i protocolli precedenti, ma l'ambiente target è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd}.  
+
+[...]L'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect} per WSN
 
 \section{Descrizione del progetto}
-\lipsum[3]
 \subsection{Analisi dei requisiti}
 \subsection{Scelte progettuali}
 \section{Caratteristiche del linguaggio}
