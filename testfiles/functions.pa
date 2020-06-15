@@ -1,0 +1,12 @@
+def sum(x,y){
+  x=x+1;
+  x+y;
+}
+def sub(x,y){
+  x=x+1;
+  x-y;
+}
+def mul(x,y){
+  x=x+1;
+  x*y;
+}

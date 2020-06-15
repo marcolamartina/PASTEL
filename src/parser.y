@@ -36,6 +36,7 @@ extern int file_mod;
 
 %type <a> exp stmt list explist decl
 %type <v> value
+%type <sl> symlist
 
 %define parse.error verbose
 %start program
@@ -46,7 +47,8 @@ program: /* nothing */
   | program stmt { if(debug) dumpast($2, 0);
 					eval($2);
 					treefree($2);}
-  | program error '\n' { yyerrok; printf("%s", file_mod ? "" : "> "); }
+  | program error '\n'  { yyerrok; printf("%s", file_mod ? "" : "> "); }
+  | program DEF NAME '(' symlist ')' '{' list '}'     { dodef($3, $5, $8); }
  ;
 
 
@@ -67,6 +69,7 @@ list: /* nothing */ { $$ = NULL; }
    ;
 
 
+
 exp: '(' exp ')'          { $$ = $2; }
    | FUNC '(' explist ')' { $$ = newfunc($1, $3); }
    | value                { $$ = newvalue($1);}
@@ -83,6 +86,7 @@ exp: '(' exp ')'          { $$ = $2; }
    | exp CMP exp          { $$ = newcmp($2, $1, $3); }
    | exp ADDR             { $$ = newfunc($2, $1); }
    | exp PORT             { $$ = newfunc($2, $1); }
+   | NAME '(' explist ')' { $$ = newcall($1, $3); }
 ;
 
 decl: TYPE NAME    					{ $$ = newdecl($2,$1); }
@@ -96,6 +100,9 @@ value: VALUE
 ;
 explist: exp
  | exp ',' explist    { $$ = newast('L', $1, $3); }
+;
+symlist: NAME       { $$ = newsymlist($1, NULL); }
+ | NAME ',' symlist { $$ = newsymlist($1, $3); }
 ;
 
 

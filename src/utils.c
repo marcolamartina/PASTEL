@@ -28,6 +28,7 @@ static void start_connection(struct val * v);
 static void close_connection(struct val * v);
 static void receive_from_connection(struct val * device, struct val * string);
 static void send_to_connection(struct val * device, struct val * string);
+static struct val * calluser(struct ufncall *);
 
 void open_terminal(struct val * device){
   if(typeof_v(device)!='d'){
@@ -700,6 +701,16 @@ double compare(struct val * a, struct val * b){
   return result;
 }
 
+/* define a function */
+void dodef(struct symbol *name, struct symlist *syms, struct ast *func){
+  if(name->syms) symlistfree(name->syms);
+  if(name->func) treefree(name->func);
+  name->syms = syms;
+  name->func = func;
+}
+
+
+
 struct val * eval(struct ast *a){
   struct val *v;
   struct val *temp;
@@ -837,6 +848,7 @@ struct val * eval(struct ast *a){
       }
       break;
 
+
     /* expressions */
   case ':': v = new_device(eval(a->l),eval(a->r)); break;
   case '+': v = sum(eval(a->l),eval(a->r)); break;
@@ -920,7 +932,9 @@ struct val * eval(struct ast *a){
 
   case 'L': temp=eval(a->l); v = eval(a->r); free_lost(temp);  break;
 
-  case 'F': v=callbuiltin((struct fncall *)a); break;
+  case 'F': v = callbuiltin((struct fncall *)a); break;
+
+  case 'C': v = calluser((struct ufncall *)a); break;
 
   default: printf("internal error: bad node %c\n", a->nodetype);
   }
@@ -937,6 +951,88 @@ int arg_len(struct ast * list){
   return len;
 }
 
+
+
+static struct val * calluser(struct ufncall *f){
+  struct symbol *fn = f->s;	/* function name */
+  struct symlist *sl;		/* dummy arguments */
+  struct ast *args = f->l;	/* actual arguments */
+  struct val **oldval, **newval;	/* saved arg values */
+  struct val * v;
+  int nargs;
+  int i;
+
+  if(!fn->func) {
+    yyerror("call to undefined function", fn->name);
+    return NULL;
+  }
+
+  /* count the arguments */
+  sl = fn->syms;
+  for(nargs = 0; sl; sl = sl->next){
+    nargs++;
+  }
+
+  /* prepare to save them */
+  oldval = (struct val **)malloc(nargs * sizeof(struct val));
+  newval = (struct val **)malloc(nargs * sizeof(struct val));
+  if(!oldval || !newval) {
+    yyerror("Out of space in %s", fn->name); return NULL;
+  }
+
+  /* evaluate the arguments */
+  for(i = 0; i < nargs; i++) {
+    if(!args) {
+      yyerror("too few args in call to %s", fn->name);
+      free(oldval); free(newval);
+      return NULL;
+    }
+
+    if(args->nodetype == 'L') {	/* if this is a list node */
+      newval[i] = eval(args->l);
+      args = args->r;
+    } else {			/* if it's the end of the list */
+      newval[i] = eval(args);
+      args = NULL;
+    }
+  }
+
+  /* save old values of dummies, assign new ones */
+  sl = fn->syms;
+  for(i = 0; i < nargs; i++) {
+    struct symbol *s = sl->sym;
+
+    oldval[i] = s->value;
+    s->value = newval[i];
+    sl = sl->next;
+  }
+
+
+  /* evaluate the function */
+  v = eval(fn->func);
+
+  /* put the dummies back */
+  sl = fn->syms;
+  for(i = 0; i < nargs; i++) {
+    struct symbol *s = sl->sym;
+
+    s->value = oldval[i];
+    sl = sl->next;
+  }
+  /*
+  for(int j=0; j<nargs; j++){
+    free_lost(newval[j]);
+  }
+  */
+  free(newval);
+  /*
+  for(int j=0; j<nargs; j++){
+    free_lost(oldval[j]);
+  }
+  */
+  free(oldval);
+  return v;
+}
 
 struct val * callbuiltin(struct fncall *f) {
   struct val * result=NULL;
@@ -1123,6 +1219,7 @@ void quit(struct val * arg){
 			exit(arg->int_val);
 	}
 }
+
 
 struct val * split_string(struct val * string, struct val * token){
   if(typeof_v(string)!='s'){
@@ -1641,8 +1738,6 @@ void dumpast(struct ast *a, int level){
     printf("index =\n");
     dumpast(((struct symasgn_l *)a)->i, level+1);
     dumpast(((struct symasgn_l *)a)->v, level);
-
-
     break;
 
   case 'n':
@@ -1652,6 +1747,10 @@ void dumpast(struct ast *a, int level){
     dumpast(((struct symref_l *)a)->i, level+1);
     break;
 
+  case 'C':
+    printf("call %s\n", ((struct ufncall *)a)->s->name);
+    dumpast(a->l, level);
+    break;
 
   default: printf("bad %c\n", a->nodetype);
     break;
