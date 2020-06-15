@@ -28,14 +28,27 @@ static void close_connection(struct val * v);
 static void receive_from_connection(struct val * device, struct val * string);
 static void send_to_connection(struct val * device, struct val * string);
 
-void open_terminal(char * port){
+void open_terminal(struct val * device){
+  if(typeof_v(device)!='d'){
+    yyerror("Cannot open terminal");
+    return;
+  }
+  if(strcmp(device->string_val, "localhost") && strcmp(device->string_val, "127.0.0.1")){
+    yyerror("Cannot open terminal");
+    return;
+  }
+
   char * string;
+  char * title;
+
+  asprintf(&title, "%s:%hu\n", device->string_val, device->port_val);
+
   switch(OS){
     case 1:
-      asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"nc -lk %s\"\'", port );
+      asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"clear; echo %s; nc -lk %hu \"\'",  title, device->port_val );
       break;
     case 2:
-      asprintf(&string, "gnome-terminal -- sh -c \"nc -lk %s; bash\"", port);
+      asprintf(&string, "gnome-terminal -- sh -c \"clear; echo \"%s\"; nc -lk %hu;  bash\"", title, device->port_val);
       break;
     default:
       yyerror("Function not supported in this OS");
@@ -43,6 +56,7 @@ void open_terminal(char * port){
   }
   system(string);
   free(string);
+  free(title);
 }
 
 static unsigned symhash(char *sym)
@@ -1054,6 +1068,14 @@ struct val * callbuiltin(struct fncall *f) {
       temp=toString(v);
       result=new_string(temp);
       free(temp);
+    }
+    break;
+
+  case B_console:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      open_terminal(v);
     }
     break;
   default:

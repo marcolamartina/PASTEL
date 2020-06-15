@@ -64,7 +64,8 @@ enum bifs {			/* built-in functions */
   B_s2r,
   B_s2d,
   B_s2a,
-  B_toString
+  B_toString,
+  B_console
 };
 
 /* nodes in the Abstract Syntax Tree */
