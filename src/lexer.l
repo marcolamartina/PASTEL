@@ -92,9 +92,10 @@
 <string_state>[^\"]*  {yylval.v=new_string(yytext); return VALUE;}
 <string_state>\"      {yy_pop_state(); }
 
-"/*"                {yy_push_state(comment_state); }
-<comment_state>"*/" {yy_pop_state(); }
-<comment_state>[^*\/]*   /* ignore comments */
+"/*"                      {yy_push_state(comment_state); }
+<comment_state>"*/"       {yy_pop_state(); }
+<comment_state>[^*\/]*    {/* ignore comments */}
+<comment_state>.          {/* ignore comments */}
 
 
  /* device */
