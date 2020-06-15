@@ -41,7 +41,7 @@ void open_terminal(struct val * device){
   char * string;
   char * title;
 
-  asprintf(&title, "%s:%hu\n", device->string_val, device->port_val);
+  asprintf(&title, "%s:%hu", device->string_val, device->port_val);
 
   switch(OS){
     case 1:
