@@ -60,6 +60,7 @@
 
 	/* Built-in functions */
 "print"  			{ yylval.fn = B_print; return FUNC; }
+"quit"  			{ yylval.fn = B_quit; return FUNC; }
 "connect" 		{ yylval.fn = B_connect; return FUNC; }
 "disconnect"	{ yylval.fn = B_disconnect; return FUNC; }
 "receive"			{ yylval.fn = B_receive; return FUNC; }

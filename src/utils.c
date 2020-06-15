@@ -956,6 +956,12 @@ struct val * callbuiltin(struct fncall *f) {
       printf("%s\n", temp);
       free(temp);
     }
+	case B_quit:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+			quit(v);
+    }
     break;
 	case B_connect:
     if (num_arg != 1) {
@@ -1106,6 +1112,15 @@ struct val * callbuiltin(struct fncall *f) {
     yyerror("Unknown built-in function %d", functype);
   }
   return result;
+}
+
+void quit(struct val * arg){
+	if(typeof_v(arg) != 'i'){
+			printf("%s\n", toString(arg));
+			exit(1);
+	} else {
+			exit(arg->int_val);
+	}
 }
 
 struct val * split_string(struct val * string, struct val * token){

@@ -51,6 +51,7 @@ void symlistfree(struct symlist *sl);
 
 enum bifs {			/* built-in functions */
   B_print = 1,
+  B_quit,
   B_connect,
   B_disconnect,
   B_send,
@@ -213,5 +214,6 @@ struct val * s2d(struct val * v);
 struct val * s2r(struct val * v);
 struct val * s2i(struct val * v);
 void load_file(struct val * file);
+void quit(struct val * arg);
 struct val * split_string(struct val * string, struct val * token);
 struct val * strip_string(struct val * string);
