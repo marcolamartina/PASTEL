@@ -48,7 +48,7 @@ void open_terminal(struct val * device){
       asprintf(&string, "osascript -e \'tell application \"Terminal\" to do script \"clear; echo %s; nc -lk %hu \"\'",  title, device->port_val );
       break;
     case 2:
-      asprintf(&string, "gnome-terminal -- sh -c \"clear; echo \"%s\"; nc -lk %hu;  bash\"", title, device->port_val);
+      asprintf(&string, "gnome-terminal -- sh -c \"clear; echo %s; nc -lk %hu; bash\"", title, device->port_val);
       break;
     default:
       yyerror("Function not supported in this OS");
