@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <math.h>
+#include <ctype.h>
 #include <arpa/inet.h>
 #include "utils.h"
 
@@ -1085,10 +1086,72 @@ struct val * callbuiltin(struct fncall *f) {
       load_file(v);
     }
     break;
+  case B_strip:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      result=strip_string(v);
+    }
+    break;
+  case B_split:
+    if (num_arg != 2) {
+      yyerror("Wrong argument number, expected 2, found %d", num_arg);
+    } else{
+      v_temp=eval(f->l->l);
+      result=split_string(v_temp,v);
+      free_lost(v_temp);
+    }
+    break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
   return result;
+}
+
+struct val * split_string(struct val * string, struct val * token){
+  if(typeof_v(string)!='s'){
+    yyerror("Cannot split a non-string value, found %c", typeof_v(string));
+    return NULL;
+  }
+  if(typeof_v(token)!='s'){
+    yyerror("Cannot split a string with a non-string value token, found %c", typeof_v(token));
+    return NULL;
+  }
+
+  struct val *v=NULL;
+  struct val *result=NULL;
+  v=malloc(sizeof(struct val));
+  result=v;
+  v->aliases=0;
+  v->type='l';
+  char * temp=strdup(string->string_val);
+  char *t;
+  t = strtok(temp, token->string_val);
+  while( t != NULL ) {
+      v->next=new_string(t);
+      v=v->next;
+      t = strtok(NULL, token->string_val);
+   }
+
+  return result;
+}
+
+struct val * strip_string(struct val * string){
+  if(typeof_v(string)!='s'){
+    yyerror("Cannot strip a non-string value, found %c", typeof_v(string));
+    return NULL;
+  }
+  char * s=strdup(string->string_val);
+  while(isspace(*s)){
+    s++;
+  }
+  char* back = s + strlen(s);
+  while(isspace(*--back)){
+    /*do nothing*/
+  }
+  *(back+1) = '\0';
+
+  return new_string(s);
 }
 
 void load_file(struct val * file){
