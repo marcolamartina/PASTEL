@@ -1,0 +1,25 @@
+\begin{thebibliography}{1}
+
+\bibitem{tandale2017empirical}
+U.~{Tandale}, B.~{Momin}, and D.~P. {Seetharam}.
+\newblock An empirical study of application layer protocols for iot.
+\newblock In {\em 2017 International Conference on Energy, Communication, Data
+  Analytics and Soft Computing (ICECDS)}, pages 2447--2451, 2017.
+
+\bibitem{gaglio2017dc4cd}
+Salvatore Gaglio, Giuseppe~Lo Re, Gloria Martorella, and Daniele Peri.
+\newblock {DC4CD}: a platform for distributed computing on constrained devices.
+\newblock {\em ACM Transactions on Embedded Computing Systems (TECS)},
+  17(1):1--25, 2017.
+
+\bibitem{libes1991expect}
+Don Libes.
+\newblock expect: Scripts for controlling interactive processes.
+\newblock {\em Computing Systems}, 4(2):99--125, 1991.
+
+\bibitem{libes1990expect}
+Don Libes.
+\newblock expect: Curing those uncontrollable fits of interaction.
+\newblock In {\em USENIX Summer}, pages 183--192, 1990.
+
+\end{thebibliography}
