@@ -65,7 +65,8 @@ enum bifs {			/* built-in functions */
   B_s2d,
   B_s2a,
   B_toString,
-  B_console
+  B_console,
+  B_load
 };
 
 /* nodes in the Abstract Syntax Tree */
@@ -209,3 +210,4 @@ struct val * s2a(struct val * v);
 struct val * s2d(struct val * v);
 struct val * s2r(struct val * v);
 struct val * s2i(struct val * v);
+void load_file(struct val * file);

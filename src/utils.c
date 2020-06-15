@@ -1078,10 +1078,49 @@ struct val * callbuiltin(struct fncall *f) {
       open_terminal(v);
     }
     break;
+  case B_load:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      load_file(v);
+    }
+    break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }
   return result;
+}
+
+void load_file(struct val * file){
+  int temp=yylineno;
+  if(typeof_v(file)!='s'){
+    yyerror("Wrong filename specified, found value of type %c", typeof_v(file));
+    return;
+  }
+  extern FILE * yyin;
+	if((strcmp(file->string_val+strlen(file->string_val)-3,".pa")!=0)){
+    yyerror("Insert a .pa file");
+    return;
+  }else{
+    file_mod++;
+    yyin=fopen(file->string_val, "r");
+  }
+
+	if (!yyin){
+			yyerror("Error on opening source file");
+			return;
+	}
+	yyrestart(yyin);
+	yylineno = 1;
+	yyparse();
+	fclose(yyin);
+  file_mod--;
+
+	yyin=stdin;
+	yyrestart(yyin);
+	yylineno = temp;
+  printf("%s", file_mod ? "" : "> ");
+  yyparse();
 }
 
 void free_lost(struct val * v){

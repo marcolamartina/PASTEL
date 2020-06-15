@@ -73,6 +73,7 @@
 "s2a"			    { yylval.fn = B_s2a; return FUNC; }
 "toString"		{ yylval.fn = B_toString; return FUNC; }
 "console"     { yylval.fn = B_console; return FUNC; }
+"load"        { yylval.fn = B_load; return FUNC; }
 
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
