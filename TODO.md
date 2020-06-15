@@ -12,4 +12,4 @@ TODO
 * [ ] UDP support (i.e. send/recieve with no open connection)
 * [ ] builtin open terminal
 * [ ] user defined functions
-* [ ] error port number > max value
+* [x] error port number > max value

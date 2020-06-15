@@ -642,7 +642,7 @@ struct val * new_device(struct val * addr, struct val * port){
   result->aliases=0;
   result->type='d';
   result->string_val=strdup(addr->string_val);
-  if(port->int_val>0 && port->int_val<((2<<16)-1)){
+  if(port->int_val>0 && port->int_val<((1<<16)-1)){
     result->port_val = port->int_val;
   } else {
     yyerror("invalid port number, found %d", port->int_val);
