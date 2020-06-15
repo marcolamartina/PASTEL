@@ -13,3 +13,4 @@ TODO
 * [x] user defined functions
 * [x] error port number > max value
 * [ ] scoping
+* [ ] file separation
