@@ -1,0 +1,12 @@
+device sensor = localhost:1234;
+string nl = "
+";
+string s ="";
+console(sensor);
+connect(sensor);
+send(sensor, "CSV_DATA REPLY"+nl);
+receive(sensor, s);
+
+for( entry in split(s,",") ){
+	print(strip(entry));
+}
