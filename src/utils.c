@@ -956,6 +956,7 @@ struct val * callbuiltin(struct fncall *f) {
       printf("%s\n", temp);
       free(temp);
     }
+    break;
 	case B_quit:
     if (num_arg != 1) {
       yyerror("Wrong argument number, expected 1, found %d", num_arg);
