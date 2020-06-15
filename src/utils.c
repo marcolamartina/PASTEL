@@ -784,10 +784,10 @@ struct val * eval(struct ast *a){
 					return NULL;
 				}
         if(typeof_v(v)==((struct symdeclasgn *)a)->type){
-          temp2=v;
-          v=listdup(v);
           v->aliases++;
           if(typeof_v(v)=='l'){
+          	temp2=v;
+          	v=listdup(v);
             temp=v;
             while((temp=temp->next)){
               temp->aliases++;
