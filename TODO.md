@@ -10,5 +10,6 @@ TODO
 * [x] include directives
 * [x] basic string operations (i.e. string splitting, stripping )
 * [x] builtin open terminal
-* [ ] user defined functions
+* [x] user defined functions
 * [x] error port number > max value
+* [ ] scoping

@@ -784,7 +784,21 @@ struct val * eval(struct ast *a){
 					return NULL;
 				}
         if(typeof_v(v)==((struct symdeclasgn *)a)->type){
+          temp2=v;
+          v=listdup(v);
           v->aliases++;
+          if(typeof_v(v)=='l'){
+            temp=v;
+            while((temp=temp->next)){
+              temp->aliases++;
+            }
+            temp=((struct symdeclasgn *)a)->s->value;
+            while((temp=temp->next)){
+              temp->aliases--;
+            }
+            free_lost(temp2);
+          }
+
           ((struct symdeclasgn *)a)->s->value->aliases--;
           free_lost(((struct symdeclasgn *)a)->s->value);
           ((struct symdeclasgn *)a)->s->value = v;
@@ -803,13 +817,21 @@ struct val * eval(struct ast *a){
 				yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
 			} else if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
         v->aliases++;
-        temp=v;
-        while((temp=temp->next)){
-          temp->aliases++;
+        if(typeof_v(v)=='l'){
+          temp=v;
+          while((temp=temp->next)){
+            temp->aliases++;
+          }
+          temp=((struct symasgn *)a)->s->value;
+          while((temp=temp->next)){
+            temp->aliases--;
+          }
         }
+
         ((struct symasgn *)a)->s->value->aliases--;
         free_lost(((struct symasgn *)a)->s->value);
         ((struct symasgn *)a)->s->value = v;
+
       }else{
         yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symasgn *)a)->s), typeof_v(v) );
       }
