@@ -16,9 +16,15 @@ struct val {
   size_t aliases;
 };
 
+struct symtable_stack{
+	struct symbol * symtab;
+	struct symtable_stack * next;
+};
+
 /* simple symtab of fixed size */
 #define NHASH 9997
-struct symbol symtab[NHASH];
+
+struct symtable_stack * symstack;
 
 struct symbol *lookup(char*);
 
