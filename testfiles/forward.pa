@@ -12,11 +12,11 @@ connect(b);
 
 while(message != end_msg){
 	send(a," > ");
-	receive(a,message);
+	message=receive(a);
 	send(b,message);
 	if(message!=end_msg){
 		send(b," > ");
-		receive(b,message);
+		message=receive(b);
 		send(a,message);
 	}
 }

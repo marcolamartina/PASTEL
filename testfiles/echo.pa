@@ -8,7 +8,7 @@ exit="exit
 console(a);
 connect(a);
 while(b!=exit){
-	receive(a,b);
+	b=receive(a);
 	print(b);
 	send(a,b);
 }

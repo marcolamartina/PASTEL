@@ -5,7 +5,7 @@ string s ="";
 console(sensor);
 connect(sensor);
 send(sensor, "CSV_DATA REPLY"+nl);
-receive(sensor, s);
+s=receive(sensor);
 
 for( entry in split(s,",") ){
 	print(strip(entry));
