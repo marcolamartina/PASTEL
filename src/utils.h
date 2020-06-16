@@ -1,3 +1,32 @@
+#ifndef UTILS_H
+#define UTILS_H
+
+enum bifs {			/* built-in functions */
+  B_print = 1,
+  B_quit,
+  B_connect,
+  B_disconnect,
+  B_send,
+  B_receive,
+  B_insert,
+  B_remove,
+  B_length,
+  B_port,
+  B_address,
+  B_s2i,
+  B_s2r,
+  B_s2d,
+  B_s2a,
+  B_toString,
+  B_console,
+  B_load,
+  B_split,
+  B_strip,
+  B_sleep,
+  B_typeof,
+  B_isConnected
+};
+
 /* symbol table */
 struct symbol {					/* a variable name */
   char *name;
@@ -6,15 +35,6 @@ struct symbol {					/* a variable name */
   struct symlist *syms; /* list of dummy args */
 };
 
-struct val {
-  char type;
-	struct val * next;		/* next element if list */
-  char* string_val;
-  int int_val;
-  double real_val;
-  unsigned short port_val;
-  size_t aliases;
-};
 
 struct symtable_stack{
 	struct symbol * symtab;
@@ -55,29 +75,6 @@ void symlistfree(struct symlist *sl);
  *
  */
 
-enum bifs {			/* built-in functions */
-  B_print = 1,
-  B_quit,
-  B_connect,
-  B_disconnect,
-  B_send,
-  B_receive,
-  B_insert,
-  B_remove,
-  B_length,
-  B_port,
-  B_address,
-  B_s2i,
-  B_s2r,
-  B_s2d,
-  B_s2a,
-  B_toString,
-  B_console,
-  B_load,
-  B_split,
-  B_strip,
-  B_sleep
-};
 
 /* nodes in the Abstract Syntax Tree */
 /* all have common initial nodetype */
@@ -167,14 +164,12 @@ struct ast *newdeclasgn(char *s, char type, struct ast *v);
 struct ast *newvalue(struct val *v);
 struct ast *newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *tr);
 struct ast *newforeach(int nodetype, char *i, struct ast *list, struct ast *l);
-struct ast * newref_l(char *s, struct ast *i);
-struct ast * newasgn_l(char *s, struct ast *i, struct ast *v);
+struct ast *newref_l(char *s, struct ast *i);
+struct ast *newasgn_l(char *s, struct ast *i, struct ast *v);
 
 /* define a function */
 void dodef(char *name, struct symlist *syms, struct ast *stmts);
 
-/* evaluate an AST */
-struct val * eval(struct ast *);
 
 /* delete and free an AST */
 void treefree(struct ast *);
@@ -185,42 +180,20 @@ void yyerror(const char *s, ...);
 void yyrestart  (FILE * input_file );
 int file_mod;
 
-extern int debug;
-void dumpast(struct ast *a, int level);
+
 void free_lost(struct val * v);
-struct val * callbuiltin(struct fncall *);
+void remove_symbol(struct symbol * s);
+struct val * calluser(struct ufncall *);
 
 char typeof_v(struct val * v);
 char typeof_s(struct symbol * s);
 char * toString(struct val * v);
 struct val * valuedup(struct val * v);
 struct val * listdup(struct val * v);
-struct val * sum(struct val * a, struct val * b);
-struct val * sub(struct val * a, struct val * b);
-struct val * mul(struct val * a, struct val * b);
-struct val * division(struct val * a, struct val * b);
-struct val * new_real(double a);
-struct val * new_int(int a);
-struct val * new_device(struct val * addr, struct val * port);
-struct val * new_string(char * a);
-struct val * new_address(char * a);
-struct val * new_list(struct ast * list);
-struct val * change_sign(struct val * a);
 struct val * eval(struct ast *a);
-struct val * and_logic(struct val * a, struct val * b);
-struct val * or_logic(struct val * a, struct val * b);
 struct val * get_element(struct val * list, int index);
-struct val * get_port(struct val * v);
-struct val * get_address(struct val * v);
 int length(struct val * list);
 int arg_len(struct ast * l);
-void list_remove(struct val * list, struct val * index);
-void list_insert(struct val * list, struct val * value, struct val * index);
-struct val * s2a(struct val * v);
-struct val * s2d(struct val * v);
-struct val * s2r(struct val * v);
-struct val * s2i(struct val * v);
-void load_file(struct val * file);
-void quit(struct val * arg);
-struct val * split_string(struct val * string, struct val * token);
-struct val * strip_string(struct val * string);
+
+
+#endif /* UTILS_H */

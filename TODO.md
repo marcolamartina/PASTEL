@@ -17,3 +17,5 @@ TODO
 * [x] sleep
 * [x] CR
 * [x] functions without arguments
+* [x] typeof
+* [x] isconnected

@@ -1,4 +1,3 @@
-/* recognize tokens for the calculator */
 
 %option noyywrap nodefault yylineno
 %option stack
@@ -7,8 +6,11 @@
 
 
 %{
-# include "utils.h"
-# include "parser.tab.h"
+#include "utils.h"
+#include "debuginfo.h"
+#include "builtin.h"
+#include "types.h"
+#include "parser.tab.h"
 %}
 
 
@@ -79,6 +81,8 @@
 "strip"       { yylval.fn = B_strip; return FUNC; }
 "split"       { yylval.fn = B_split; return FUNC; }
 "sleep"       { yylval.fn = B_sleep; return FUNC; }
+"typeof"      { yylval.fn = B_typeof; return FUNC; }
+"isConnected" { yylval.fn = B_isConnected; return FUNC; }
 
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }

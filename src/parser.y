@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "debuginfo.h"
+#include "builtin.h"
+#include "types.h"
+#include "eval.h"
+
 int yylex();
 extern int file_mod;
 %}
