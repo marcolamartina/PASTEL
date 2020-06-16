@@ -13,7 +13,7 @@ TODO
 * [x] user defined functions
 * [x] error port number > max value
 * [x] scoping
-* [ ] file separation
+* [x] file separation
 * [x] sleep
-* [ ] CR
+* [x] CR
 * [x] functions without arguments
