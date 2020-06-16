@@ -721,7 +721,7 @@ struct val * eval(struct ast *a){
 	v = NULL;
 
   if(!a) {
-    yyerror("internal error, null eval");
+    //yyerror("internal error, null eval");
     return NULL;
   }
 
@@ -782,37 +782,33 @@ struct val * eval(struct ast *a){
 			s = lookup(((struct symdeclasgn *)a)->s);
       if(s->value->type != 'u'){
 		     yyerror("%s already has type '%c'", s->name, s->value->type);
-	    } else {
-        v=eval(((struct symdeclasgn *)a)->v);
-				if(!v){
-					yyerror("Cannot assign NULL value");
-					return NULL;
+				 return NULL;
+			}
+			v=eval(((struct symdeclasgn *)a)->v);
+			if(!v){
+				yyerror("Cannot assign NULL value");
+				return NULL;
+			}
+			if(typeof_v(v)!=((struct symdeclasgn *)a)->type){
+				yyerror("assignement error for incompatible types (%c=%c)", typeof_s(s), typeof_v(v) );
+				return NULL;
+			}
+			if(typeof_v(v)=='l'){ /* If v is a list sets the aliases for the other items*/
+				v=listdup(v);
+				temp=v;
+				while((temp=temp->next)){
+					temp->aliases++;
 				}
-        if(typeof_v(v)==((struct symdeclasgn *)a)->type){
-          v->aliases++;
-          if(typeof_v(v)=='l'){
-          	temp2=v;
-          	v=listdup(v);
-            temp=v;
-            while((temp=temp->next)){
-              temp->aliases++;
-            }
-            temp=s->value;
-            while((temp=temp->next)){
-              temp->aliases--;
-            }
-            free_lost(temp2);
-          }
-
-          s->value->aliases--;
-          free_lost(s->value);
-          s->value = v;
-        }else{
-           yyerror("assignement error for incompatible types (%c=%c)", typeof_s(s), typeof_v(v) );
-         }
-	    }
-
-      break;
+				temp=s->value;
+				while((temp=temp->next)){
+					temp->aliases--;
+				}
+			}
+			v->aliases++;
+			s->value->aliases--;
+			free_lost(s->value);
+			s->value = v;
+			break;
 
 
     /* assignment */
@@ -1578,6 +1574,9 @@ void list_remove(struct val * list, struct val * index){
 
 
 void treefree(struct ast *a){
+	if(!a){
+		return;
+	}
   switch(a->nodetype) {
 
     /* two subtrees */

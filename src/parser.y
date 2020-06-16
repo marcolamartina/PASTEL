@@ -98,11 +98,13 @@ decl: TYPE NAME    					{ $$ = newdecl($2,$1); }
 value: VALUE
   | '[' explist ']'   { $$ = new_list($2); }
 ;
-explist: exp
- | exp ',' explist    { $$ = newast('L', $1, $3); }
+explist: {$$=NULL;}
+	| exp
+	| exp ',' explist    { $$ = newast('L', $1, $3); }
 ;
-symlist: NAME       { $$ = newsymlist($1, NULL); }
- | NAME ',' symlist { $$ = newsymlist($1, $3); }
+symlist: {$$=NULL;}
+	| NAME       { $$ = newsymlist($1, NULL); }
+	| NAME ',' symlist { $$ = newsymlist($1, $3); }
 ;
 
 
