@@ -12,7 +12,7 @@ TODO
 * [x] builtin open terminal
 * [x] user defined functions
 * [x] error port number > max value
-* [ ] scoping
+* [x] scoping
 * [ ] file separation
 * [x] sleep
 * [ ] CR
