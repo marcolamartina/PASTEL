@@ -14,6 +14,6 @@ TODO
 * [x] error port number > max value
 * [ ] scoping
 * [ ] file separation
-* [ ] sleep
+* [x] sleep
 * [ ] CR
 * [x] functions without arguments
