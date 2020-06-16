@@ -16,3 +16,4 @@ TODO
 * [ ] file separation
 * [ ] sleep
 * [ ] CR
+* [ ] functions without arguments
