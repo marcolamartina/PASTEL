@@ -5,6 +5,7 @@ b="";
 string exit;
 exit="exit
 ";
+console(a);
 connect(a);
 while(b!=exit){
 	receive(a,b);
@@ -13,3 +14,4 @@ while(b!=exit){
 }
 
 disconnect(a);
+quit(0);
