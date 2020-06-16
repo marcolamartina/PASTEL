@@ -629,8 +629,15 @@ void yyerror(const char *s, ...){
   fprintf(stderr, "%d: error: ", yylineno);
   vfprintf(stderr, s, ap);
   fprintf(stderr, "\n");
-  //exit(1);
+  char * err=malloc(7*sizeof(char));
+  strncpy(err,s,6);
+  err[6]='\0';
+  if(strcmp(err,"syntax")==0){
+    free(err);
+    exit(1);
+  }
 }
+
 
 int main(int argc, char **argv){
 	symstack = calloc(1, sizeof(struct symtable_stack));
