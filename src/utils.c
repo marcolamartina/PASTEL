@@ -1231,6 +1231,17 @@ struct val * callbuiltin(struct fncall *f) {
       free_lost(v_temp);
     }
     break;
+  case B_sleep:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+			if(typeof_v(v) != 'i'){
+				yyerror("Wrong argument type, expected int, found %c", typeof_v(v));
+				return NULL;
+			}
+			sleep(v->int_val);
+    }
+    break;
   default:
     yyerror("Unknown built-in function %d", functype);
   }

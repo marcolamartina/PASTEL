@@ -69,7 +69,8 @@ enum bifs {			/* built-in functions */
   B_console,
   B_load,
   B_split,
-  B_strip
+  B_strip,
+  B_sleep
 };
 
 /* nodes in the Abstract Syntax Tree */
