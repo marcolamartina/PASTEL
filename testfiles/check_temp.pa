@@ -4,13 +4,14 @@ string message = "";
 int temp = 0;
 
 console(a);
+sleep(1);
 connect(a);
 
 while( temp <= 27){
 	send(a, "response temp @ tell: ~ :tell ");
 	message=receive(a);
 	temp = s2i(strip(message));
-	sleep(10);
+	sleep(1);
 }
 disconnect(a);
 

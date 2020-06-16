@@ -279,6 +279,7 @@ void open_terminal(struct val * device){
   system(string);
   free(string);
   free(title);
+  sleep(1);  
 }
 
 void quit(struct val * arg){
