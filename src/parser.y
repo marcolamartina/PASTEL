@@ -9,7 +9,7 @@ extern int file_mod;
 
 %union {
   struct ast *a;
-  struct symbol *s;		/* which symbol */
+  char *str;		/* which symbol name */
   struct symlist *sl;
   struct val * v;
   char c;
@@ -19,7 +19,7 @@ extern int file_mod;
 /* declare tokens */
 %token IF ELSE WHILE FOR IN DEF
 %token <fn> FUNC ADDR PORT
-%token <s> NAME
+%token <str> NAME
 %token <c> TYPE
 %token <v> VALUE
 

@@ -24,11 +24,11 @@ struct symbol *lookup(char*);
 
 /* list of symbols, for an argument list */
 struct symlist {
-  struct symbol *sym;
+  char *sym;
   struct symlist *next;
 };
 
-struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
+struct symlist *newsymlist(char *sym, struct symlist *next);
 void symlistfree(struct symlist *sl);
 
 /* node types
@@ -90,7 +90,7 @@ struct fncall {			/* built-in function */
 struct ufncall {		/* user function */
   int nodetype;			/* type C */
   struct ast *l;		/* list of arguments */
-  struct symbol *s;
+  char *s;
 };
 
 struct flow {
@@ -108,42 +108,42 @@ struct value_val {
 struct symref_l {
   int nodetype;			/* type n */
   struct ast *i;		/* index*/
-  struct symbol *s;
+  char *s;
 };
 struct symref {
   int nodetype;			/* type N */
-  struct symbol *s;
+  char *s;
 };
 
 struct symdecl {
   int nodetype;			/* type D */
-  struct symbol *s;
+  char *s;
   char type;
 };
 
 struct symasgn {
   int nodetype;			/* type = */
-  struct symbol *s;
+  char *s;
   struct ast *v;		/* value */
 };
 
 struct symdeclasgn {
   int nodetype;			/* type d */
-  struct symbol *s;
+  char *s;
   struct ast *v;		/* value */
   char type;
 };
 
 struct symasgn_l {
   int nodetype;			/* type # */
-  struct symbol *s;
+  char *s;
   struct ast *i;
   struct ast *v;		/* value */
 };
 
 struct foreach {
   int nodetype;			/* type f */
-  struct symbol *i;
+  char *i;
   struct ast *list;
   struct ast *l;		/* command list */
 };
@@ -152,19 +152,19 @@ struct foreach {
 struct ast *newast(int nodetype, struct ast *l, struct ast *r);
 struct ast *newcmp(int cmptype, struct ast *l, struct ast *r);
 struct ast *newfunc(int functype, struct ast *l);
-struct ast *newcall(struct symbol *s, struct ast *l);
-struct ast *newref(struct symbol *s);
-struct ast *newdecl(struct symbol *s, char type);
-struct ast *newasgn(struct symbol *s, struct ast *v);
-struct ast *newdeclasgn(struct symbol *s, char type, struct ast *v);
+struct ast *newcall(char *s, struct ast *l);
+struct ast *newref(char *s);
+struct ast *newdecl(char *s, char type);
+struct ast *newasgn(char *s, struct ast *v);
+struct ast *newdeclasgn(char *s, char type, struct ast *v);
 struct ast *newvalue(struct val *v);
 struct ast *newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *tr);
-struct ast *newforeach(int nodetype, struct symbol *i, struct ast *list, struct ast *l);
-struct ast * newref_l(struct symbol *s, struct ast *i);
-struct ast * newasgn_l(struct symbol *s, struct ast *i, struct ast *v);
+struct ast *newforeach(int nodetype, char *i, struct ast *list, struct ast *l);
+struct ast * newref_l(char *s, struct ast *i);
+struct ast * newasgn_l(char *s, struct ast *i, struct ast *v);
 
 /* define a function */
-void dodef(struct symbol *name, struct symlist *syms, struct ast *stmts);
+void dodef(char *name, struct symlist *syms, struct ast *stmts);
 
 /* evaluate an AST */
 struct val * eval(struct ast *);

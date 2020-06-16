@@ -172,7 +172,7 @@ struct ast * newfunc(int functype, struct ast *l){
 }
 
 
-struct ast * newcall(struct symbol *s, struct ast *l) {
+struct ast * newcall(char *s, struct ast *l) {
   struct ufncall *a = malloc(sizeof(struct ufncall));
 
   if(!a) {
@@ -185,7 +185,7 @@ struct ast * newcall(struct symbol *s, struct ast *l) {
   return (struct ast *)a;
 }
 
-struct ast * newref_l(struct symbol *s, struct ast *i){
+struct ast * newref_l(char *s, struct ast *i){
   struct symref_l *a = malloc(sizeof(struct symref_l));
 
   if(!a) {
@@ -198,7 +198,7 @@ struct ast * newref_l(struct symbol *s, struct ast *i){
   return (struct ast *)a;
 }
 
-struct ast * newref(struct symbol *s){
+struct ast * newref(char *s){
   struct symref *a = malloc(sizeof(struct symref));
 
   if(!a) {
@@ -210,7 +210,7 @@ struct ast * newref(struct symbol *s){
   return (struct ast *)a;
 }
 
-struct ast * newdecl(struct symbol *s, char type){
+struct ast * newdecl(char *s, char type){
   struct symdecl *a = malloc(sizeof(struct symdecl));
 
   if(!a) {
@@ -224,7 +224,7 @@ struct ast * newdecl(struct symbol *s, char type){
 	return (struct ast *)a;
 }
 
-struct ast * newasgn(struct symbol *s, struct ast *v){
+struct ast * newasgn(char *s, struct ast *v){
   struct symasgn *a = malloc(sizeof(struct symasgn));
 
   if(!a) {
@@ -237,7 +237,7 @@ struct ast * newasgn(struct symbol *s, struct ast *v){
   return (struct ast *)a;
 }
 
-struct ast * newdeclasgn(struct symbol *s, char type, struct ast *v){
+struct ast * newdeclasgn(char *s, char type, struct ast *v){
   struct symdeclasgn *a = malloc(sizeof(struct symdeclasgn));
 
   if(!a) {
@@ -251,7 +251,7 @@ struct ast * newdeclasgn(struct symbol *s, char type, struct ast *v){
   return (struct ast *)a;
 }
 
-struct ast * newasgn_l(struct symbol *s, struct ast *i, struct ast *v){
+struct ast * newasgn_l(char *s, struct ast *i, struct ast *v){
   struct symasgn_l *a = malloc(sizeof(struct symasgn_l));
 
   if(!a) {
@@ -279,7 +279,7 @@ struct ast * newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast 
   return (struct ast *)a;
 }
 
-struct ast * newforeach(int nodetype, struct symbol *i, struct ast *list, struct ast *l){
+struct ast * newforeach(int nodetype, char *i, struct ast *list, struct ast *l){
   struct foreach *a = malloc(sizeof(struct foreach));
 
   if(!a) {
@@ -293,7 +293,7 @@ struct ast * newforeach(int nodetype, struct symbol *i, struct ast *list, struct
   return (struct ast *)a;
 }
 
-struct symlist * newsymlist(struct symbol *sym, struct symlist *next){
+struct symlist * newsymlist(char *sym, struct symlist *next){
   struct symlist *sl = malloc(sizeof(struct symlist));
 
   if(!sl) {
@@ -702,16 +702,18 @@ double compare(struct val * a, struct val * b){
 }
 
 /* define a function */
-void dodef(struct symbol *name, struct symlist *syms, struct ast *func){
-  if(name->syms) symlistfree(name->syms);
-  if(name->func) treefree(name->func);
-  name->syms = syms;
-  name->func = func;
+void dodef(char *name, struct symlist *syms, struct ast *func){
+	struct symbol * fname = lookup(name);
+  if(fname->syms) symlistfree(fname->syms);
+  if(fname->func) treefree(fname->func);
+  fname->syms = syms;
+  fname->func = func;
 }
 
 
 
 struct val * eval(struct ast *a){
+  struct symbol *s;
   struct val *v;
   struct val *temp;
   struct val *temp2;
@@ -729,15 +731,16 @@ struct val * eval(struct ast *a){
 
     /* name reference */
 	case 'n':
-    v=((struct symref_l *)a)->s->value;
+		s = lookup(((struct symref_l *)a)->s);
+    v=s->value;
     temp=eval(((struct symref_l *)a)->i);
-    if(typeof_s(((struct symref_l *)a)->s) == 'u'){
-      yyerror("variable %s uninstantiated.", ((struct symref_l *)a)->s->name);
-    } else if(typeof_s(((struct symref_l *)a)->s)!='l'){
-      yyerror("variable is not a list, found %c", typeof_s(((struct symref_l *)a)->s));
+    if(typeof_s(s) == 'u'){
+      yyerror("variable %s uninstantiated.", s->name);
+    } else if(typeof_s(s)!='l'){
+      yyerror("variable is not a list, found %c", typeof_s(s));
     }else{
       if(typeof_v(temp)=='i' && temp->int_val>=0){
-        v = ((struct symref_l *) a)->s->value;
+        v = s->value;
         for(int i = temp->int_val; i > 0 && v->next != NULL; i--){
           v = v->next; /* auxiliary var */
         }
@@ -755,28 +758,30 @@ struct val * eval(struct ast *a){
     }
     break;
 	case 'N':
-		if(typeof_s(((struct symasgn *)a)->s) == 'u'){
-			yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
-			v = ((struct symref *)a)->s->value; break;
+		s = lookup(((struct symref *)a)->s);
+		if(typeof_s(s) == 'u'){
+			yyerror("variable %s uninstantiated.", s->name);
+			v = s->value; break;
 		} else {
-			v = ((struct symref *)a)->s->value; break;
+			v = s->value; break;
 		}
 
   /* name declaration */
   case 'D':
-      if(((struct symdecl *)a)->s->value->type != 'u'){
-		     yyerror("%s already has type '%c'", ((struct symdecl *)a)->s->name,
-                                             ((struct symdecl *)a)->s->value->type);
+			s = lookup(((struct symdecl *)a)->s);
+      if(s->value->type != 'u'){
+		     yyerror("%s already has type '%c'", s->name,
+                                             s->value->type);
 	    } else {
-			   ((struct symdecl *)a)->s->value->type = ((struct symdecl *)a)->type ;
+			   s->value->type = ((struct symdecl *)a)->type ;
 	    }
 
       break;
 
   case 'd':
-      if(((struct symdeclasgn *)a)->s->value->type != 'u'){
-		     yyerror("%s already has type '%c'", ((struct symdeclasgn *)a)->s->name,
-                                             ((struct symdeclasgn *)a)->s->value->type);
+			s = lookup(((struct symdeclasgn *)a)->s);
+      if(s->value->type != 'u'){
+		     yyerror("%s already has type '%c'", s->name, s->value->type);
 	    } else {
         v=eval(((struct symdeclasgn *)a)->v);
 				if(!v){
@@ -792,18 +797,18 @@ struct val * eval(struct ast *a){
             while((temp=temp->next)){
               temp->aliases++;
             }
-            temp=((struct symdeclasgn *)a)->s->value;
+            temp=s->value;
             while((temp=temp->next)){
               temp->aliases--;
             }
             free_lost(temp2);
           }
 
-          ((struct symdeclasgn *)a)->s->value->aliases--;
-          free_lost(((struct symdeclasgn *)a)->s->value);
-          ((struct symdeclasgn *)a)->s->value = v;
+          s->value->aliases--;
+          free_lost(s->value);
+          s->value = v;
         }else{
-           yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symdeclasgn *)a)->s), typeof_v(v) );
+           yyerror("assignement error for incompatible types (%c=%c)", typeof_s(s), typeof_v(v) );
          }
 	    }
 
@@ -813,42 +818,44 @@ struct val * eval(struct ast *a){
     /* assignment */
   case '=':
       v=eval(((struct symasgn *)a)->v);
-			if(typeof_s(((struct symasgn *)a)->s) == 'u'){
-				yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s->name);
-			} else if(typeof_v(v)==typeof_s(((struct symasgn *)a)->s)){
+			s = lookup(((struct symasgn *)a)->s);
+			if(typeof_s(s) == 'u'){
+				yyerror("variable %s uninstantiated.", ((struct symasgn *)a)->s);
+			} else if(typeof_v(v)==typeof_s(s)){
         v->aliases++;
         if(typeof_v(v)=='l'){
           temp=v;
           while((temp=temp->next)){
             temp->aliases++;
           }
-          temp=((struct symasgn *)a)->s->value;
+          temp=s->value;
           while((temp=temp->next)){
             temp->aliases--;
           }
         }
 
-        ((struct symasgn *)a)->s->value->aliases--;
-        free_lost(((struct symasgn *)a)->s->value);
-        ((struct symasgn *)a)->s->value = v;
+        s->value->aliases--;
+        free_lost(s->value);
+        s->value = v;
 
       }else{
-        yyerror("assignement error for incompatible types (%c=%c)", typeof_s(((struct symasgn *)a)->s), typeof_v(v) );
+        yyerror("assignement error for incompatible types (%c=%c)", typeof_s(s), typeof_v(v) );
       }
       break;
 
   case '#':
+			s = lookup(((struct symasgn_l *)a)->s);
       temp=eval(((struct symasgn_l *)a)->v);
       temp2=eval(((struct symasgn_l *)a)->i);
-			if(typeof_s(((struct symasgn_l *)a)->s) == 'u'){
-				yyerror("variable %s uninstantiated.", ((struct symasgn_l *)a)->s->name);
+			if(typeof_s(s) == 'u'){
+				yyerror("variable %s uninstantiated.", ((struct symasgn_l *)a)->s);
 			} else if(typeof_v(temp) == 'l'){
 				yyerror("Cannot have nested lists");
-			} else if(typeof_s(((struct symasgn_l *)a)->s)!='l'){
-        yyerror("variable is not a list, found %c", typeof_s(((struct symasgn_l *)a)->s));
+			} else if(typeof_s(s)!='l'){
+        yyerror("variable is not a list, found %c", typeof_s(s));
       }else{
         if(typeof_v(temp2)=='i' && temp2->int_val>=0){
-          v = ((struct symasgn_l *) a)->s->value;
+          v = s->value;
           for(int i = temp2->int_val; i > 0 && v->next != NULL; i--){
         		v = v->next; /* auxiliary var */
         	}
@@ -927,6 +934,7 @@ struct val * eval(struct ast *a){
 
   case 'f':
     v = NULL;		/* a default value */
+		s = lookup(((struct foreach *)a)->i);
 
     if( ((struct foreach *)a)->l) {
       temp=(eval( ((struct foreach *)a)->list));
@@ -934,20 +942,20 @@ struct val * eval(struct ast *a){
         yyerror("No valid list specified");
         return NULL;
       }
-      if(typeof_s(((struct foreach *)a)->i)!='u'){
-        yyerror("Variable %s already declared", ((struct foreach *)a)->i->name);
+      if(typeof_s(s)!='u'){
+        yyerror("Variable %s already declared", s->name);
         return NULL;
       }
       temp2=temp;
 
       while( (temp=temp->next) ){
-        ((struct foreach *)a)->i->value=temp;
+        s->value=temp;
 				temp->aliases++;
 	      v = eval(((struct foreach *)a)->l);
 				temp->aliases--;
       }
-			((struct foreach *)a)->i->value->aliases++;	/* the remove_symbol will decrement the aliases */
-			remove_symbol(((struct foreach *)a)->i);
+			s->value->aliases++;	/* the remove_symbol will decrement the aliases */
+			remove_symbol(s);
     }
     break;			/* last value is value */
 
@@ -976,7 +984,7 @@ int arg_len(struct ast * list){
 
 
 static struct val * calluser(struct ufncall *f){
-  struct symbol *fn = f->s;	/* function name */
+  struct symbol *fn = lookup(f->s);	/* function name */
   struct symlist *sl;		/* dummy arguments */
   struct ast *args = f->l;	/* actual arguments */
   struct val **oldval, **newval;	/* saved arg values */
@@ -1022,7 +1030,7 @@ static struct val * calluser(struct ufncall *f){
   /* save old values of dummies, assign new ones */
   sl = fn->syms;
   for(i = 0; i < nargs; i++) {
-    struct symbol *s = sl->sym;
+    struct symbol *s = lookup(sl->sym);
 
     oldval[i] = s->value;
     s->value = newval[i];
@@ -1036,7 +1044,7 @@ static struct val * calluser(struct ufncall *f){
   /* put the dummies back */
   sl = fn->syms;
   for(i = 0; i < nargs; i++) {
-    struct symbol *s = sl->sym;
+    struct symbol *s = lookup(sl->sym);
 
     s->value = oldval[i];
     sl = sl->next;
@@ -1695,9 +1703,9 @@ void dumpast(struct ast *a, int level){
     printf("value %s\n", string); free(string); break;
 
     /* name reference */
-  case 'N': string=toString(((struct symref *)a)->s->value);
-            printf("ref %s", ((struct symref *)a)->s->name);
-            if(((struct symref *)a)->s->value){
+  case 'N': string=toString((lookup(((struct symref *)a)->s))->value);
+            printf("ref %s", (lookup(((struct symref *)a)->s))->name);
+            if((lookup(((struct symref *)a)->s))->value){
               printf("=%s\n", string );
               free(string);
             }else{
@@ -1707,13 +1715,13 @@ void dumpast(struct ast *a, int level){
             break;
 
   /* name declaration */
-  case 'D': printf("decl %s\n", ((struct symref *)a)->s->name); break;
+  case 'D': printf("decl %s\n", ((struct symref *)a)->s); break;
 
     /* assignment */
-  case '=': printf("= %s\n", ((struct symasgn *)a)->s->name);
+  case '=': printf("= %s\n", ((struct symasgn *)a)->s);
     dumpast( ((struct symasgn *)a)->v, level); break;
 
-  case 'd': printf("= %s\n", ((struct symdeclasgn *)a)->s->name);
+  case 'd': printf("= %s\n", ((struct symdeclasgn *)a)->s);
     dumpast( ((struct symdeclasgn *)a)->v, level); break;
 
     /* expressions */
@@ -1755,7 +1763,7 @@ void dumpast(struct ast *a, int level){
     break;
 
   case '#':
-    printf("%s[index]=\n", ((struct symasgn_l *)a)->s->name);
+    printf("%s[index]=\n", ((struct symasgn_l *)a)->s);
     printf("%*s", 2*level, "");
     printf("index =\n");
     dumpast(((struct symasgn_l *)a)->i, level+1);
@@ -1763,14 +1771,14 @@ void dumpast(struct ast *a, int level){
     break;
 
   case 'n':
-    printf("%s[index]\n", ((struct symref_l *)a)->s->name);
+    printf("%s[index]\n", ((struct symref *)a)->s);
     printf("%*s", 2*level, "");
     printf("index =\n");
     dumpast(((struct symref_l *)a)->i, level+1);
     break;
 
   case 'C':
-    printf("call %s\n", ((struct ufncall *)a)->s->name);
+    printf("call %s\n", ((struct ufncall *)a)->s);
     dumpast(a->l, level);
     break;
 

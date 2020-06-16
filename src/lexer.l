@@ -102,7 +102,7 @@
 ((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|"localhost" { yylval.v=new_address(yytext); return VALUE; }
 
  /* names */
-[a-zA-Z_][a-zA-Z0-9_]*  { yylval.s = lookup(yytext); return NAME; }
+[a-zA-Z_][a-zA-Z0-9_]*  { yylval.str = strdup(yytext); return NAME; }
 
 
 "//".*  /* ignore comments */
