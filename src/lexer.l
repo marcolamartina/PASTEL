@@ -78,6 +78,7 @@
 "load"        { yylval.fn = B_load; return FUNC; }
 "strip"       { yylval.fn = B_strip; return FUNC; }
 "split"       { yylval.fn = B_split; return FUNC; }
+"sleep"       { yylval.fn = B_sleep; return FUNC; }
 
 
 "debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }

@@ -16,9 +16,15 @@ struct val {
   size_t aliases;
 };
 
+struct symtable_stack{
+	struct symbol * symtab;
+	struct symtable_stack * next;
+};
+
 /* simple symtab of fixed size */
 #define NHASH 9997
-struct symbol symtab[NHASH];
+
+struct symtable_stack * symstack;
 
 struct symbol *lookup(char*);
 
@@ -69,7 +75,8 @@ enum bifs {			/* built-in functions */
   B_console,
   B_load,
   B_split,
-  B_strip
+  B_strip,
+  B_sleep
 };
 
 /* nodes in the Abstract Syntax Tree */

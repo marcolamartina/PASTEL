@@ -23,6 +23,8 @@ extern int file_mod;
 
 /* symbol table */
 /* hash a symbol */
+static void inner_scope();
+static void outer_scope();
 static void remove_symbol(struct symbol * s);
 static void start_connection(struct val * v);
 static void close_connection(struct val * v);
@@ -72,6 +74,8 @@ static unsigned symhash(char *sym)
 }
 
 void remove_symbol(struct symbol * s){
+	struct symbol * symtab;
+	symtab = symstack->symtab;
   struct symbol *sp = &symtab[symhash(s->name)%NHASH];
   int scount = NHASH;		/* how many have we looked at */
 
@@ -95,12 +99,34 @@ void remove_symbol(struct symbol * s){
 }
 
 struct symbol * lookup(char* sym){
-  struct symbol *sp = &symtab[symhash(sym)%NHASH];
+	struct symbol * symtab;
+	struct symtable_stack * curr_scope = symstack;
+  struct symbol *sp;
   int scount = NHASH;		/* how many have we looked at */
 
-  while(--scount >= 0) {
-    if(sp->name && !strcmp(sp->name, sym)) { return sp; }
+	/* Lookup section */
+	while(curr_scope && curr_scope->symtab){
+		symtab = curr_scope->symtab;
+		sp = &symtab[symhash(sym)%NHASH];
+		while(--scount >= 0) {
+			if(sp->name && !strcmp(sp->name, sym)) { return sp; }
+			if(!sp->name) {		/* new entry */
+				break;
+			}
+			if(++sp >= symtab+NHASH) sp = symtab; /* try the next entry */
+		}
+		curr_scope = curr_scope->next;
+	}
 
+	/* Insert section */
+	curr_scope = symstack;
+	symtab = curr_scope->symtab;
+	sp = &symtab[symhash(sym)%NHASH];
+	while(--scount >= 0) {
+    if(sp->name && !strcmp(sp->name, sym)) { 
+			yyerror("Symbol already defined in this scope");
+			return NULL;
+		 }
     if(!sp->name) {		/* new entry */
       sp->name = strdup(sym);
       sp->value = malloc(sizeof(struct val));
@@ -112,12 +138,10 @@ struct symbol * lookup(char* sym){
       sp->syms = NULL;
       return sp;
     }
-
     if(++sp >= symtab+NHASH) sp = symtab; /* try the next entry */
   }
   yyerror("symbol table overflow\n");
   abort(); /* tried them all, table is full */
-
 }
 
 struct ast * newast(int nodetype, struct ast *l, struct ast *r){
@@ -978,6 +1002,23 @@ int arg_len(struct ast * list){
 }
 
 
+void inner_scope(){
+	struct symtable_stack * new_scope = calloc(1, sizeof(struct symtable_stack));
+	new_scope-> next = symstack;
+	new_scope->symtab = calloc(NHASH, sizeof(struct symbol));
+	if(!new_scope->symtab){
+    yyerror("out of space");
+    exit(0);
+	}
+	symstack = new_scope;
+}
+
+void outer_scope(){
+	struct symtable_stack * inner = symstack;
+	symstack = symstack->next;
+	free(inner->symtab);
+	free(inner);
+}
 
 static struct val * calluser(struct ufncall *f){
   struct symbol *fn = lookup(f->s);	/* function name */
@@ -992,7 +1033,7 @@ static struct val * calluser(struct ufncall *f){
     yyerror("call to undefined function", fn->name);
     return NULL;
   }
-
+	inner_scope();
   /* count the arguments */
   sl = fn->syms;
   for(nargs = 0; sl; sl = sl->next){
@@ -1057,6 +1098,7 @@ static struct val * calluser(struct ufncall *f){
   }
   */
   free(oldval);
+	outer_scope();
   return v;
 }
 
@@ -1229,6 +1271,17 @@ struct val * callbuiltin(struct fncall *f) {
       v_temp=eval(f->l->l);
       result=split_string(v_temp,v);
       free_lost(v_temp);
+    }
+    break;
+  case B_sleep:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+			if(typeof_v(v) != 'i'){
+				yyerror("Wrong argument type, expected int, found %c", typeof_v(v));
+				return NULL;
+			}
+			sleep(v->int_val);
     }
     break;
   default:
@@ -1655,6 +1708,10 @@ void yyerror(const char *s, ...){
 }
 
 int main(int argc, char **argv){
+	symstack = calloc(1, sizeof(struct symtable_stack));
+	symstack->next = NULL;
+	symstack->symtab = NULL;
+	inner_scope();
 	extern FILE * yyin;
   file_mod=0;
 	for(int i = 1; i<argc; i++){
@@ -1680,7 +1737,9 @@ int main(int argc, char **argv){
 	yyrestart(yyin);
 	yylineno = 1;
   printf("%s", file_mod ? "" : "> ");
-  return yyparse();
+  yyparse();
+	outer_scope();
+	return 0;
 }
 
 /* debugging: dump out an AST */
