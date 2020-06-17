@@ -1,0 +1,21 @@
+device luce_soggiorno = localhost:1234;
+device televisione = localhost:1235;
+device condizionatore = localhost:1236;
+
+list soggiorno=[luce_soggiorno, televisione, condizionatore];
+
+def arrivo_a_casa(){
+  for (d in soggiorno){
+    console(d);
+    connect(d);
+    if(isConnected(d)){
+      send(d, "ON"+NL);
+      if(strip(receive(d))!="ACK"){
+        print("Qualcosa è andato storto");
+      }
+      disconnect(d);
+    } else {
+      print("Impossibile stabilire una connessione verso il device "+d);
+    }
+  }
+}
