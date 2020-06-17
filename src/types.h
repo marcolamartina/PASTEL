@@ -27,6 +27,6 @@ struct val * new_int(int a);
 struct val * new_device(struct val * addr, struct val * port);
 struct val * new_string(char * a);
 struct val * new_address(char * a);
-struct val * new_list(struct ast * list);
+struct ast * new_list(struct ast * list);
 
 #endif /* TYPES_H */

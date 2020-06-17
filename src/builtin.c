@@ -388,6 +388,7 @@ struct val * s2i(struct val * v){
 
 struct val * s2d(struct val * v){
   char * ip;
+  char * port_s;
   int port;
 
   if(typeof_v(v)!='s'){
@@ -396,7 +397,16 @@ struct val * s2d(struct val * v){
   } else {
 
     ip = strtok(v->string_val, ":");
-    port = atoi(strtok(NULL, ":"));
+    port_s = strtok(NULL, ":");
+	if(!port_s){
+		yyerror("No port number specified");
+		return NULL;
+	}
+    port = atoi(port_s);
+	if(!ip || !port){
+		yyerror("Cannot convert %s to a device", v->string_val);
+		return NULL;
+	}
 
     struct val * result=malloc(sizeof(struct val));
   	result->next = NULL;

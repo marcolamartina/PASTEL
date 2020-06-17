@@ -20,6 +20,29 @@ struct val * eval(struct ast *a){
   }
 
   switch(a->nodetype) {
+	case 'J':
+		a = a->l;
+		v=malloc(sizeof(struct val));
+		temp=v;
+		v->type='l';
+		v->next = NULL;
+		v->aliases=0;
+		if(!a || !a->l){
+			return v;
+		}
+		do {
+			temp->next=(a->nodetype=='L' ? eval(a->l) : eval(a));
+			if(typeof_v(temp->next)=='l'){
+				yyerror("Cannot have nested lists");
+				temp->next=NULL;
+				return v;
+			}   
+			temp=temp->next;
+			temp->aliases=0;
+
+		} while(a->nodetype=='L' && (a=a->r));
+		break;
+
     /* constant */
   case 'K': v = valuedup(((struct value_val *)a)->v); break;
 
@@ -53,6 +76,9 @@ struct val * eval(struct ast *a){
     break;
 	case 'N':
 		s = lookup(((struct symref *)a)->s);
+		if(!s){
+			yyerror("variable %s not found.",((struct symref *)a)->s);
+		}
 		if(typeof_s(s) == 'u'){
 			yyerror("variable %s uninstantiated.", s->name);
 			v = s->value; break;
@@ -74,6 +100,9 @@ struct val * eval(struct ast *a){
 
   case 'd':
 			s = insert_symbol(((struct symdeclasgn *)a)->s);
+			if(!s){
+				 return NULL;
+			}
       if(s->value->type != 'u'){
 		     yyerror("%s already has type '%c'", s->name, s->value->type);
 				 return NULL;
@@ -137,6 +166,10 @@ struct val * eval(struct ast *a){
 			s = lookup(((struct symasgn_l *)a)->s);
       temp=eval(((struct symasgn_l *)a)->v);
       temp2=eval(((struct symasgn_l *)a)->i);
+			if(!temp || !temp2){
+				yyerror("Cannot assign null value");
+				return NULL;
+			}
 			if(typeof_s(s) == 'u'){
 				yyerror("variable %s uninstantiated.", ((struct symasgn_l *)a)->s);
 			} else if(typeof_v(temp) == 'l'){

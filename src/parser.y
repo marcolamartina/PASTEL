@@ -92,6 +92,7 @@ exp: '(' exp ')'          { $$ = $2; }
    | exp ADDR             { $$ = newfunc($2, $1); }
    | exp PORT             { $$ = newfunc($2, $1); }
    | NAME '(' explist ')' { $$ = newcall($1, $3); }
+	 | '[' explist ']'   		{ $$ = new_list($2); }
 ;
 
 decl: TYPE NAME    					{ $$ = newdecl($2,$1); }
@@ -101,7 +102,6 @@ decl: TYPE NAME    					{ $$ = newdecl($2,$1); }
 ;
 
 value: VALUE
-  | '[' explist ']'   { $$ = new_list($2); }
 ;
 explist: {$$=NULL;}
 	| exp

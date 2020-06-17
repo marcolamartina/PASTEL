@@ -56,7 +56,7 @@ void remove_symbol(struct symbol * s){
 }
 
 struct symbol * lookup(char* sym){
-	return lookup_aux(sym, 1);
+	return lookup_aux(sym, 0);
 }
 
 struct symbol * lookup_aux(char* sym, int print_error){
@@ -562,6 +562,9 @@ void free_lost(struct val * v){
 	if(!v){
 		return;
 	}
+	if(!v->aliases){
+		return;
+	}
   if(v->aliases<=0){
 		if(v->next){
 				free_lost(v->next);
@@ -595,7 +598,7 @@ void treefree(struct ast *a){
 
     /* one subtree */
 
-  case 'M': case 'C': case 'F':
+  case 'M': case 'C': case 'F': case 'J':
     treefree(a->l);
     break;
 

@@ -6,27 +6,11 @@
 
 
 
-struct val * new_list(struct ast * list){
-  struct val * result=malloc(sizeof(struct val));
-  struct val * temp=result;
-	result->next = NULL;
-  result->aliases=0;
-  result->type='l';
-  if(!list || !list->l){
-    return result;
-  }
-  do {
-    temp->next=list->nodetype=='L' ? eval(list->l) : eval(list);
-    if(typeof_v(temp->next)=='l'){
-      yyerror("Cannot have nested lists");
-      temp->next=NULL;
-      return result;
-    }
-    temp=temp->next;
-    temp->aliases=0;
-
-  } while(list->nodetype=='L' && (list=list->r));
-  return result;
+struct ast * new_list(struct ast * list){
+	struct ast *a = malloc(sizeof(struct ast));
+	a->nodetype = 'J';
+	a->l = list;
+  return a;
 }
 
 struct val * new_real(double a){

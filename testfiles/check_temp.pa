@@ -9,8 +9,7 @@ connect(a);
 
 while( temp <= 27){
 	send(a, "response temp @ tell: ~ :tell ");
-	message=receive(a);
-	temp = s2i(strip(message));
+	temp = s2i(strip(receive(a)));
 	sleep(1);
 }
 disconnect(a);
