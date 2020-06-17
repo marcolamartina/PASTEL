@@ -1,7 +1,6 @@
 device a = localhost:1234;
 device b = localhost:1235;
-string end_msg = "bye
-";
+string end_msg = "bye"+NL;
 string message = "";
 
 console(a);

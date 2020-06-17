@@ -40,7 +40,6 @@ extern int file_mod;
 
 
 %type <a> exp stmt list explist decl
-%type <v> value
 %type <sl> symlist
 
 %define parse.error verbose
@@ -77,7 +76,7 @@ list: /* nothing */ { $$ = NULL; }
 
 exp: '(' exp ')'          { $$ = $2; }
    | FUNC '(' explist ')' { $$ = newfunc($1, $3); }
-   | value                { $$ = newvalue($1);}
+   | VALUE                { $$ = newvalue($1);}
    | exp ':' exp          { $$ = newast(':', $1,$3); }
    | exp '+' exp          { $$ = newast('+', $1,$3); }
    | exp '-' exp          { $$ = newast('-', $1,$3); }
@@ -101,8 +100,6 @@ decl: TYPE NAME    					{ $$ = newdecl($2,$1); }
   | TYPE NAME '=' exp       { $$ = newdeclasgn($2,$1,$4); }
 ;
 
-value: VALUE
-;
 explist: {$$=NULL;}
 	| exp
 	| exp ',' explist    { $$ = newast('L', $1, $3); }

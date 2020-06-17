@@ -73,7 +73,7 @@ void symlistfree(struct symlist *sl);
  *  d type declaration and assignement
  *  # assignement to list position
  *  n list element ref
- *
+ *  J static list
  */
 
 
