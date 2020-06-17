@@ -1,0 +1,62 @@
+//load("../testfiles/utils.pa");
+
+def topicPost(topic, msg){ // sends the msg string to every device in topic
+	for(d in topic){
+		connect(d);
+		if(isConnected(d)){
+			send(d, msg);
+		disconnect(d);
+		} else {
+			print("Couldn't connect to " + toString(d));
+		}
+	}
+}
+
+list known_devices = [ localhost:1234, localhost:1235, localhost:1236, localhost:1237];
+
+list topic1;
+list topic2;
+list topic3;
+
+string reply;
+list topics;
+
+for(d in known_devices){
+	console(d);			// sets up simulated environment.
+}
+
+for(d in known_devices){
+	connect(d);
+	if(isConnected(d)){
+		send(d, "SUBS_LIST REPLY TELL: ~ :TELL"+NL);
+		reply = strip(receive(d));
+		if(reply!=""){
+			topics=split(reply,",");
+			for(t in topics){
+				if(strip(t)=="t1"){
+					insert(topic1,d,0);
+				} else{ if(strip(t)=="t2"){
+					insert(topic2,d,0);
+				} else{ if(strip(t)=="t3"){
+					insert(topic3,d,0);
+				}}}
+			}
+		}
+	disconnect(d);
+	} else {
+		print("Couldn't connect to " + toString(d));
+	}
+}
+
+sleep(2);
+print("Topic 1: ");print(topic1);
+print("Topic 2: ");print(topic2); 
+print("Topic 3: ");print(topic3);
+
+
+print("Sending ACK to TOPIC1");
+topicPost(topic1, "TOPIC1 SUBSCRIPTION ACK"+NL);
+print("Sending ACK to TOPIC2");
+topicPost(topic2, "TOPIC2 SUBSCRIPTION ACK"+NL);
+print("Sending ACK to TOPIC3");
+topicPost(topic3, "TOPIC3 SUBSCRIPTION ACK"+NL);
