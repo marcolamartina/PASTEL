@@ -47,6 +47,7 @@ struct symtable_stack{
 struct symtable_stack * symstack;
 
 struct symbol *lookup(char*);
+struct symbol *insert_symbol(char*);
 
 /* list of symbols, for an argument list */
 struct symlist {

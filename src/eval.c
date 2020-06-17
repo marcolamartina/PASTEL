@@ -62,7 +62,7 @@ struct val * eval(struct ast *a){
 
   /* name declaration */
   case 'D':
-			s = lookup(((struct symdecl *)a)->s);
+			s = insert_symbol(((struct symdecl *)a)->s);
       if(s->value->type != 'u'){
 		     yyerror("%s already has type '%c'", s->name,
                                              s->value->type);
@@ -73,7 +73,7 @@ struct val * eval(struct ast *a){
       break;
 
   case 'd':
-			s = lookup(((struct symdeclasgn *)a)->s);
+			s = insert_symbol(((struct symdeclasgn *)a)->s);
       if(s->value->type != 'u'){
 		     yyerror("%s already has type '%c'", s->name, s->value->type);
 				 return NULL;

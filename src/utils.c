@@ -60,7 +60,6 @@ struct symbol * lookup(char* sym){
   struct symbol *sp;
   int scount = NHASH;		/* how many have we looked at */
 
-	/* Lookup section */
 	while(curr_scope && curr_scope->symtab){
 		symtab = curr_scope->symtab;
 		sp = &symtab[symhash(sym)%NHASH];
@@ -73,8 +72,16 @@ struct symbol * lookup(char* sym){
 		}
 		curr_scope = curr_scope->next;
 	}
+	yyerror("Symbol not defined");
+	return NULL;
+}
 
-	/* Insert section */
+struct symbol * insert_symbol(char* sym){
+	struct symbol * symtab;
+	struct symtable_stack * curr_scope = symstack;
+  struct symbol *sp;
+  int scount = NHASH;		/* how many have we looked at */
+
 	curr_scope = symstack;
 	symtab = curr_scope->symtab;
 	sp = &symtab[symhash(sym)%NHASH];
@@ -417,9 +424,10 @@ struct val * valuedup(struct val * v){
 
 /* define a function */
 void dodef(char *name, struct symlist *syms, struct ast *func){
-	struct symbol * fname = lookup(name);
-  if(fname->syms) symlistfree(fname->syms);
-  if(fname->func) treefree(fname->func);
+	struct symbol * fname = insert_symbol(name);
+	if(! fname){
+		return;
+	}
   fname->syms = syms;
   fname->func = func;
 }
