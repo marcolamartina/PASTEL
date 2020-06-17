@@ -177,6 +177,18 @@ struct val * change_sign(struct val * a){
   return result;
 }
 
+static int compare_address(char * a, char * b){
+  int result;
+  if(!strcmp(a,"localhost") && !strcmp(b,"127.0.0.1")){
+    result=0;
+  } else if (!strcmp(b,"localhost") && !strcmp(a,"127.0.0.1")){
+    result=0;
+  } else {
+    result=strcmp(a,b);
+  }
+  return result;
+}
+
 double compare(struct val * a, struct val * b){
   double result;
   if(typeof_v(a)==typeof_v(b)){
@@ -184,8 +196,8 @@ double compare(struct val * a, struct val * b){
       case 'i': result=a->int_val-b->int_val; break;
       case 'r': result=a->real_val-b->real_val; break;
       case 's': result=strcmp(a->string_val,b->string_val); break;
-      case 'a': result=strcmp(a->string_val,b->string_val); break;
-      case 'd': result=(strcmp(a->string_val,b->string_val) || (a->port_val - b->port_val)); break;
+      case 'a': result=compare_address(a->string_val,b->string_val); break;
+      case 'd': result=(compare_address(a->string_val,b->string_val) || (a->port_val - b->port_val)); break;
       default: yyerror("comparison not supported for these types (%c/%c)", typeof_v(a), typeof_v(b)); break;
     }
   }else if(typeof_v(a)=='i'&&typeof_v(b)=='r'){
