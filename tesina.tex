@@ -4,6 +4,8 @@
 \newcommand{\hlc}[2][yellow]{ {\sethlcolor{#1} \hl{#2}} }
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+
 
 
 
@@ -14,31 +16,34 @@
 
 \begin{document}
 \maketitle
+\tableofcontents
+
 
 \section{Introduzione}
-
-{[...]} linguaggio per gestire e coordinare le interazioni tra dispositivi IoT [...] sistemi ciberfisici complessi che necessitano una conoscenza dello stato globale del sistema per coordinarsi. Infatti il sitema potrebbe includere dispositivi con risorse limitate e scarse capacità computazionali, che quindi non sono in grado di memorizzare lo stato del resto dei sensori ed effettuare decisioni complesse. 
+PASTEL è stato pensato come un linguaggio di scripting per gestire e coordinare le interazioni tra dispositivi IoT basati su TCP.\\
+L'utilizzo di PASTEL può essere vantaggioso in sistemi ciberfisici complessi che necessitano una conoscenza dello stato globale del sistema per coordinarsi. Infatti il sitema potrebbe includere dispositivi con risorse limitate e scarse capacità computazionali, che quindi non sono in grado di memorizzare lo stato del resto dei sensori ed effettuare decisioni complesse. 
 
 Un altro contesto in cui PASTEL può essere utile è testare in modo replicabile il corretto comportamento interattivo di un sistema ciberfisico: il linguaggio proposto infatti può facilmente simulare l'output di molti sensori ed inviarlo agli attuatori.
 
+Il resto della \hl{tesina} è strutturato come segue: la sezione~\ref{section:stato-arte} illustra il contesto in cui si colloca il linguaggio proposto, nella sezione~\ref{section:descrizione} vengono analizzati i dettagli implementativi, nella sezione~\ref{section:caratteristiche-linguaggio} si illustrano le caratteristiche di PASTEL e degli esempi di applicazioni, infine nella sezione~\ref{section:conclusioni} vengono riepilogati i punti principali del lavoro svolto.
 
-\section{Stato dell'arte}
+\section{Stato dell'arte}\label{section:stato-arte}
 
 I dispositivi IoT comunemente eseguono protocolli semplici come CoAP, REST e MQTT~\cite{tandale2017empirical}. \hlc[cyan]{[Inserire descrizione dei protocolli, magari qualche altra citazione]}
 
-Il linguaggio proposto può facilmente essere utilizzato con i protocolli precedenti, ma l'ambiente target è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd}.  
+Il linguaggio proposto può facilmente essere utilizzato con i protocolli precedenti, eccetto CoAP poiché basato su UDP. L'ambiente target principale però è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd} e su questi si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.  
 
-[...]L'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect} per WSN
+[...]L'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect} per reti di sensori wireless (WSN).
 
-\section{Descrizione del progetto}
+\section{Descrizione del progetto}\label{section:descrizione}
 \subsection{Analisi dei requisiti}
 \subsection{Scelte progettuali}
-\section{Caratteristiche del linguaggio}
+\section{Caratteristiche del linguaggio}\label{section:caratteristiche-linguaggio}
 \subsection{Grammatica}
 \subsection{Descrizione del parser}
-\subsection{Casi d'uso}
-\subsection{Risultati ottenuti}
-\section{Conclusioni}
+\subsection{Casi d'uso}\label{subsection:casi-d_uso}
+\subsection{Risultati ottenuti}\label{subsection:risultati}
+\section{Conclusioni}\label{section:conclusioni}
 
 
 
