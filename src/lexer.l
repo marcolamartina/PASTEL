@@ -104,6 +104,8 @@
 
  /* constants */
  "NL" { yylval.v=new_string("\n"); return VALUE; }
+ "TRUE"   { yylval.v=new_int(1); return VALUE; }
+ "FALSE"  { yylval.v=new_int(0); return VALUE; }
 
  /* device */
 ((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|"localhost" { yylval.v=new_address(yytext); return VALUE; }

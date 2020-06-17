@@ -1,0 +1,17 @@
+device root=127.0.0.1:1234;
+string message="Neighbours_list reply"+NL;
+console(root);
+connect(root);
+
+if(isConnected(root)==FALSE){
+  quit("Cannot connect to root at "+root);
+}
+send(root,message);
+string reply=receive(root);
+list neighbours = split(reply,","); //expected CSV
+int i=0;
+while(i<length(neighbours)){
+  neighbours[i]=s2d(strip(neighbours[i]));
+  i=i+1;
+}
+print(neighbours);
