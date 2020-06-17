@@ -224,16 +224,16 @@ struct val * eval(struct ast *a){
 
   case 'f':
     v = NULL;		/* a default value */
-		s = lookup(((struct foreach *)a)->i);
+		s = insert_symbol(((struct foreach *)a)->i);
+    if(!s){
+      yyerror("Variable %s already declared", s->name);
+      return NULL;
+    }
 
     if( ((struct foreach *)a)->l) {
       temp=(eval( ((struct foreach *)a)->list));
       if(!temp || typeof_v(temp)!='l'){
         yyerror("No valid list specified");
-        return NULL;
-      }
-      if(typeof_s(s)!='u'){
-        yyerror("Variable %s already declared", s->name);
         return NULL;
       }
       temp2=temp;

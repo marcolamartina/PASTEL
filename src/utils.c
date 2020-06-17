@@ -16,6 +16,7 @@ extern int file_mod;
 /* hash a symbol */
 static void inner_scope();
 static void outer_scope();
+static struct symbol * lookup_aux(char* sym, int print_error);
 
 
 
@@ -55,6 +56,10 @@ void remove_symbol(struct symbol * s){
 }
 
 struct symbol * lookup(char* sym){
+	return lookup_aux(sym, 1);
+}
+
+struct symbol * lookup_aux(char* sym, int print_error){
 	struct symbol * symtab;
 	struct symtable_stack * curr_scope = symstack;
   struct symbol *sp;
@@ -72,7 +77,9 @@ struct symbol * lookup(char* sym){
 		}
 		curr_scope = curr_scope->next;
 	}
-	yyerror("Symbol not defined");
+	if(print_error){
+		yyerror("Symbol %s not defined", sym);
+	}
 	return NULL;
 }
 
@@ -464,9 +471,13 @@ void outer_scope(){
 
 struct val * calluser(struct ufncall *f){
   struct symbol *fn = lookup(f->s);	/* function name */
-  struct symlist *sl;		/* dummy arguments */
-  struct ast *args = f->l;	/* actual arguments */
-  struct val **oldval, **newval;	/* saved arg values */
+	if(!fn){
+		yyerror("call to undefined function", f->s);
+		return NULL;
+	}
+  struct symlist *sl;								/* dummy arguments */
+  struct ast *args = f->l;					/* actual arguments */
+  struct val **oldval, **newval;		/* saved arg values */
   struct val * v;
   int nargs;
   int i;
@@ -509,11 +520,13 @@ struct val * calluser(struct ufncall *f){
   /* save old values of dummies, assign new ones */
   sl = fn->syms;
   for(i = 0; i < nargs; i++) {
-    struct symbol *s = lookup(sl->sym);
-
-    oldval[i] = s->value;
-    s->value = newval[i];
-    sl = sl->next;
+    struct symbol *s = lookup_aux(sl->sym,0);
+	if(!s){
+		s = insert_symbol(sl->sym);
+	}
+	oldval[i] = s->value;
+	s->value = newval[i];
+	sl = sl->next;
   }
 
 

@@ -1,25 +1,48 @@
-def sum(x,y){
-  x=x+1;
-  int z=x+y;
-}
-
-def fib(n){
-	if(n<=1){1;}
+def fib_r(n){
+	if(n<=2){1;}
 	else{
-		fib(n-1)+fib(n-2);
+		fib_r(n-1)+fib_r(n-2);
 	}
 }
 
-list r = [0];
-int i = 0;
-while(i<10){
-	i = i+1;
-	insert(r,i,i);
+def fib_i(n){
+	int a = 0;
+	int b = 1;
+	int c = 1;
+	while(n-2 >= 0){
+		c = a+b;
+		a = b;
+		b = c;
+		n = n-1;
+	}
+	c;
 }
-print(r);
 
-for(j in r){
-	print(j);
-	print(fib(j));
-	print("--");
+
+def run_fib_r(n){
+	list r = [0];
+	int i = 0;
+	while(i<n){
+		i = i+1;
+		insert(r,i,i);
+	}
+	for(j in r){
+		print(j);
+		print(fib_r(j));
+		print("--");
+	}
+}
+
+def run_fib_i(n){
+	list r = [0];
+	int i = 0;
+	while(i<n){
+		i = i+1;
+		insert(r,i,i);
+	}
+	for(j in r){
+		print(j);
+		print(fib_i(j));
+		print("--");
+	}
 }
