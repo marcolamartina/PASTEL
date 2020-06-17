@@ -19,3 +19,5 @@ def arrivo_a_casa(){
     }
   }
 }
+
+arrivo_a_casa();

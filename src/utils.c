@@ -419,6 +419,9 @@ struct val * valuedup(struct val * v){
 		case 'r': v2 = new_real(v->real_val); break;
 		case 's': v2 = new_string(v->string_val); break;
 		case 'a': v2 = new_address(v->string_val); break;
+		case 'd':
+			 v2 = new_device(new_address(v->string_val), new_int(v->port_val));	
+			 break;
     //case 'l': v2 = listdup(v); break;
 		default:
 			v2=v;

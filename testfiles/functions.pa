@@ -46,3 +46,8 @@ def run_fib_i(n){
 		print("--");
 	}
 }
+
+print("Running iterative Fibonacci");
+run_fib_i(15);
+print("Running recursive Fibonacci");
+run_fib_r(15);

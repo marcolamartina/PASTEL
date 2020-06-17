@@ -20,6 +20,7 @@ struct val * eval(struct ast *a){
   }
 
   switch(a->nodetype) {
+		/* static list */
 	case 'J':
 		a = a->l;
 		v=malloc(sizeof(struct val));
@@ -46,7 +47,7 @@ struct val * eval(struct ast *a){
     /* constant */
   case 'K': v = valuedup(((struct value_val *)a)->v); break;
 
-    /* name reference */
+		/* list element ref */
 	case 'n':
 		s = lookup(((struct symref_l *)a)->s);
     v=s->value;
@@ -66,7 +67,8 @@ struct val * eval(struct ast *a){
           free_lost(temp);
           return NULL;
         }
-        v=v->next;
+        v=valuedup(v->next);
+				v->next = NULL;
       } else {
         string = toString(temp);
         yyerror("index is not a positive integer, found %c=%s", typeof_v(temp), string);
@@ -74,6 +76,7 @@ struct val * eval(struct ast *a){
       }
     }
     break;
+    /* name reference */
 	case 'N':
 		s = lookup(((struct symref *)a)->s);
 		if(!s){
@@ -272,12 +275,13 @@ struct val * eval(struct ast *a){
       temp2=temp;
 
       while( (temp=temp->next) ){
-        s->value=temp;
-				temp->aliases++;
+        s->value=valuedup(temp);
+				s->value->next = NULL;
+				s->value->aliases++;
 	      v = eval(((struct foreach *)a)->l);
-				temp->aliases--;
+				s->value->aliases--;
       }
-			s->value->aliases++;	/* the remove_symbol will decrement the aliases */
+			//s->value->aliases++;	/* the remove_symbol will decrement the aliases */
 			remove_symbol(s);
     }
     break;			/* last value is value */

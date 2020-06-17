@@ -1,9 +1,0 @@
-int a = 0;
-list l = [1,2,3,4];
-while(a<length(l)){
-	print(length(l));
-	l[a]="0";
-	a=a+1;
-	print(a);
-}
-print(l);

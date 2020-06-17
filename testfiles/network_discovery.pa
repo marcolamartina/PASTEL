@@ -1,12 +1,22 @@
 device root=127.0.0.1:1234;
+list known_nodes = [ root ];
+
+def append(_list, item){
+	insert(_list, item, length(_list));
+}
+
+def inList(item, _list){
+	int found = FALSE;
+	for(i in _list){
+		if(i == item){
+			found = TRUE;
+		}
+	}
+	found;
+}
 
 def find_neighbours(node){
 		string message="Neighbours_list reply"+NL;
-
-		print(node);
-		list known_nodes = [ node ];
-
-		console(node);
 		connect(node);
 
 		if(isConnected(node)==FALSE){
@@ -22,8 +32,24 @@ def find_neighbours(node){
 		}
 		disconnect(node);
 
-		known_nodes = known_nodes + neighbours;
-		print(known_nodes);
+		for(d in neighbours){
+			if(inList(d,known_nodes) == FALSE){
+				append(known_nodes,d);
+			}
+		}
+		print("Neighbours of device " + toString(node));
+		print(neighbours);
 }
 
-find_neighbours(root);
+int i = 0;
+while(i < length(known_nodes)){
+	console(known_nodes[i]);
+	find_neighbours(known_nodes[i]);
+	i = i+1;
+}
+
+print("Total found nodes:");
+print(known_nodes);
+quit(0);
+
+// localhost:1239, localhost:1238, localhost:1237

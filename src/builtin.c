@@ -402,25 +402,13 @@ struct val * s2d(struct val * v){
 		yyerror("No port number specified");
 		return NULL;
 	}
-    port = atoi(port_s);
+	port = atoi(port_s);
 	if(!ip || !port){
 		yyerror("Cannot convert %s to a device", v->string_val);
 		return NULL;
 	}
 
-    struct val * result=malloc(sizeof(struct val));
-  	result->next = NULL;
-    result->aliases=0;
-    result->type='d';
-    result->string_val=strdup(ip);
-    if(port>0 && port<((2<<16)-1)){
-      result->port_val = port;
-    } else {
-      yyerror("invalid port number, found %d", port);
-    }
-  	result->int_val = 0;
-    return result;
-
+	return new_device(new_address(ip), new_int(port));
   }
 }
 

@@ -8,7 +8,7 @@ console(a);
 connect(a);
 while(b!=exit){
 	b=receive(a);
-	print(b);
+	print(strip(b));
 	send(a,b);
 }
 
