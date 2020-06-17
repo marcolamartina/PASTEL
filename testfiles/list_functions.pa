@@ -1,0 +1,15 @@
+print("list_function");
+
+def append(_list, item){
+	insert(_list, item, length(_list));
+}
+
+def inList(item, _list){
+	int found = FALSE;
+	for(i in _list){
+		if(i == item){
+			found = TRUE;
+		}
+	}
+	found;
+}

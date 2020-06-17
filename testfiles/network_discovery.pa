@@ -1,19 +1,8 @@
+load("../testfiles/list_functions.pa");
+
 device root=127.0.0.1:1234;
 list known_nodes = [ root ];
 
-def append(_list, item){
-	insert(_list, item, length(_list));
-}
-
-def inList(item, _list){
-	int found = FALSE;
-	for(i in _list){
-		if(i == item){
-			found = TRUE;
-		}
-	}
-	found;
-}
 
 def find_neighbours(node){
 		string message="Neighbours_list reply"+NL;

@@ -279,7 +279,7 @@ void open_terminal(struct val * device){
   system(string);
   free(string);
   free(title);
-  sleep(1);  
+  sleep(1);
 }
 
 void quit(struct val * arg){
@@ -340,11 +340,15 @@ struct val * strip_string(struct val * string){
 
 void load_file(struct val * file){
   int temp=yylineno;
+  extern FILE * yyin;
+  FILE * old_input=yyin;
+
+
   if(typeof_v(file)!='s'){
     yyerror("Wrong filename specified, found value of type %c", typeof_v(file));
     return;
   }
-  extern FILE * yyin;
+
 	if((strcmp(file->string_val+strlen(file->string_val)-3,".pa")!=0)){
     yyerror("Insert a .pa file");
     return;
@@ -357,13 +361,17 @@ void load_file(struct val * file){
 			yyerror("Error on opening source file");
 			return;
 	}
+
 	yyrestart(yyin);
 	yylineno = 1;
 	yyparse();
 	fclose(yyin);
   file_mod--;
-
-	yyin=stdin;
+  printf("%p\n", yyin);
+  printf("%p\n", stdin);
+  printf("%p\n", old_input);
+	yyin=old_input;
+  printf("%p\n", yyin);
 	yyrestart(yyin);
 	yylineno = temp;
   printf("%s", file_mod ? "" : "> ");
