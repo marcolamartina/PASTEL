@@ -149,7 +149,7 @@ int popfile(void);
 
 
 [ \t]   /* ignore white space */
-"\n"    { printf("%s", file_mod ? "" : "> "); yylineno++; }
+"\n"    { printf("%s", file_mod ? "" : "> "); }
 
 .	{ yyerror("Mystery character %c\n", *yytext); }
 %%
