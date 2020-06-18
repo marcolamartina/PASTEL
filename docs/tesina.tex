@@ -101,7 +101,7 @@ Un'invio di messaggio si riassume nelle seguenti operazioni:
 
 Al fine di ottenere risultati il più possibile realistici abbiamo usato tre schemi diversi con cui mandare i messaggi:
 \begin{itemize}
-	\item Ciclo ierativo: all'interno di un ciclo while vengono eseguite le operazioni sopra citate.
+	\item Ciclo iterativo: all'interno di un ciclo while vengono eseguite le operazioni sopra citate.
 	\item Chiamate a funzione: all'interno di un ciclo while viene chiamata una funzione che effettua le operazioni di invio.
 	\item Funzione ricorsiva: una funzione ha un parametro che conta quanti messaggi devono ancora essere inviati. Al termine dell'invio di un messaggio il parametro viene decrementato e si effettua una chiamata ricorsiva.
 \end{itemize}
@@ -127,18 +127,49 @@ Il tempo impiegato è misurato utilizzando il programma di sistema \texttt{time}
 
 Come si può vedere dalla tabella~\ref{table:performance} e in figura~\ref{fig:performance-graph} (si noti che gli assi sono in scala logaritmica), l'implementazione con la chiamata a funzione è quella con mediamente più veloce, anche se ha un tempo netto leggermente maggiore dell'implementazione puramente ricorsiva, anche se resta comparabile.
 
+\begin{figure}
+	\centering
+	\resizebox{0.7\columnwidth}{!}{
+		\includegraphics{sources/performance-graph}}
+	\caption{Performance dell'interprete}
+	\label{fig:performance-graph}
+\end{figure}
+
 Una possibile spiegazione per questa peculiarità è che l'invio di messaggi è un processo molto IO-bound, quindi l'approccio iterativo è sufficientemente veloce da non trovare le risorse disponibili e viene sospeso aspettando un interrupt dal sistema operativo, incorrendo in numerosi context switch costosi. La chiamata a funzione, invece, ha dell'overhead per la creazione dello stack, questo, come si vede dal tempo netto, è abbastanza piccolo, ma potrebbe essere sufficientemente grande da evitare il context switch.
 
 Questo dato sembra anche giustificare la scelta di sviluppare un linguaggio di scripting interpretato invece che un linguaggio compilato, visto che l'ambito di applicazione principale sarà legato all'invio di messaggi nella rete, e non elaborate manipolazioni dei dati.
 
 Il tempo totale dell'implementazione ricorsiva è il maggiore di tutti\footnote{Su 10000 messaggi l'esecuzione è stata interrotta prematuramente dall'esaurimento della memoria a disposizione}, nonostante il numero di scope da creare sia lo stesso delle chiamate a funzione iterative, infatti, le ricerche dei simboli nello stack delle chimate a funzione diventano progressivamente più costose all'aumento delle chiamate ricorsive.
 
+\begin{table}[htbp]
+	\centering
+    \resizebox{\columnwidth}{!}{
+	\begin{tabular}{|c| cc | cc| cc|}
+		\hline
+		                   & \multicolumn{2}{c|}{{\normalsize PASTEL }} & \multicolumn{2}{c|}{{\normalsize Python singola connessione }} & \multicolumn{2}{c|}{{\normalsize Python connessioni multiple}} \\ \cline{2-7}
+		Numero di messaggi & Tempo totale (s) &     Tempo netto (s)     & Tempo totale (s) &               Tempo netto (s)               & Tempo totale (s) &               Tempo netto (s)               \\ \hline
+		        10         & 1.350            &          0.17           & 1.339            &                    0.32                     & 1.357& 0.340\\
+		        50         & 1.278            &          0.15           & 1.328            &                    0.31                     & 1.448 &0.430\\
+		       100         & 1.260            &          0.15           & 1.441            &                    0.42                     &  1.610&0.570\\
+		       1000        & 1.305            &          0.19           & 1.340            &                    0.33                     & 6.232 &4.800\\
+		      10000        & 1.508            &          0.35           & 2.115            &                    0.56                     & 10.254 &8.54\\ \hline
+	\end{tabular}}
+	\caption{Tempo necessario per l'invio di un numero crescente di messaggi in Python, e in PASTEL con connessione singola}
+	\label{table:python-performance}
+\end{table}
+
+Per potere meglio valutare le performance del linguaggio, è stato deciso di confrontare le prestazioni sullo stesso benchmark con il Python. È stata scelta la modalità ``chiamata a funzione'', inoltre lo stesso test è stato ripetuto anche con l'invio di più messaggi una singola connessione per valutare una più ampia gamma di scenari. I nuovi risultati sperimentali sono sintetizzati nella tabella~\ref{table:python-performance}.
+
+Come si può notare anche dalla figura~\ref{fig:performance-comparison}, il programma PASTEL ha sempre prestazioni comparabili se non migliori di quelle del programma equivalente in Python, a testimonianza della validità dell'implementazione.
+
+
+
 \begin{figure}
 	\centering
-	\resizebox{\columnwidth}{!}{
-	\includegraphics{sources/performance-graph}}
-	\caption{Performance dell'interprete}
-	\label{fig:performance-graph}
+	\resizebox{0.7\columnwidth}{!}{
+		\includegraphics{sources/pvp.pdf}}
+	\caption{Confronto delle performance di PASTEL e Python}
+	\label{fig:performance-comparison}
 \end{figure}
 
 

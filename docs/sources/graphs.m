@@ -74,7 +74,7 @@ title("Tempo totale, connessione singola");
 hold off
 
 subplot(2,2,4);
-loglog(data(:,1)',data(:,3)','-o');
+loglog(data_2(:,1)',data_2(:,3)','-o');
 hold on
 grid on
 loglog(data_2(:,1)',data_2(:,5)','-o');

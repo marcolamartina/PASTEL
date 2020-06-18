@@ -1,0 +1,16 @@
+def send_message(dev, num){
+    send(dev, toString(num));
+}
+
+ 
+
+device a = localhost:1234;
+console(a);
+connect(a);
+int i = 0;
+while(i < 10){
+    send_message(a, i);
+    i = i+1;
+}
+disconnect(a);
+quit(0);
