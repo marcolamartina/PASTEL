@@ -19,7 +19,6 @@ enum bifs {			/* built-in functions */
   B_s2a,
   B_toString,
   B_console,
-  B_load,
   B_split,
   B_strip,
   B_sleep,
@@ -181,7 +180,8 @@ void yyerror(const char *s, ...);
 void yyrestart  (FILE * input_file );
 int file_mod;
 
-
+void inner_scope();
+void outer_scope();
 void free_lost(struct val * v);
 void remove_symbol(struct symbol * s);
 struct val * calluser(struct ufncall *);

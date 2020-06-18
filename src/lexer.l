@@ -3,6 +3,7 @@
 %option stack
 %x string_state
 %x comment_state
+%x IFILE
 
 
 %{
@@ -11,6 +12,20 @@
 #include "builtin.h"
 #include "types.h"
 #include "parser.tab.h"
+
+struct bufstack {
+  struct bufstack *prev;
+  YY_BUFFER_STATE bs;
+  int lineno;
+  char *filename;
+  FILE *f;
+} *curbs = NULL;
+
+char *curfilename;
+
+int newfile(char *fn);
+int popfile(void);
+
 %}
 
 
@@ -77,7 +92,6 @@
 "s2a"			    { yylval.fn = B_s2a; return FUNC; }
 "toString"		{ yylval.fn = B_toString; return FUNC; }
 "console"     { yylval.fn = B_console; return FUNC; }
-"load"        { yylval.fn = B_load; return FUNC; }
 "strip"       { yylval.fn = B_strip; return FUNC; }
 "split"       { yylval.fn = B_split; return FUNC; }
 "sleep"       { yylval.fn = B_sleep; return FUNC; }
@@ -113,12 +127,108 @@
  /* names */
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.str = strdup(yytext); return NAME; }
 
+ /* include */
+ ^"#"[ \t]*include[ \t]*[\"<] { BEGIN IFILE; }
+ <IFILE>[^ \t\n\">]+ {
+                        { int c;
+                          while((c = input()) && c != '\n') ;
+                        }
+                        yylineno++;
+                        if(!newfile(yytext))
+                          yyterminate(); /* no such file */
+                        BEGIN INITIAL;
+                      }
+<IFILE>.|\n {
+              fprintf(stderr, "%4d bad include line\n", yylineno);
+              yyterminate();
+            }
+
+<<EOF>> { if(!popfile()) yyterminate(); printf("%s", file_mod ? "" : "> "); }
 
 "//".*  /* ignore comments */
 
 
 [ \t]   /* ignore white space */
-"\n"    { printf("%s", file_mod ? "" : "> "); }
+"\n"    { printf("%s", file_mod ? "" : "> "); yylineno++; }
 
 .	{ yyerror("Mystery character %c\n", *yytext); }
 %%
+
+int newfile(char *fn) {
+  FILE *f;
+  if(strcmp(fn,"stdin")){
+    f=fopen(fn, "r");
+		file_mod=1;
+  }else{
+    f=stdin;
+		file_mod=0;
+  }
+  struct bufstack *bs = malloc(sizeof(struct bufstack));
+  /* die if no file or no room */
+  if(!f) { perror(fn); return 0; }
+  if(!bs) { perror("malloc"); exit(1); }
+
+  /* remember state */
+  if(curbs){
+		curbs->lineno = yylineno;
+	}
+  bs->prev = curbs;
+
+  /* set up current entry */
+  bs->bs = yy_create_buffer(f, YY_BUF_SIZE);
+  bs->f = f;
+  bs->filename = fn;
+  yy_switch_to_buffer(bs->bs);
+  curbs = bs;
+  yylineno = 1;
+  curfilename = fn;
+  return 1;
+}
+
+int popfile(void) {
+  struct bufstack *bs = curbs;
+  struct bufstack *prevbs;
+  if(!bs) return 0;
+
+  /* get rid of current entry */
+  fclose(bs->f);
+  yy_delete_buffer(bs->bs);
+
+  /* switch back to previous */
+  prevbs = bs->prev;
+  free(bs);
+  if(!prevbs) return 0;
+  yy_switch_to_buffer(prevbs->bs);
+  curbs = prevbs;
+  yylineno = curbs->lineno;
+  curfilename = curbs->filename;
+  if(strcmp(curfilename,"stdin")){
+		file_mod=1;
+  }else{
+		file_mod=0;
+  }
+  return 1;
+}
+
+int main(int argc, char **argv){
+	symstack = calloc(1, sizeof(struct symtable_stack));
+	symstack->next = NULL;
+	symstack->symtab = NULL;
+	inner_scope();
+	newfile("stdin");
+	for(int i = 1; i<argc; i++){
+		if((strcmp(argv[i]+strlen(argv[i])-3,".pa")!=0)){
+      fprintf(stderr, "Insert a .pa file");
+      return 1;
+    }else{
+      if(newfile(argv[i])) yyparse();
+    }
+	}
+
+	if(argc==1){
+		printf("%s", file_mod ? "" : "> ");
+		yyparse();
+	}
+	outer_scope();
+	return 0;
+}

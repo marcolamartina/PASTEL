@@ -12,14 +12,10 @@ int yyparse();
 
 extern int file_mod;
 
-/* symbol table */
-/* hash a symbol */
-static void inner_scope();
-static void outer_scope();
 static struct symbol * lookup_aux(char* sym, int print_error);
 
-
-
+/* symbol table */
+/* hash a symbol */
 static unsigned symhash(char *sym)
 {
   unsigned int hash = 0;
@@ -420,7 +416,7 @@ struct val * valuedup(struct val * v){
 		case 's': v2 = new_string(v->string_val); break;
 		case 'a': v2 = new_address(v->string_val); break;
 		case 'd':
-			 v2 = new_device(new_address(v->string_val), new_int(v->port_val));	
+			 v2 = new_device(new_address(v->string_val), new_int(v->port_val));
 			 break;
     //case 'l': v2 = listdup(v); break;
 		default:
@@ -663,40 +659,4 @@ void yyerror(const char *s, ...){
     free(err);
     exit(1);
   }
-}
-
-
-int main(int argc, char **argv){
-	symstack = calloc(1, sizeof(struct symtable_stack));
-	symstack->next = NULL;
-	symstack->symtab = NULL;
-	inner_scope();
-	extern FILE * yyin;
-  file_mod=0;
-	for(int i = 1; i<argc; i++){
-		if((strcmp(argv[1]+strlen(argv[1])-3,".pa")!=0)){
-      fprintf(stderr, "Insert a .pa file");
-      return 1;
-    }else{
-      file_mod++;
-      yyin=fopen(argv[i], "r");
-    }
-
-		if (!yyin){
-				yyerror("Error on opening source file");
-				return 1;
-		}
-		yyrestart(yyin);
-		yylineno = 1;
-		yyparse();
-		fclose(yyin);
-    file_mod--;
-	}
-	yyin=stdin;
-	yyrestart(yyin);
-	yylineno = 1;
-  printf("%s", file_mod ? "" : "> ");
-  yyparse();
-	outer_scope();
-	return 0;
 }

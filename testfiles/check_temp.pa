@@ -7,7 +7,7 @@ console(a);
 connect(a);
 
 while( temp <= 27){
-	send(a, "response temp @ tell: ~ :tell ");
+	send(a, "temp @ reply tell: ~ :tell ");
 	message=receive(a);
 	temp = s2i(strip(message));
 	sleep(1);

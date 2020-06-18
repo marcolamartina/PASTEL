@@ -28,7 +28,6 @@ static struct val * s2a(struct val * v);
 static struct val * s2d(struct val * v);
 static struct val * s2r(struct val * v);
 static struct val * s2i(struct val * v);
-static void load_file(struct val * file);
 static void quit(struct val * arg);
 static struct val * split_string(struct val * string, struct val * token);
 static struct val * strip_string(struct val * string);
@@ -182,13 +181,6 @@ struct val * callbuiltin(struct fncall *f) {
       open_terminal(v);
     }
     break;
-  case B_load:
-    if (num_arg != 1) {
-      yyerror("Wrong argument number, expected 1, found %d", num_arg);
-    } else{
-      load_file(v);
-    }
-    break;
   case B_strip:
     if (num_arg != 1) {
       yyerror("Wrong argument number, expected 1, found %d", num_arg);
@@ -323,14 +315,17 @@ struct val * split_string(struct val * string, struct val * token){
 struct val * strip_string(struct val * string){
   if(typeof_v(string)!='s'){
     yyerror("Cannot strip a non-string value, found %c", typeof_v(string));
-    return NULL;
+    return new_string("");
+  }
+  if(!string->string_val){
+    return new_string("");
   }
   char * s=strdup(string->string_val);
   while(isspace(*s)){
     s++;
   }
   char* back = s + strlen(s);
-  while(isspace(*--back)){
+  while(back>=s && isspace(*--back)){
     /*do nothing*/
   }
   *(back+1) = '\0';
@@ -338,45 +333,6 @@ struct val * strip_string(struct val * string){
   return new_string(s);
 }
 
-void load_file(struct val * file){
-  int temp=yylineno;
-  extern FILE * yyin;
-  FILE * old_input=yyin;
-
-
-  if(typeof_v(file)!='s'){
-    yyerror("Wrong filename specified, found value of type %c", typeof_v(file));
-    return;
-  }
-
-	if((strcmp(file->string_val+strlen(file->string_val)-3,".pa")!=0)){
-    yyerror("Insert a .pa file");
-    return;
-  }else{
-    file_mod++;
-    yyin=fopen(file->string_val, "r");
-  }
-
-	if (!yyin){
-			yyerror("Error on opening source file");
-			return;
-	}
-
-	yyrestart(yyin);
-	yylineno = 1;
-	yyparse();
-	fclose(yyin);
-  file_mod--;
-  printf("%p\n", yyin);
-  printf("%p\n", stdin);
-  printf("%p\n", old_input);
-	yyin=old_input;
-  printf("%p\n", yyin);
-	yyrestart(yyin);
-	yylineno = temp;
-  printf("%s", file_mod ? "" : "> ");
-  yyparse();
-}
 
 struct val * s2i(struct val * v){
   char * end;
