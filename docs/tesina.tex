@@ -40,13 +40,17 @@ Il termine REST rappresenta un sistema di trasmissione di dati su HTTP senza ult
 
 L'architettura REST si basa su HTTP. Il funzionamento prevede una struttura degli URL ben definita che identifica univocamente una risorsa o un insieme di risorse e l'utilizzo dei verbi HTTP specifici per il recupero di informazioni (GET), per la modifica (POST, PUT, PATCH, DELETE) e per altri scopi (OPTIONS, ecc.)~\cite{fielding2000architectural}.
 
-MQTT è un protocollo di connettività machine-to-machine (M2M) / "Internet of Things". È stato progettato come un trasporto di messaggistica estremamente leggero. È utile per le connessioni  remote in cui è richiesto un codice ridotto e/o l'ampiezza di banda della rete è limitata. Ad esempio, è stato utilizzato nei sensori che comunicano con un intermediario tramite collegamento satellitare, attraverso occasionali connessioni dial-up con operatori sanitari e in una gamma di scenari di automazione domestica e piccoli dispositivi. È ideale anche per le applicazioni mobili a causa delle sue dimensioni ridotte, basso consumo energetico, pacchetti di dati ridotti al minimo e distribuzione efficiente delle informazioni a uno o più ricevitori~\cite{banks2019mqtt}.
+MQTT è un protocollo di connettività machine-to-machine (M2M) / "Internet of Things". È stato progettato come un trasporto di messaggistica estremamente leggero. È utile per le connessioni  remote in cui è richiesto un codice ridotto e/o l'ampiezza di banda della rete è limitata. Ad esempio, è stato utilizzato nei sensori che comunicano con un intermediario tramite collegamento satellitare, attraverso occasionali connessioni dial-up con operatori sanitari e in una gamma di scenari di automazione domestica e piccoli dispositivi. È ideale anche per le applicazioni mobili a causa delle sue dimensioni ridotte, basso consumo energetico, pacchetti di dati ridotti al minimo e distribuzione efficiente delle informazioni a uno o più ricevitori~\cite{banks2019mqtt}.\\\\
 
 
 
 Il linguaggio proposto può facilmente essere utilizzato con i protocolli precedenti, eccetto CoAP poiché basato su UDP. L'ambiente target principale però è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd} e su questi si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.  
 
-[...]L'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect} per reti di sensori wireless (WSN).
+[...]L'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect, libes1995exploring} per reti di sensori wireless (WSN).
+
+Expect è un programma che "parla" con altri programmi interattivi secondo uno script. Seguendo lo script, Expect sa cosa ci si può aspettare da un programma e quale dovrebbe essere la risposta corretta. Un linguaggio interpretato fornisce ramificazioni e strutture di controllo di alto livello per dirigere il dialogo. Inoltre, l'utente può assumere il controllo e interagire direttamente quando lo desidera, in seguito restituendo il controllo allo script.
+
+Il tool \texttt{expect} è basato sul linguaggio Tcl. Tcl è stato uno dei primi linguaggi "dinamici" a diventare popolare, vedendo un uso diffuso a partire dai primi anni '90. Tcl ha trovato ampio successo in molti campi, e le distribuzioni di Tcl spaziano da dispositivi integrati come route, a infrastrutture di back-end distribuite.~\cite{nadkarni2017tcl}.\\\\
 
 Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obbiettivo di fornire uno strumento che permette di interfacciarsi con facilità e in modo affidabile con dispositivi IoT, [...]
 
@@ -78,14 +82,14 @@ L'algoritmo termina automaticamente nonappena l'ultimo dei nodi noti interrogato
 
 Per semplicità si assume che il calcolatore che esegue il programma abbia un range di comunicazione molto superiore ai nodi della rete, e che possa quindi raggiungerli in un singolo hop, una strategia più generale dovrebbe ovviamente prevedere la costruzione di messaggi di routing.
 
-\lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Source code of \lstname}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
+\lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sourgente di \lstname}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
 
 \subsubsection{Publish-Subscribe}\label{subsubsection:pub-sub}
 
 Come visto precedentemente in~\cite{tandale2017empirical} il modello Publish-Subscribe è molto comune come protocollo di comunicazione nel campo IoT. Nel listato~\ref{listing:sub} mostriamo come PASTEL permetta con facilità di interrogare una lista di nodi per ottenere i topic a cui ogni nodo intende fare il subscribe, dopo questo step di configurazione è immediato poter mandare a tutti i nodi iscritti ad un topic un determinato messaggio.
 
 
-\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Source code of \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sourgente di \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
  ]{../testfiles/subscriber.pa}
 
 
@@ -93,7 +97,7 @@ Con questo framework diventa estremamente facile per un nodo comunicare un messa
 
 Il programma si aspetta un input del tipo ``\texttt{<lista di topic> :TOPICS <messaggio>}'', la parte di messaggio che precede ``\texttt{:TOPICS}'' è interpretata come una lista di topic separati da virgole, il messaggio che segue quel tag, invece, verrà inviato a tutti i nodi che si sono precedentemente iscritti ad almeno uno di quei topic.
 
-\lstinputlisting[firstline=1, lastline=29, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Source code of \lstname}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=29, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sourgente di \lstname}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
 ]{../testfiles/publisher.pa}
 
 Lo schema di funzionamento illustrato può ovviamente essere ulteriormente raffinato impedendo l'iscrizione multipla ad uno stesso topic e aggiungendo controlli per evitare di inviare più volte uno stesso messaggio un nodo iscritto a più topic, o al nodo che ha originato il messaggio. Inoltre è possibile prevedere la possibilità di cancellare le iscrizioni o modificarle periodicamente.
@@ -174,6 +178,8 @@ Per potere meglio valutare le performance del linguaggio, è stato deciso di con
 
 Come si può notare anche dalla figura~\ref{fig:performance-comparison}, il programma PASTEL ha sempre prestazioni comparabili se non migliori di quelle del programma equivalente in Python, a testimonianza della validità dell'implementazione.
 
+Tutto il codice utilizzato per i benchmarking è riportato nell'appendice (sezione~\ref{section:appendix})
+
 
 
 \begin{figure}
@@ -189,8 +195,28 @@ Come si può notare anche dalla figura~\ref{fig:performance-comparison}, il prog
 
 
 
-
+\clearpage
 \bibliographystyle{unsrt}
 \bibliography{references}
+\clearpage
+\section{Appendice}\label{section:appendix}
+
+\lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice per inviare messagi su connessioni separate in un loop.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+]{../testfiles/benchmarks/send_messages_loop.pa}
+
+\lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice per inviare messagi su connessioni separate con chiamate a funzione in un loop.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+]{../testfiles/benchmarks/send_messages_func.pa}
+
+\lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice per inviare messagi su connessioni separate ricorsivamente.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+]{../testfiles/benchmarks/send_messages_recur.pa}
+
+\lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice Python per inviare messagi su connessioni separate con chiamate a funzione in un loop.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+]{../testfiles/benchmarks/send_multiple.py}
+
+\lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice PASTEL per inviare messagi su una singola connessione con chiamate a funzione in un loop.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+]{../testfiles/benchmarks/send_single.pa}
+
+\lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice Python per inviare messagi su una singola connessione con chiamate a funzione in un loop.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+]{../testfiles/benchmarks/send_single.py}
 
 \end{document}          

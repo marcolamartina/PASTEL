@@ -1,9 +1,6 @@
 def send_message(dev, num){
     send(dev, toString(num));
 }
-
- 
-
 device a = localhost:1234;
 console(a);
 connect(a);
