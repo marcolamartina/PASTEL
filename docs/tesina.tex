@@ -30,7 +30,19 @@ Il resto della \hl{tesina} è strutturato come segue: la sezione~\ref{section:st
 
 \section{Stato dell'arte}\label{section:stato-arte}
 
-I dispositivi IoT comunemente eseguono protocolli semplici come CoAP, REST e MQTT~\cite{tandale2017empirical}. \hlc[cyan]{[Inserire descrizione dei protocolli, magari qualche altra citazione]}
+I dispositivi IoT comunemente eseguono protocolli semplici come CoAP, REST e MQTT~\cite{tandale2017empirical}. 
+
+Constrained Application Protocol (CoAP) è un   protocollo di trasferimento web specializzato da utilizzare con nodi o reti con risorse limitate (ad es. reti a bassa potenza, senza trasferimento affidabile dei dati). I nodi hanno spesso microcontrollori  a 8 bit con piccole quantità di ROM e RAM, mentre reti con risorse limitate come IPv6 su Low-Power Wireless Personal Area  (6LoWPANs) hanno spesso tassi di errore dei pacchetti elevati e un tipico throughput di 10 s di kbit/s. Il protocollo è progettato per applicazioni  machine-to-machine (M2M) come smart energy e building automation.~\cite{shelby2014constrained}.
+
+Representational State Transfer (REST) è uno tipo di architettura per i sistemi distribuiti. L'espressione representational state transfer e il suo acronimo, REST, furono introdotti nel 2000 nella tesi di dottorato di Roy Fielding, uno dei principali autori delle specifiche dell'Hypertext Transfer Protocol (HTTP), e vennero rapidamente adottati dalla comunità di sviluppatori Internet.
+
+Il termine REST rappresenta un sistema di trasmissione di dati su HTTP senza ulteriori livelli, quali ad esempio SOAP. I sistemi REST non prevedono il concetto di sessione, ovvero sono stateless.
+
+L'architettura REST si basa su HTTP. Il funzionamento prevede una struttura degli URL ben definita che identifica univocamente una risorsa o un insieme di risorse e l'utilizzo dei verbi HTTP specifici per il recupero di informazioni (GET), per la modifica (POST, PUT, PATCH, DELETE) e per altri scopi (OPTIONS, ecc.)~\cite{fielding2000architectural}.
+
+MQTT è un protocollo di connettività machine-to-machine (M2M) / "Internet of Things". È stato progettato come un trasporto di messaggistica estremamente leggero. È utile per le connessioni  remote in cui è richiesto un codice ridotto e/o l'ampiezza di banda della rete è limitata. Ad esempio, è stato utilizzato nei sensori che comunicano con un intermediario tramite collegamento satellitare, attraverso occasionali connessioni dial-up con operatori sanitari e in una gamma di scenari di automazione domestica e piccoli dispositivi. È ideale anche per le applicazioni mobili a causa delle sue dimensioni ridotte, basso consumo energetico, pacchetti di dati ridotti al minimo e distribuzione efficiente delle informazioni a uno o più ricevitori~\cite{banks2019mqtt}.
+
+
 
 Il linguaggio proposto può facilmente essere utilizzato con i protocolli precedenti, eccetto CoAP poiché basato su UDP. L'ambiente target principale però è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd} e su questi si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.  
 

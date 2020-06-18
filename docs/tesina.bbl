@@ -1,10 +1,26 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{tandale2017empirical}
 U.~{Tandale}, B.~{Momin}, and D.~P. {Seetharam}.
 \newblock An empirical study of application layer protocols for iot.
 \newblock In {\em 2017 International Conference on Energy, Communication, Data
   Analytics and Soft Computing (ICECDS)}, pages 2447--2451, 2017.
+
+\bibitem{shelby2014constrained}
+Zach Shelby, Klaus Hartke, and Carsten Bormann.
+\newblock The constrained application protocol (coap).
+\newblock 2014.
+
+\bibitem{fielding2000architectural}
+Roy~T Fielding and Richard~N Taylor.
+\newblock {\em Architectural styles and the design of network-based software
+  architectures}, volume~7.
+\newblock University of California, Irvine Irvine, 2000.
+
+\bibitem{banks2019mqtt}
+A~Banks, E~Briggs, K~Borgendale, and R~Gupta.
+\newblock Mqtt version 5.0.
+\newblock {\em OASIS Standard}, 2019.
 
 \bibitem{gaglio2017dc4cd}
 Salvatore Gaglio, Giuseppe~Lo Re, Gloria Martorella, and Daniele Peri.
