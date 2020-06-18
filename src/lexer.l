@@ -19,7 +19,7 @@ struct bufstack {
   int lineno;
   char *filename;
   FILE *f;
-} *curbs = 0;
+} *curbs = NULL;
 
 char *curfilename;
 
@@ -158,17 +158,20 @@ int newfile(char *fn) {
   FILE *f;
   if(strcmp(fn,"stdin")){
     f=fopen(fn, "r");
+		file_mod=1;
   }else{
     f=stdin;
+		file_mod=0;
   }
-  file_mod++;
   struct bufstack *bs = malloc(sizeof(struct bufstack));
   /* die if no file or no room */
   if(!f) { perror(fn); return 0; }
   if(!bs) { perror("malloc"); exit(1); }
 
   /* remember state */
-  if(curbs)curbs->lineno = yylineno;
+  if(curbs){
+		curbs->lineno = yylineno;
+	}
   bs->prev = curbs;
 
   /* set up current entry */
@@ -185,7 +188,6 @@ int newfile(char *fn) {
 int popfile(void) {
   struct bufstack *bs = curbs;
   struct bufstack *prevbs;
-  file_mod--;
   if(!bs) return 0;
 
   /* get rid of current entry */
@@ -200,6 +202,11 @@ int popfile(void) {
   curbs = prevbs;
   yylineno = curbs->lineno;
   curfilename = curbs->filename;
+  if(strcmp(curfilename,"stdin")){
+		file_mod=1;
+  }else{
+		file_mod=0;
+  }
   return 1;
 }
 
@@ -208,23 +215,20 @@ int main(int argc, char **argv){
 	symstack->next = NULL;
 	symstack->symtab = NULL;
 	inner_scope();
-  file_mod=-1;
+	newfile("stdin");
 	for(int i = 1; i<argc; i++){
 		if((strcmp(argv[i]+strlen(argv[i])-3,".pa")!=0)){
       fprintf(stderr, "Insert a .pa file");
       return 1;
     }else{
-      file_mod++;
       if(newfile(argv[i])) yyparse();
-      file_mod--;
     }
 	}
 
-  if(newfile("stdin")){
-    printf("%s", file_mod ? "" : "> ");
-    yyparse();
-  }
-
+	if(argc==1){
+		printf("%s", file_mod ? "" : "> ");
+		yyparse();
+	}
 	outer_scope();
 	return 0;
 }
