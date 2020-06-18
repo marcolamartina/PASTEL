@@ -315,14 +315,17 @@ struct val * split_string(struct val * string, struct val * token){
 struct val * strip_string(struct val * string){
   if(typeof_v(string)!='s'){
     yyerror("Cannot strip a non-string value, found %c", typeof_v(string));
-    return NULL;
+    return new_string("");
+  }
+  if(!string->string_val){
+    return new_string("");
   }
   char * s=strdup(string->string_val);
   while(isspace(*s)){
     s++;
   }
   char* back = s + strlen(s);
-  while(isspace(*--back)){
+  while(back>=s && isspace(*--back)){
     /*do nothing*/
   }
   *(back+1) = '\0';

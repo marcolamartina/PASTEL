@@ -5,6 +5,10 @@ connect(sensor);
 send(sensor, "CSV_DATA REPLY"+NL);
 string s=strip(receive(sensor));
 
-for( entry in split(s,",") ){
-	print(strip(entry));
+if(s!=""){
+	for( entry in split(s,",") ){
+		print(strip(entry));
+	}
+} else {
+	print("No data received");
 }
