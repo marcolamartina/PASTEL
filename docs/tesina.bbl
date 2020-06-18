@@ -1,5 +1,11 @@
 \begin{thebibliography}{1}
 
+\bibitem{tandale2017empirical}
+U.~{Tandale}, B.~{Momin}, and D.~P. {Seetharam}.
+\newblock An empirical study of application layer protocols for iot.
+\newblock In {\em 2017 International Conference on Energy, Communication, Data
+  Analytics and Soft Computing (ICECDS)}, pages 2447--2451, 2017.
+
 \bibitem{gaglio2017dc4cd}
 Salvatore Gaglio, Giuseppe~Lo Re, Gloria Martorella, and Daniele Peri.
 \newblock {DC4CD}: a platform for distributed computing on constrained devices.

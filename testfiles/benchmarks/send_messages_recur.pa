@@ -1,0 +1,19 @@
+def send_message(dev, times){
+	connect(dev);
+	if(isConnected(dev)){
+		send(dev, toString(times)+" ");
+		disconnect(dev);
+	} else {
+		print("Couldn't connect to " + toString(dev));
+	}
+	if(times){
+		send_message(dev, times-1);
+	}
+}
+
+device a = localhost:1234;
+console(a);
+
+send_message(a,10000);
+quit(0);
+
