@@ -32,7 +32,11 @@ struct val * sum(struct val * a, struct val * b){
 			result->type = 'a';
 			int temp ;
 			result->string_val = malloc(sizeof(char)*15);
-			inet_pton(AF_INET, a->string_val, &temp);
+      if(!strcmp(a->string_val,"localhost")){
+        inet_pton(AF_INET, "127.0.0.1", &temp);
+      } else {
+        inet_pton(AF_INET, a->string_val, &temp);
+      }
 			temp += htonl(b->int_val);
 			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
 		} else {

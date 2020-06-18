@@ -1,20 +1,14 @@
-def send_message(dev){
-	connect(dev);
-	if(isConnected(dev)){
-		send(dev, toString(i));
-		disconnect(dev);
-	} else {
-		print("Couldn't connect to " + toString(dev));
-	}
+def send_message(dev, num){
+	send(dev, toString(num));
 }
 
 device a = localhost:1234;
 console(a);
-
+connect(a);
 int i = 0;
-while(i < 10000){
+while(i < 10){
+	send_message(a, i);
 	i = i+1;
-	send_message(a);
 }
+disconnect(a);
 quit(0);
-

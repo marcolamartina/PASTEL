@@ -30,10 +30,10 @@ extern int file_mod;
 
 
 %right '='
-%nonassoc ADDR PORT
 %left AND OR
 %nonassoc <fn> CMP
 %left ':'
+%nonassoc ADDR PORT
 %left '+' '-'
 %left '*' '/'
 %nonassoc UMINUS
