@@ -4,11 +4,14 @@ console(sensor);
 connect(sensor);
 send(sensor, "CSV_DATA REPLY"+NL);
 string s=strip(receive(sensor));
+list lista;
 
 if(s!=""){
 	for( entry in split(s,",") ){
-		print(strip(entry));
+		insert(lista,(strip(entry)),0);
 	}
 } else {
 	print("No data received");
 }
+
+print(lista);

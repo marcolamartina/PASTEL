@@ -17,7 +17,7 @@ void dumpast(struct ast *a, int level){
   }
 
   switch(a->nodetype) {
-	case 'J': printf("list "); break;
+	case 'J': printf("list \n"); break;
     /* constant */
   case 'K': string=toString(((struct value_val *)a)->v);
     printf("value %s\n", string); free(string); break;
