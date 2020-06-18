@@ -60,13 +60,13 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obbiettivo di 
 \section{Caratteristiche del linguaggio}\label{section:caratteristiche-linguaggio}
 \subsection{Grammatica}
 \subsection{Descrizione del parser}
-{[...]} Figura~\ref{fig:parser}[...]
+{[...]} Figura~\ref{fig:parser_simple} (In appendice il grafico completo)[...]
 \begin{figure}
 	\centering
 	\resizebox{\columnwidth}{!}{
-	\includegraphics{sources/parser}}
-	\caption{Grafico del FSA generato da Bison}
-	\label{fig:parser}
+	\includegraphics{sources/parser_simple}}
+	\caption{Grafico del FSA generato utilizzando  GNU Bison 3.5.4 XML Automaton Report su una struttura fortemente semplificata per facilitare la rappresentazione. La grammatica completa non presenta conflitti shift/reduce e reduce/reduce.}
+	\label{fig:parser_simple}
 \end{figure}
 
 \subsection{Casi d'uso}\label{subsection:casi-d_uso}
@@ -178,7 +178,7 @@ Per potere meglio valutare le performance del linguaggio, è stato deciso di con
 
 Come si può notare anche dalla figura~\ref{fig:performance-comparison}, il programma PASTEL ha sempre prestazioni comparabili se non migliori di quelle del programma equivalente in Python, a testimonianza della validità dell'implementazione.
 
-Tutto il codice utilizzato per i benchmarking è riportato nell'appendice (sezione~\ref{section:appendix})
+Tutto il codice utilizzato per i benchmarking è riportato nell'appendice.
 
 
 
@@ -198,8 +198,19 @@ Tutto il codice utilizzato per i benchmarking è riportato nell'appendice (sezio
 \clearpage
 \bibliographystyle{unsrt}
 \bibliography{references}
+\addcontentsline{toc}{section}{Riferimenti bibliografici}
+
 \clearpage
-\section{Appendice}\label{section:appendix}
+\section*{Appendice}\label{section:appendix}
+\addcontentsline{toc}{section}{Appendice}
+
+\begin{center}
+	\centering
+	\resizebox{\columnwidth}{!}{
+		\includegraphics{sources/parser}}\\
+	Grafico del FSA generato utilizzando GNU Bison 3.5.4 XML Automaton Report.
+\end{center}
+
 
 \lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice per inviare messagi su connessioni separate in un loop.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
 ]{../testfiles/benchmarks/send_messages_loop.pa}
