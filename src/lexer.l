@@ -143,7 +143,7 @@ int popfile(void);
               yyterminate();
             }
 
-<<EOF>> { if(!popfile()) yyterminate();}
+<<EOF>> { if(!popfile()) yyterminate(); printf("%s", file_mod ? "" : "> "); }
 
 "//".*  /* ignore comments */
 
@@ -208,7 +208,7 @@ int main(int argc, char **argv){
 	symstack->next = NULL;
 	symstack->symtab = NULL;
 	inner_scope();
-  file_mod=0;
+  file_mod=-1;
 	for(int i = 1; i<argc; i++){
 		if((strcmp(argv[i]+strlen(argv[i])-3,".pa")!=0)){
       fprintf(stderr, "Insert a .pa file");
@@ -219,10 +219,12 @@ int main(int argc, char **argv){
       file_mod--;
     }
 	}
-	yyrestart(stdin);
-	yylineno = 1;
-  printf("%s", file_mod ? "" : "> ");
-  yyparse();
+
+  if(newfile("stdin")){
+    printf("%s", file_mod ? "" : "> ");
+    yyparse();
+  }
+
 	outer_scope();
 	return 0;
 }
