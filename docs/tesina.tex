@@ -90,7 +90,23 @@ Lo schema di funzionamento illustrato può ovviamente essere ulteriormente raffi
 
 Il codice mostrato nelle sezioni~\ref{subsubsection:net-disc} e~\ref{subsubsection:pub-sub} mostra la potenzialità di essere integrato in un unico sistema software che, inserito in una rete, a partire dalla conoscenza di un singolo nodo, riesce a ricostruire la topologia della rete raggiungibile e gestire il funzionamento di un protocollo non banale del tipo publish-subscribe, dimostrando l'applicabilità del linguaggio proposto all'interno del contesto target. 
 
+Per testare la scalabilità dell'implementazione del linguaggio abbiamo misurato il tempo impiegato per inviare un numero crescente di messaggi.\\
+Un'invio di messaggio si riassume nelle seguenti operazioni:
+\begin{enumerate}
+	\item Si stabilisce una connessione.
+	\item{Si verifica che la connessione abbia avuto successo.}
+	\item Si invia il messaggio. 
+	\item Si richiude la connessione.
+\end{enumerate}
 
+Al fine di ottenere risultati il più possibile realistici abbiamo usato tre schemi diversi con cui mandare i messaggi:
+\begin{itemize}
+	\item Ciclo ierativo: all'interno di un ciclo while vengono eseguite le operazioni sopra citate.
+	\item Chiamate a funzione: all'interno di un ciclo while viene chiamata una funzione che effettua le operazioni di invio.
+	\item Funzione ricorsiva: una funzione ha un parametro che conta quanti messaggi devono ancora essere inviati. Al termine dell'invio di un messaggio il parametro viene decrementato e si effettua una chiamata ricorsiva.
+\end{itemize}
+
+Il tempo impiegato è misurato utilizzando il programma di sistema \texttt{time}~\cite{time1linux}. Il tempo totale corrisponde al valore ``real'', mentre il tempo netto è la somma di ``user'' e ``sys''. I programmi eseguono una chiamata a \texttt{console()} che comporta un secondo di attesa per l'apertura del terminale.
 
 \begin{table}[htbp]
 	\centering
@@ -103,11 +119,29 @@ Il codice mostrato nelle sezioni~\ref{subsubsection:net-disc} e~\ref{subsubsecti
 		        50         & 2.629            &              0.517               & 1.554            &                0.484                 & 3.166            &            0.102            \\
 		       100         & 1.539            &              0.467               & 1.654            &                0.495                 & 5.192            &            0.104            \\
 		       1000        & 2.659            &              0.544               & 1.726            &                0.581                 & 1.264            &            0.247            \\
-		      10000        & 47.178           &              1.278               & 5.542            &                1.428                 & 18.718           &           13.194           \\ \hline
+		      10000        & 47.178           &              1.278               & 5.542            &                1.428                 & 18.718           &           13.194            \\ \hline
 	\end{tabular}}
 	\caption{Tempo necessario per l'invio di un numero crescente di messaggi}
-	\label{table:metric_average_reliable}
+	\label{table:performance}
 \end{table}
+
+Come si può vedere dalla tabella~\ref{table:performance} e in figura~\ref{fig:performance-graph} (si noti che gli assi sono in scala logaritmica), l'implementazione con la chiamata a funzione è quella con mediamente più veloce, anche se ha un tempo netto leggermente maggiore dell'implementazione puramente ricorsiva, anche se resta comparabile.
+
+Una possibile spiegazione per questa peculiarità è che l'invio di messaggi è un processo molto IO-bound, quindi l'approccio iterativo è sufficientemente veloce da non trovare le risorse disponibili e viene sospeso aspettando un interrupt dal sistema operativo, incorrendo in numerosi context switch costosi. La chiamata a funzione, invece, ha dell'overhead per la creazione dello stack, questo, come si vede dal tempo netto, è abbastanza piccolo, ma potrebbe essere sufficientemente grande da evitare il context switch.
+
+Questo dato sembra anche giustificare la scelta di sviluppare un linguaggio di scripting interpretato invece che un linguaggio compilato, visto che l'ambito di applicazione principale sarà legato all'invio di messaggi nella rete, e non elaborate manipolazioni dei dati.
+
+Il tempo totale dell'implementazione ricorsiva è il maggiore di tutti\footnote{Su 10000 messaggi l'esecuzione è stata interrotta prematuramente dall'esaurimento della memoria a disposizione}, nonostante il numero di scope da creare sia lo stesso delle chiamate a funzione iterative, infatti, le ricerche dei simboli nello stack delle chimate a funzione diventano progressivamente più costose all'aumento delle chiamate ricorsive.
+
+\begin{figure}
+	\centering
+	\resizebox{\columnwidth}{!}{
+	\includegraphics{sources/performance-graph}}
+	\caption{Performance dell'interprete}
+	\label{fig:performance-graph}
+\end{figure}
+
+
 \section{Conclusioni}\label{section:conclusioni}
 
 
