@@ -1,11 +1,5 @@
 \begin{thebibliography}{1}
 
-\bibitem{tandale2017empirical}
-U.~{Tandale}, B.~{Momin}, and D.~P. {Seetharam}.
-\newblock An empirical study of application layer protocols for iot.
-\newblock In {\em 2017 International Conference on Energy, Communication, Data
-  Analytics and Soft Computing (ICECDS)}, pages 2447--2451, 2017.
-
 \bibitem{gaglio2017dc4cd}
 Salvatore Gaglio, Giuseppe~Lo Re, Gloria Martorella, and Daniele Peri.
 \newblock {DC4CD}: a platform for distributed computing on constrained devices.
@@ -21,5 +15,22 @@ Don Libes.
 Don Libes.
 \newblock expect: Curing those uncontrollable fits of interaction.
 \newblock In {\em USENIX Summer}, pages 183--192, 1990.
+
+\bibitem{narten1998neighbor}
+Thomas Narten, Erik Nordmark, William Simpson, and Hesham Soliman.
+\newblock Neighbor discovery for ip version 6 (ipv6), 1998.
+
+\bibitem{kandhalu2010u}
+Arvind Kandhalu, Karthik Lakshmanan, and Ragunathan Rajkumar.
+\newblock U-connect: a low-latency energy-efficient asynchronous neighbor
+  discovery protocol.
+\newblock In {\em Proceedings of the 9th ACM/IEEE international conference on
+  information processing in sensor networks}, pages 350--361, 2010.
+
+\bibitem{alsa2012secure}
+Ahmad Alsa'deh and Christoph Meinel.
+\newblock Secure neighbor discovery: Review, challenges, perspectives, and
+  recommendations.
+\newblock {\em IEEE Security \& Privacy}, 10(4):26--34, 2012.
 
 \end{thebibliography}

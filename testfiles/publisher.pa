@@ -1,0 +1,25 @@
+# include <../testfiles/subscriber.pa>
+
+for (d in known_devices){
+	connect(d);
+	if(isConnected(d)){
+		send(d, "PUBLISH REPLY TELL: ~ :TELL"+NL);
+		reply= strip(receive(d));
+		disconnect(d);
+		if(reply !=""){
+			post = split(reply, ":TOPICS");
+			topics = split(post[0],",");
+			message = strip(post[1]);
+			for ( t in topics ){
+				if  (strip(t)=="t1") {
+					topicPost(topic1, message);
+				}else{if(strip(t)=="t2") {
+					topicPost(topic2, message) ;
+				}else{if(strip(t)=="t3") {
+					topicPost(topic3, message) ;
+				}}}
+		}
+	} else {
+		print("Couldn't connect to " + toString(d));
+	}
+}

@@ -1,0 +1,19 @@
+def send_messages(dev,times){
+int i = 0;
+	while(i < times){
+		i = i+1;
+		connect(dev);
+		if(isConnected(dev)){
+			send(dev, toString(i));
+			disconnect(dev);
+		} else {
+			print("Couldn't connect to " + toString(dev));
+		}
+	}
+}
+
+device a = localhost:1234;
+console(a);
+send_messages(a,10000);
+quit(0);
+
