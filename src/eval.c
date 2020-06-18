@@ -37,7 +37,7 @@ struct val * eval(struct ast *a){
 				yyerror("Cannot have nested lists");
 				temp->next=NULL;
 				return v;
-			}   
+			}
 			temp=temp->next;
 			temp->aliases=0;
 
@@ -91,14 +91,22 @@ struct val * eval(struct ast *a){
 
   /* name declaration */
   case 'D':
-			s = insert_symbol(((struct symdecl *)a)->s);
+      s = insert_symbol(((struct symdecl *)a)->s);
       if(s->value->type != 'u'){
 		     yyerror("%s already has type '%c'", s->name,
                                              s->value->type);
 	    } else {
-			   s->value->type = ((struct symdecl *)a)->type ;
-	    }
+        switch (((struct symdecl *)a)->type) {
+          case 'i': s->value=new_int(0); break;
+          case 'r': s->value=new_real(0.0); break;
+          case 's': s->value=new_string(""); break;
+          case 'd': s->value=new_device(new_address("0.0.0.0"),new_int(0)); break;
+          case 'a': s->value=new_address("0.0.0.0"); break;
+          case 'l':
+          default: s->value->type = ((struct symdecl *)a)->type ; break;
+        }
 
+	    }
       break;
 
   case 'd':
