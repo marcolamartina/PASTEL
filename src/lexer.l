@@ -128,8 +128,8 @@ int popfile(void);
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.str = strdup(yytext); return NAME; }
 
  /* include */
- ^"#"[ \t]*include[ \t]*[\"<] { BEGIN IFILE; }
- <IFILE>[^ \t\n\">]+ {
+ ^"#"[ \t]*include[ \t]*[\"] { BEGIN IFILE; }
+ <IFILE>[^ \t\n\"]+ {
                         { int c;
                           while((c = input()) && c != '\n') ;
                         }

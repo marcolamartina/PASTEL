@@ -64,7 +64,7 @@ Per semplicità si assume che il calcolatore che esegue il programma abbia un ra
 Come visto precedentemente in~\cite{tandale2017empirical} il modello Publish-Subscribe è molto comune come protocollo di comunicazione nel campo IoT. Nel listato~\ref{listing:sub} mostriamo come PASTEL permetta con facilità di interrogare una lista di nodi per ottenere i topic a cui ogni nodo intende fare il subscribe, dopo questo step di configurazione è immediato poter mandare a tutti i nodi iscritti ad un topic un determinato messaggio.
 
 
-\lstinputlisting[firstline=3, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Source code of \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Source code of \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
  ]{testfiles/subscriber.pa}
 
 
@@ -72,7 +72,7 @@ Con questo framework diventa estremamente facile per un nodo comunicare un messa
 
 Il programma si aspetta un input del tipo ``\texttt{<lista di topic> :TOPICS <messaggio>}'', la parte di messaggio che precede ``\texttt{:TOPICS}'' è interpretata come una lista di topic separati da virgole, il messaggio che segue quel tag, invece, verrà inviato a tutti i nodi che si sono precedentemente iscritti ad almeno uno di quei topic.
 
-\lstinputlisting[firstline=3, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Source code of \lstname}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=29, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Source code of \lstname}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
 ]{testfiles/publisher.pa}
 
 Lo schema di funzionamento illustrato può ovviamente essere ulteriormente raffinato impedendo l'iscrizione multipla ad uno stesso topic e aggiungendo controlli per evitare di inviare più volte uno stesso messaggio un nodo iscritto a più topic, o al nodo che ha originato il messaggio. Inoltre è possibile prevedere la possibilità di cancellare le iscrizioni o modificarle periodicamente.

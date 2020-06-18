@@ -386,7 +386,7 @@ char * toString(struct val * v){
     case 'r': asprintf(&result, "%f", v->real_val); break;
     case 's': result= strdup(v->string_val); break;
 		case 'a': result= strdup(v->string_val); break;					//IP address
-		case 'd': asprintf(&result, "%s:%d - %sconnected", v->string_val, v->port_val, (v->int_val != 0 ? "":"not " )); break;
+		case 'd': asprintf(&result, "%s:%d", v->string_val, v->port_val); break;
 		case 'u': result=strdup("uninstantiated variable"); break;
     default: yyerror("cannot print a value of type \"%c\"", typeof_v(v)); result=strdup(""); break;
   }

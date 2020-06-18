@@ -1,5 +1,3 @@
-//load("../testfiles/utils.pa");
-
 def topicPost(topic, msg){ // sends the msg string to every device in topic
 	for(d in topic){
 		connect(d);

@@ -283,6 +283,28 @@ void quit(struct val * arg){
 	}
 }
 
+char *strtokm(char *str, const char *delim)
+{
+    static char *tok;
+    static char *next;
+    char *m;
+
+    if (delim == NULL) return NULL;
+
+    tok = (str) ? str : next;
+    if (tok == NULL) return NULL;
+
+    m = strstr(tok, delim);
+
+    if (m) {
+        next = m + strlen(delim);
+        *m = '\0';
+    } else {
+        next = NULL;
+    }
+
+    return tok;
+}
 
 struct val * split_string(struct val * string, struct val * token){
   if(typeof_v(string)!='s'){
@@ -302,11 +324,11 @@ struct val * split_string(struct val * string, struct val * token){
   v->type='l';
   char * temp=strdup(string->string_val);
   char *t;
-  t = strtok(temp, token->string_val);
+  t = strtokm(temp, token->string_val);
   while( t != NULL ) {
       v->next=new_string(t);
       v=v->next;
-      t = strtok(NULL, token->string_val);
+      t = strtokm(NULL, token->string_val);
    }
 
   return result;
