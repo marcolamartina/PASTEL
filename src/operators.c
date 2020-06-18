@@ -190,7 +190,7 @@ static int compare_address(char * a, char * b){
 }
 
 double compare(struct val * a, struct val * b){
-  double result;
+  double result=0.0;
   if(typeof_v(a)==typeof_v(b)){
     switch (typeof_v(a)) {
       case 'i': result=a->int_val-b->int_val; break;
