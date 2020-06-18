@@ -90,7 +90,7 @@ struct symbol * insert_symbol(char* sym){
 	sp = &symtab[symhash(sym)%NHASH];
 	while(--scount >= 0) {
     if(sp->name && !strcmp(sp->name, sym)) {
-			yyerror("Symbol already defined in this scope");
+			yyerror("Symbol %s already defined in this scope", sym);
 			return NULL;
 		 }
     if(!sp->name) {		/* new entry */
