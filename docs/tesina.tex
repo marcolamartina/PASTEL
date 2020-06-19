@@ -182,8 +182,122 @@ Riportiamo di seguito le regole di produzione in formato BNF del linguaggio prop
 
 Le regole di produzione per \texttt{<exp>} sembrerebbero ambigue, infatti una stessa sequenza di operatori potrebbe essere rappresentata da più alberi di parsing. È generalmente possibile riscrivere la grammatica per eliminare l'ambiguità, però Bison mette a disposizione degli strumenti che permettono di specificare la precedenza degli operatori disambiguando la grammatica e scartando automaticamente gli alberi di parsing non validi, consentendo l'utilizzo di una grammatica più semplice e compatta.
 
-In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti generato da Bison su una versione ridotta della grammatica per fornire un'idea generale della struttura di un programma grammaticalmente corretto. Questa grammatica semplificata rimuove delle regole di produzione ricorsive per ridurre il numero di stati, migliorando la leggibilità. In appendice si riporta il grafo della grammatica completa.
+In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti generato da Bison su una versione ridotta della grammatica per fornire un'idea generale della struttura di un programma grammaticalmente corretto. Questa grammatica semplificata rimuove delle regole di produzione ricorsive per ridurre il numero di stati, migliorando la leggibilità. In appendice si riporta il grafo della grammatica completa.\\\\
 
+Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio e strutture di controllo.\\
+
+{\large \textbf{Tipi}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+int	"int"
+real	"real"
+address	"address"
+string	"string"
+list	"list"
+device	"device"
+\end{lstlisting}
+
+{\large \textbf{Valori}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+int	[0-9]+
+real	[0-9]+\.[0-9]+
+address	((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|"localhost"
+string	\".*\"
+\end{lstlisting}
+
+{\large \textbf{Nomi variabili}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+nomi	[a-zA-Z_][a-zA-Z0-9_]*
+\end{lstlisting}
+
+{\large \textbf{Costanti}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+newline	"NL"
+true	"TRUE"
+false	"FALSE"
+\end{lstlisting}
+
+{\large \textbf{Commenti}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+inline	"\\".*
+block	"/*"[^*\/]*"*/"
+\end{lstlisting}
+
+{\large \textbf{Comparazioni}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+maggiore		">"
+minore			"<"
+diverso			"!="
+uguale			"=="
+maggiore o uguale	">="
+minore o uguale		"<="
+\end{lstlisting}
+
+{\large \textbf{Operazioni}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+and 		"and"
+or		"or"
+somma		"+"
+differenza	"-"
+moltiplicazione	"*"
+divisione	"/"
+assegnamento	"="
+\end{lstlisting}
+
+{\large \textbf{Simboli}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+,			","
+;			";"
+{			"{"
+}			"}"
+[			"["
+]			"]"
+(			"("
+)			")"
+spazi e tabulazioni	[ \t]
+ritorno a capo		"\n"
+altri simboli		.
+\end{lstlisting}
+
+
+{\large \textbf{Funzioni built-in}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+print		"print" 
+quit		"quit"
+connect		"connect"
+disconnect	"disconnect"
+receive		"receive"
+send		"send"
+insert		"insert"
+remove		"remove"
+length		"length"
+s2i		"s2i"
+s2r		"s2r"
+s2d		"s2d"
+s2a		"s2a"	
+s2l		"s2l"
+toString	"toString"
+console		"console"
+strip		"strip"
+split		"split"
+sleep		"sleep"
+typeof		"typeof"
+isConnected	"isConnected"
+.port		".port"
+.address	".address"
+include		^"#"[ \t]*include[ \t]*[\"].*[\"]
+debug		"debug"[0-9]+
+\end{lstlisting}
+
+
+{\large \textbf{Strutture di controllo}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+if	"if"
+else	"else
+while	"while"
+for	"for"
+in	"in"
+def	"def"
+\end{lstlisting}
 
 \begin{figure}
 	\centering
@@ -192,6 +306,8 @@ In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti genera
 	\caption{Grafo del FSA generato utilizzando  GNU Bison 3.5.4 XML Automaton Report su una struttura fortemente semplificata per facilitare la rappresentazione. La grammatica completa non presenta conflitti shift/reduce e reduce/reduce.}
 	\label{fig:parser_simple}
 \end{figure}
+
+Per riuscire a scrivere qualsiasi simbolo all'interno delle stringhe, vengono utilizzati gli \texttt{state} di Flex.
 
 	%% FUNZIONALITÀ DEL LINGUAGGIO
 \subsection{Funzionalità del linguaggio}
