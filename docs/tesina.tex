@@ -135,33 +135,32 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 \textbf{Tipi}
 Il linguaggio PASTEL possiede sia tipi primitivi che composti. I tipi primitivi sono:
 \begin{itemize}
-\item int, utilizzato per rappresentare i numeri interi
-\item real, utilizzato per rappresentare i numeri in virgola mobile
-\item string, utilizzato per rappresentare le stringhe di caratteri
-\item address, utilizzato per rappresentare gli indirizzi IPv4
+\item \texttt{int}, utilizzato per rappresentare i numeri interi
+\item \texttt{real}, utilizzato per rappresentare i numeri in virgola mobile
+\item \texttt{string}, utilizzato per rappresentare le stringhe di caratteri
+\item \texttt{address}, utilizzato per rappresentare gli indirizzi IPv4
 \end{itemize}
 
 I tipi composti sono invece:
 \begin{itemize}
-\item device, prodotto cartesiano tra i tipi address e int 
-\item list, tipo ricorsivo 
+\item \texttt{device}, prodotto cartesiano tra i tipi address e int 
+\item \texttt{list}, tipo ricorsivo 
 \end{itemize}
 
-\\
 \textbf{Strutture di controllo}
 Il linguaggio fornisce la possibilità di usare sia comandi condizionali che comandi iterativi. I comandi condizionali sono i classici:
 \begin{itemize}
-\item if ( condition ) { instractions }
-\item if ( condition ) { instractions } else { instractions }
+\item \texttt{if ( condition ) \{ instractions \}}
+\item \texttt{if ( condition ) \{ instractions \} else \{ instractions \}}
 \end{itemize}
 I comandi iterativi invece sono:
 \begin{itemize}
-\item while ( condition ) { instructions }
-\item for ( var in list ) { instructions } 
+\item \texttt{while ( condition ) \{ instructions \}}
+\item \texttt{for ( var in list ) \{ instructions \} }
 \end{itemize}
-Nell'espressione while si itera indefinitivamente finché la condition è diversa da 0, 
-\\
+Nell'espressione \texttt{while} si itera indefinitivamente finché la condition è diversa da 0, nel \texttt{for} invece si itera per ogni elemento contenuto nella lista.\\\\
 \textbf{Operazioni}
+Il linguaggio consente le seguenti operazioni
 \\
 \textbf{Selettori}
 \\
