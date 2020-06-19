@@ -71,6 +71,11 @@ John Levine.
 \newblock {\em Flex \& Bison: Text Processing Tools}.
 \newblock " O'Reilly Media, Inc.", 2009.
 
+\bibitem{dijkstra1968letters}
+Edsger~W Dijkstra.
+\newblock Letters to the editor: go to statement considered harmful.
+\newblock {\em Communications of the ACM}, 11(3):147--148, 1968.
+
 \bibitem{narten1998neighbor}
 Thomas Narten, Erik Nordmark, William Simpson, and Hesham Soliman.
 \newblock Neighbor discovery for ip version 6 (ipv6), 1998.
