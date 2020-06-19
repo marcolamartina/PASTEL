@@ -127,7 +127,7 @@ struct val * eval(struct ast *a){
 				return NULL;
 			}
 			if(typeof_v(v)!=((struct symdeclasgn *)a)->type){
-				yyerror("assignement error for incompatible types (%c=%c)", typeof_s(s), typeof_v(v) );
+				yyerror("assignement error for incompatible types (%c=%c)", ((struct symdeclasgn *)a)->type, typeof_v(v) );
 				return NULL;
 			}
 			if(typeof_v(v)=='l'){ /* If v is a list sets the aliases for the other items*/
