@@ -126,14 +126,12 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 
 \section{Caratteristiche del linguaggio}\label{section:caratteristiche-linguaggio}
 
-	%% GRAMMATICA
-\subsection{Grammatica}
+	%% GRAMMATICA, LEXER E PARSER
+\subsection{Grammatica, lexer e parser}
 
-	%% DESCRIZIONE DEL PARSER
-\subsection{Descrizione del parser}
 Un requisito del progetto è di creare il linguaggio con i tools Bison e Flex~\cite{levine2009flex}, due strumenti per costruire programmi che gestiscano input strutturati. Flex si occupa dell'analisi lessicale (lexing) mentre Bison si occupa dell'analisi della sintassi (parsing). L'output dei due tools è un parser di tipo LALR(1) che effettua un parsing bottom-up, con cui è possibile gestire  produzioni left-recursive, utilizzando Bison per generare il parser e Flex per riconoscere i token nella fase di lexing.
 
-Le regole di produzione in formato BNF[...]:
+Riportiamo di seguito le regole di produzione in formato BNF del linguaggio proposto:
 
 \begin{lstlisting}
 <program>::= 
@@ -194,6 +192,9 @@ In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti genera
 	\caption{Grafo del FSA generato utilizzando  GNU Bison 3.5.4 XML Automaton Report su una struttura fortemente semplificata per facilitare la rappresentazione. La grammatica completa non presenta conflitti shift/reduce e reduce/reduce.}
 	\label{fig:parser_simple}
 \end{figure}
+
+	%% FUNZIONALITÀ DEL LINGUAGGIO
+\subsection{Funzionalità del linguaggio}
 
 	%% CASI D'USO
 \subsection{Casi d'uso}\label{subsection:casi-d_uso}
