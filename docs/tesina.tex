@@ -117,7 +117,7 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 
 	%% DESCRIZIONE DEL PARSER
 \subsection{Descrizione del parser}
-{[...]} Parser di tipo LALR[...] parsing bottom-up, quindi è possibile gestire le produzioni con ricorsione a sinistra [...] utilizzando Bison per generare il parser e Flex per riconoscere i token nella fase di lexing~\cite{levine2009flex}
+Un requisito del progetto è di creare il linguaggio con i tools Bison e Flex~\cite{levine2009flex}, due strumenti per costruire programmi che gestiscano input strutturati. Flex si occupa dell'analisi lessicale (lexing) mentre Bison si occupa dell'analisi della sintassi (parsing). L'output dei due tools è un parser di tipo LALR(1) che effettua un parsing bottom-up, con cui è possibile gestire  produzioni left-recursive, utilizzando Bison per generare il parser e Flex per riconoscere i token nella fase di lexing.
 
 Le regole di produzione in formato BNF[...]:
 
