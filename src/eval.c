@@ -241,6 +241,11 @@ struct val * eval(struct ast *a){
   /* null if/else/do expressions allowed in the grammar, so check for them */
   case 'I':
     temp=(eval( ((struct flow *)a)->cond));
+    if(typeof_v(temp)!='i'){
+      yyerror("Invalid condition");
+      free_lost(temp);
+      break;
+    }
     if( temp->int_val != 0) {
       if( ((struct flow *)a)->tl) {
 	       v = eval( ((struct flow *)a)->tl);
@@ -260,7 +265,12 @@ struct val * eval(struct ast *a){
 
     if( ((struct flow *)a)->tl) {
       temp=(eval( ((struct flow *)a)->cond));
-      while( temp->int_val != 0){
+      if(typeof_v(temp)!='i'){
+        yyerror("Invalid condition");
+        free_lost(temp);
+        break;
+      }
+      while( temp->int_val != 0 ){
         free_lost(temp);
 	      v = eval(((struct flow *)a)->tl);
         temp=(eval( ((struct flow *)a)->cond));

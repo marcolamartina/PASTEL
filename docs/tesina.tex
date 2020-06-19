@@ -126,8 +126,50 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 
 \section{Caratteristiche del linguaggio}\label{section:caratteristiche-linguaggio}
 
-	%% GRAMMATICA, LEXER E PARSER
-\subsection{Grammatica, lexer e parser}
+	%% GRAMMATICA
+\subsection{Grammatica}
+
+\textbf{Tipi}
+Il linguaggio PASTEL possiede sia tipi primitivi che composti. I tipi primitivi sono:
+\begin{itemize}
+\item int, utilizzato per rappresentare i numeri interi
+\item real, utilizzato per rappresentare i numeri in virgola mobile
+\item string, utilizzato per rappresentare le stringhe di caratteri
+\item address, utilizzato per rappresentare gli indirizzi IPv4
+\end{itemize}
+
+I tipi composti sono invece:
+\begin{itemize}
+\item device, prodotto cartesiano tra i tipi address e int 
+\item list, tipo ricorsivo 
+\end{itemize}
+
+\\
+\textbf{Strutture di controllo}
+Il linguaggio fornisce la possibilità di usare sia comandi condizionali che comandi iterativi. I comandi condizionali sono i classici:
+\begin{itemize}
+\item if ( condition ) { instractions }
+\item if ( condition ) { instractions } else { instractions }
+\end{itemize}
+I comandi iterativi invece sono:
+\begin{itemize}
+\item while ( condition ) { instructions }
+\item for ( var in list ) { instructions } 
+\end{itemize}
+Nell'espressione while si itera indefinitivamente finché la condition è diversa da 0, 
+\\
+\textbf{Operazioni}
+\\
+\textbf{Selettori}
+\\
+\textbf{Funzioni definite dall'utente}
+\\
+\textbf{Funzioni built-in}
+\\
+
+
+	%% PARSER
+\subsection{Parser}
 
 Un requisito del progetto è di creare il linguaggio con i tools Bison e Flex~\cite{levine2009flex}, due strumenti per costruire programmi che gestiscano input strutturati. Flex si occupa dell'analisi lessicale (lexing) mentre Bison si occupa dell'analisi della sintassi (parsing). L'output dei due tools è un parser di tipo LALR(1) che effettua un parsing bottom-up, con cui è possibile gestire  produzioni left-recursive, utilizzando Bison per generare il parser e Flex per riconoscere i token nella fase di lexing.
 
@@ -184,9 +226,12 @@ Le regole di produzione per \texttt{<exp>} sembrerebbero ambigue, infatti una st
 
 In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti generato da Bison su una versione ridotta della grammatica per fornire un'idea generale della struttura di un programma grammaticalmente corretto. Questa grammatica semplificata rimuove delle regole di produzione ricorsive per ridurre il numero di stati, migliorando la leggibilità. In appendice si riporta il grafo della grammatica completa.\\\\
 
-Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio e strutture di controllo.\\
+	%% LEXER
+\subsection{Lexer}
 
-{\large \textbf{Tipi}}
+Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio, i selettori e strutture di controllo.\\
+
+\textbf{Tipi}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 int	"int"
 real	"real"
@@ -196,7 +241,7 @@ list	"list"
 device	"device"
 \end{lstlisting}
 
-{\large \textbf{Valori}}
+textbf{Valori}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 int	[0-9]+
 real	[0-9]+\.[0-9]+
@@ -204,25 +249,25 @@ address	((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9
 string	\".*\"
 \end{lstlisting}
 
-{\large \textbf{Nomi variabili}}
+\textbf{Nomi variabili}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 nomi	[a-zA-Z_][a-zA-Z0-9_]*
 \end{lstlisting}
 
-{\large \textbf{Costanti}}
+\textbf{Costanti}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 newline	"NL"
 true	"TRUE"
 false	"FALSE"
 \end{lstlisting}
 
-{\large \textbf{Commenti}}
+\textbf{Commenti}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 inline	"\\".*
 block	"/*"[^*\/]*"*/"
 \end{lstlisting}
 
-{\large \textbf{Comparazioni}}
+\textbf{Comparazioni}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 maggiore		">"
 minore			"<"
@@ -232,7 +277,7 @@ maggiore o uguale	">="
 minore o uguale		"<="
 \end{lstlisting}
 
-{\large \textbf{Operazioni}}
+\textbf{Operazioni}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 and 		"and"
 or		"or"
@@ -243,7 +288,7 @@ divisione	"/"
 assegnamento	"="
 \end{lstlisting}
 
-{\large \textbf{Simboli}}
+\textbf{Simboli}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 ,			","
 ;			";"
@@ -259,7 +304,7 @@ altri simboli		.
 \end{lstlisting}
 
 
-{\large \textbf{Funzioni built-in}}
+\textbf{Funzioni built-in}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 print		"print" 
 quit		"quit"
@@ -282,14 +327,17 @@ split		"split"
 sleep		"sleep"
 typeof		"typeof"
 isConnected	"isConnected"
-.port		".port"
-.address	".address"
 include		^"#"[ \t]*include[ \t]*[\"].*[\"]
 debug		"debug"[0-9]+
 \end{lstlisting}
 
+\textbf{Selettori}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
+.port		".port"
+.address	".address"
+\end{lstlisting}
 
-{\large \textbf{Strutture di controllo}}
+\textbf{Strutture di controllo}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 if	"if"
 else	"else
