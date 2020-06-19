@@ -155,6 +155,7 @@ In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti genera
 
 	%% CASI D'USO
 \subsection{Casi d'uso}\label{subsection:casi-d_uso}
+Per verificare l'applicabilità del linguaggio nel contesto target sono state effettuate delle simulazioni di potenziali ambiti in cui PASTEL potrebbe essere adoperato. Poiché il linguaggio presenta numerose funzionalità e permette lo sviluppo di software anche molto complesso, non essendo possibile esplorare tutte le possibilità offerte da PASTEL in modo conciso, ai fini di questa trattazione è stato scelto di mostrare un sottoinsieme delle funzionalità ritenuto particolarmente rappresentativo.
 
 		%% NETWORK DISCOVERY
 \subsubsection{Network discovery}\label{subsubsection:net-disc}
@@ -177,7 +178,7 @@ Per semplicità si assume che il calcolatore che esegue il programma abbia un ra
 Come visto precedentemente in~\cite{tandale2017empirical} il modello Publish-Subscribe è molto comune come protocollo di comunicazione nel campo IoT. Nel listato~\ref{listing:sub} mostriamo come PASTEL permetta con facilità di interrogare una lista di nodi per ottenere i topic a cui ogni nodo intende fare il subscribe, dopo questo step di configurazione è immediato poter mandare a tutti i nodi iscritti ad un topic un determinato messaggio.
 
 
-\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
  ]{../testfiles/subscriber.pa}
 
 
