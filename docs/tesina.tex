@@ -42,7 +42,13 @@ MQTT è un protocollo di connettività machine-to-machine (M2M) / "Internet of T
 
 
 
-Il linguaggio proposto può facilmente essere utilizzato con il protocollo REST essendo che si basa su HTTP, un protocollo completamente basato su testo. CoAP e MQTT invece, il primo poiché basato su UDP, e il secondo poiché basato su bytecode, non possono essere utilizzati. L'ambiente target principale però è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd} e su questi si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.\\\\
+Il linguaggio proposto può facilmente essere utilizzato con il protocollo REST essendo basato su HTTP, un protocollo di livello applicazione che utilizza solo testo. CoAP, utilizzando UDP come protocollo di livello trasporto, non è compatibile con l'ambiente PASTEL. MQTT si appoggia al TCP, tuttavia è basato sull'invio di codice binario, quindi non è direttamente implementabile in PASTEL a meno di utilizzare particolari tecniche di encoding~\cite{josefsson2006base16}, in quel caso sarebbe certamente possibile, ma non è il tipo di applicazione verso cui è orientato il linguaggio.
+
+L'ambiente target principale è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd}. L'utilizzo di codice simbolico (e.g. in dispositivi che eseguono un interprete FORTH) permette di generare in modo automatico istruzioni valide per tutti i dispositivi presi in considerazione, indipendentemente dall'architettura hardware sottostante.
+Inoltre, essendo possibile definire nuove parole su nodi già installati ( utilizzando quelle precedentemente definite) è possibile, a partire da delle primitive legate alle trasmissioni, abilitare tutti i nodi della rete all'esecuzione di protocolli arbitrari in una fase di inizializzazione in cui viene comunicato il codice necessario. 
+
+Con un approccio simbolico diventa anche possibile supportare protocolli normalmente basati su bytecode come MQTT nativamente~\cite{gaglio19interoperable}.
+Essendo questo il campo di applicazione principale, su questo si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.\\\\
 
 
 
@@ -84,14 +90,14 @@ L'algoritmo termina automaticamente nonappena l'ultimo dei nodi noti interrogato
 
 Per semplicità si assume che il calcolatore che esegue il programma abbia un range di comunicazione molto superiore ai nodi della rete, e che possa quindi raggiungerli in un singolo hop, una strategia più generale dovrebbe ovviamente prevedere la costruzione di messaggi di routing.
 
-\lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sourgente di \lstname}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
+\lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
 
 \subsubsection{Publish-Subscribe}\label{subsubsection:pub-sub}
 
 Come visto precedentemente in~\cite{tandale2017empirical} il modello Publish-Subscribe è molto comune come protocollo di comunicazione nel campo IoT. Nel listato~\ref{listing:sub} mostriamo come PASTEL permetta con facilità di interrogare una lista di nodi per ottenere i topic a cui ogni nodo intende fare il subscribe, dopo questo step di configurazione è immediato poter mandare a tutti i nodi iscritti ad un topic un determinato messaggio.
 
 
-\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sourgente di \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
  ]{../testfiles/subscriber.pa}
 
 
@@ -99,7 +105,7 @@ Con questo framework diventa estremamente facile per un nodo comunicare un messa
 
 Il programma si aspetta un input del tipo ``\texttt{<lista di topic> :TOPICS <messaggio>}'', la parte di messaggio che precede ``\texttt{:TOPICS}'' è interpretata come una lista di topic separati da virgole, il messaggio che segue quel tag, invece, verrà inviato a tutti i nodi che si sono precedentemente iscritti ad almeno uno di quei topic.
 
-\lstinputlisting[firstline=1, lastline=29, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sourgente di \lstname}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=29, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
 ]{../testfiles/publisher.pa}
 
 Lo schema di funzionamento illustrato può ovviamente essere ulteriormente raffinato impedendo l'iscrizione multipla ad uno stesso topic e aggiungendo controlli per evitare di inviare più volte uno stesso messaggio un nodo iscritto a più topic, o al nodo che ha originato il messaggio. Inoltre è possibile prevedere la possibilità di cancellare le iscrizioni o modificarle periodicamente.
