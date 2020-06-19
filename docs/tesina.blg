@@ -4,45 +4,45 @@ The top-level auxiliary file: tesina.aux
 The style file: unsrt.bst
 Database file #1: references.bib
 Warning--empty journal in shelby2014constrained
-You've used 16 entries,
+You've used 17 entries,
             1791 wiz_defined-function locations,
-            529 strings with 5922 characters,
-and the built_in function-call counts, 3542 in all, are:
-= -- 307
-> -- 140
+            534 strings with 5979 characters,
+and the built_in function-call counts, 3688 in all, are:
+= -- 319
+> -- 144
 < -- 5
-+ -- 54
-- -- 38
-* -- 185
-:= -- 525
-add.period$ -- 45
-call.type$ -- 16
++ -- 56
+- -- 39
+* -- 188
+:= -- 548
+add.period$ -- 48
+call.type$ -- 17
 change.case$ -- 13
 chr.to.int$ -- 0
-cite$ -- 17
-duplicate$ -- 185
-empty$ -- 374
-format.name$ -- 38
-if$ -- 828
+cite$ -- 18
+duplicate$ -- 195
+empty$ -- 393
+format.name$ -- 39
+if$ -- 863
 int.to.chr$ -- 0
-int.to.str$ -- 16
-missing$ -- 17
-newline$ -- 80
-num.names$ -- 15
-pop$ -- 77
+int.to.str$ -- 17
+missing$ -- 19
+newline$ -- 85
+num.names$ -- 16
+pop$ -- 84
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 106
+skip$ -- 108
 stack$ -- 0
 substring$ -- 185
-swap$ -- 57
+swap$ -- 58
 text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 1
-while$ -- 31
-width$ -- 18
-write$ -- 163
+while$ -- 32
+width$ -- 19
+write$ -- 173
 (There was 1 warning)

@@ -33,6 +33,11 @@ Salvatore Gaglio, Giuseppe~Lo Re, Gloria Martorella, and Daniele Peri.
 \newblock {\em ACM Transactions on Embedded Computing Systems (TECS)},
   17(1):1--25, 2017.
 
+\bibitem{brodie2004thinking}
+Leo Brodie.
+\newblock {\em Thinking Forth}.
+\newblock Punchy Pub, 2004.
+
 \bibitem{gaglio19interoperable}
 S.~{Gaglio}, G.~{Lo Re}, L.~{Giuliana}, G.~{Martorella}, D.~{Peri}, and
   A.~{Montalto}.
