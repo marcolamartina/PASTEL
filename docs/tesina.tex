@@ -158,10 +158,28 @@ I comandi iterativi invece sono:
 \item \texttt{while ( condition ) \{ instructions \}}
 \item \texttt{for ( var in list ) \{ instructions \} }
 \end{itemize}
-Nell'espressione \texttt{while} si itera indefinitivamente finché la condition è diversa da 0, nel \texttt{for} invece si itera per ogni elemento contenuto nella lista.\\\\
+Nell'espressione \texttt{while} si itera indefinitivamente finché la condition è diversa da 0, nel \texttt{for} invece si itera per ogni elemento contenuto nella lista.
+
 \textbf{Operazioni}
-Il linguaggio consente le seguenti operazioni
-\\
+Il linguaggio consente le seguenti operazioni[...] tabella~\ref{table:operatori}
+
+\begin{table}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline
+		V1\textbackslash V2 &        int         &    real     &  string  & address & device & list \\ \hline
+		        int         & + - * / OR AND CMP &             &    *     &         &        &      \\ \hline
+		       real         &                    & + - / * CMP &          &         &        &      \\ \hline
+		      string        &         *          &             & +    CMP &         &        &      \\ \hline
+		      address       &        + -         &             &          &   CMP   &        &      \\ \hline
+		      device        &                    &             &          &         &  CMP   &      \\ \hline
+		       list         &                    &             &          &         &        &  +   \\ \hline
+	\end{tabular}
+	\caption{Operazioni consentite dal linguaggio, sono da intendersi come V1 <operazione> V2. Con CMP si indicano le operazioni di comparazione ==, !=, >, >=, <, <=}
+	\label{table:operatori}
+\end{table}
+
+
 \textbf{Selettori}
 \\
 \textbf{Funzioni definite dall'utente}
