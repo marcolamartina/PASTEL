@@ -81,14 +81,16 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 
 \begin{itemize}
 	\item Lookup dei simboli in eval invece che nel lexer come il libro~\cite{levine2009flex}
-	\item Stringhe immutabili, singolo carattere non direttamente accessibile
+	\item Stringhe tipo primitivo immutabile, singolo carattere non direttamente accessibile. 
 	\item Possibilità di dividerle in lista di "caratteri" (stringhe lugnghezza 1)
-	\item Passaggio di valori per copia
+	\item associazione tra parametri reali e formali per copia
+	\item Eager evaluation
 	\item Scoping statico
 	\item Cicli condividono scope per ragioni di performance.
-	\item Campi di device accessibili ma non modificabili, evita modifiche a connessioni aperte.
-	\item Liste eterogenee puntatore a next, conseguente scelta di non permettere liste innestate, eventuale operazione di flattening può essere fatta in puro PASTEL dal programmatore.
-	\item Foreach
+	\item Campi di device accessibili ma non modificabili, evita modifiche a connessioni aperte. Niente aggiornamento selettivo, ma è consentito l'aggiornamento totale.
+	\item Liste eterogenee puntatore a next, conseguente scelta di non permettere liste innestate, eventuale operazione di flattening può essere fatta in puro PASTEL dal programmatore. È anche consentito l'accesso ad elementi della lista con i selettori tipici degli array.
+	\item Foreach, la variabile di controllo viene inizializzata all'avvio del ciclo, al termine viene eliminata e non è più referenziabile.
+	All'interno del ciclo può essere modificata (e.g. assegnamento)
 	\item Include a tempo di lexer, impedisce include condizionali che generano codice potenzialmente ambiguo con comportamento imprevedibile.
 	\item Interprete invece che compilatore
 	\item Niente funzioni dentro altre funzioni
@@ -99,13 +101,13 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item Controllo dei tipi dinamico, adatto a scripting e dati restituiti di natura variabile, potenzialmente eterogenea, quindi possibilità di controllo dei tipi. -> parametri formali non hanno vincoli sui tipi, l'onere è lasciato al programmatore.
 	\item La dichiarazione definisce un valore di default se non ne viene specificato uno
 	\item Il tipo di una variabile deve essere definito al momento della dichiarazione, e non può essere modificato. Questo consente di scrivere programmi più robusti e dal debug più semplice.
-	Per non limitare la potenza del linguaggio, le funzioni definite dall'utente possono restituire tipi di dati diversi. In questi casi si possono utilizzare le liste eterogenee per memorizzare i valori restituiti ed eseguire operazioni diverse in base al tipo. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}
+	Per non limitare la potenza del linguaggio, le funzioni definite dall'utente possono restituire tipi di dati diversi (circa overloading indipendente dal contesto). In questi casi si possono utilizzare le liste eterogenee per memorizzare i valori restituiti ed eseguire operazioni diverse in base al tipo. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}
 	\item Valori di ritorno equivalgono all'ultima eval della lista di espressioni, evita interruzioni strane
 	\item Parole riservate invece che keyword
+	\item Niente tipi definiti dall'utente
 	\item 
 	\item 
 	\item 
-	\item {\Large \textbf{text}}
 	\item 
 	\item 
 	\item 
