@@ -38,13 +38,13 @@ Il resto della relazione è strutturato come segue: la sezione~\ref{section:stat
 
 I dispositivi IoT comunemente eseguono protocolli semplici come CoAP, REST e MQTT~\cite{tandale2017empirical}. 
 
-Constrained Application Protocol (CoAP) è un   protocollo di trasferimento web specializzato da utilizzare con nodi o reti con risorse limitate (ad es. reti a bassa potenza, senza trasferimento affidabile dei dati). I nodi hanno spesso microcontrollori  a 8 bit con piccole quantità di ROM e RAM, mentre reti con risorse limitate come IPv6 su Low-Power Wireless Personal Area  (6LoWPANs) hanno spesso elevati tassi di errore dei pacchetti e un tipico throughput di 10 s di kbit/s. Il protocollo è progettato per applicazioni  machine-to-machine (M2M) come smart energy e building automation.~\cite{shelby2014constrained}.
+Constrained Application Protocol (CoAP) è un   protocollo di trasferimento web specializzato da utilizzare con nodi o reti con risorse limitate (ad es. reti a bassa potenza, senza trasferimento affidabile dei dati). I nodi hanno spesso microcontrollori  a 8 bit con piccole quantità di ROM e RAM, mentre reti con risorse limitate come IPv6 su Low-Power Wireless Personal Area  (6LoWPANs) hanno spesso elevati tassi di errore dei pacchetti e un tipico throughput di 10 s di kbit/s. Il protocollo è progettato per applicazioni  machine-to-machine (M2M) come smart energy e domotica.~\cite{shelby2014constrained}.
 
 Representational State Transfer (REST) è uno tipo di architettura per i sistemi distribuiti. L'espressione representational state transfer e il suo acronimo, REST, furono introdotti nel 2000 nella tesi di dottorato di Roy Fielding, uno dei principali autori delle specifiche dell'Hypertext Transfer Protocol (HTTP), e vennero rapidamente adottati dalla comunità di sviluppatori Internet.
 Il termine REST rappresenta un sistema di trasmissione di dati su HTTP senza ulteriori livelli, quali ad esempio SOAP. I sistemi REST non prevedono il concetto di sessione, ovvero sono stateless.
 L'architettura REST si basa su HTTP. Il funzionamento prevede una struttura degli URL ben definita che identifica univocamente una risorsa o un insieme di risorse e l'utilizzo dei verbi HTTP specifici per il recupero di informazioni (GET), per la modifica (POST, PUT, PATCH, DELETE) e per altri scopi (OPTIONS, ecc.)~\cite{fielding2000architectural}.
 
-MQTT è un protocollo di connettività machine-to-machine (M2M) / "Internet of Things". È stato progettato come un trasporto di messaggistica estremamente leggero. È utile per le connessioni  remote in cui è richiesto un codice ridotto e/o l'ampiezza di banda della rete è limitata. Ad esempio, è stato utilizzato nei sensori che comunicano con un intermediario tramite collegamento satellitare, attraverso occasionali connessioni dial-up con operatori sanitari e in una gamma di scenari di automazione domestica e piccoli dispositivi. È ideale anche per le applicazioni mobili a causa delle sue dimensioni ridotte, basso consumo energetico, pacchetti di dati ridotti al minimo e distribuzione efficiente delle informazioni a uno o più ricevitori~\cite{banks2019mqtt}.\\\\
+MQTT è un protocollo di connettività machine-to-machine (M2M) / "Internet of Things". È stato progettato come un trasporto di messaggistica estremamente leggero. È utile per le connessioni  remote in cui è richiesto un codice ridotto e/o l'ampiezza di banda della rete è limitata. Ad esempio, è stato utilizzato nei sensori che comunicano con un intermediario tramite collegamento satellitare, attraverso occasionali connessioni dial-up con operatori sanitari e in una gamma di scenari di automazione domestica e piccoli dispositivi. È ideale anche per le applicazioni mobili a causa delle sue dimensioni ridotte, basso consumo energetico, pacchetti di dati ridotti al minimo e distribuzione efficiente delle informazioni a uno o più ricevitori~\cite{banks2019mqtt}.\\
 
 
 
@@ -54,7 +54,7 @@ L'ambiente target principale è quello dei dispositivi in grado di eseguire codi
 Inoltre, essendo possibile definire nuove parole su nodi già installati ( utilizzando quelle precedentemente definite) è possibile, a partire da delle primitive legate alle trasmissioni, abilitare tutti i nodi della rete all'esecuzione di protocolli arbitrari in una fase di inizializzazione in cui viene comunicato il codice simbolico necessario. 
 
 Con un approccio simbolico diventa anche possibile supportare protocolli normalmente basati su bytecode come MQTT nativamente~\cite{gaglio19interoperable}.
-Essendo questo il campo di applicazione principale, su questo si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.\\\\
+Essendo questo il campo di applicazione principale, su questo si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.\\
 
 
 
@@ -64,7 +64,7 @@ Expect è un programma che "parla" con altri programmi interattivi secondo uno s
 
 Il tool \texttt{expect} è basato sul linguaggio Tcl. Tcl fornisce il controllo per il flusso (ad esempio, if, for, break), la valutazione delle espressioni e diverse altre funzioni come la ricorsione, definizione delle procedure, ecc.. 
 
-Tcl è stato uno dei primi linguaggi "dinamici" a diventare popolare, vedendo un uso diffuso a partire dai primi anni '90. Tcl ha trovato ampio successo in molti campi, e le distribuzioni di Tcl spaziano da dispositivi integrati come router, a infrastrutture di back-end distribuite.~\cite{nadkarni2017tcl}.\\\\
+Tcl è stato uno dei primi linguaggi "dinamici" a diventare popolare, vedendo un uso diffuso a partire dai primi anni '90. Tcl ha trovato ampio successo in molti campi, e le distribuzioni di Tcl spaziano da dispositivi integrati come router, a infrastrutture di back-end distribuite.~\cite{nadkarni2017tcl}.\\
 
 Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di fornire uno strumento che permette di interfacciarsi con facilità e in modo affidabile con dispositivi IoT, con la possibilità di potere iterare le operazioni, manipolare i dati con estrema facilità e definire delle routine da potere effettuare in maniera condizionata.
 
@@ -80,14 +80,14 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 \subsection{Scelte progettuali}
 
 \begin{itemize}
-	\item Lookup dei simboli eval invece che lexer come il libro~\cite{levine2009flex}
+	\item Lookup dei simboli in eval invece che nel lexer come il libro~\cite{levine2009flex}
 	\item Stringhe immutabili, singolo carattere non direttamente accessibile
 	\item Possibilità di dividerle in lista di "caratteri" (stringhe lugnghezza 1)
 	\item Passaggio di valori per copia
 	\item Scoping statico
 	\item Cicli condividono scope per ragioni di performance.
 	\item Campi di device accessibili ma non modificabili, evita modifiche a connessioni aperte.
-	\item Liste eterogenee puntatore a next
+	\item Liste eterogenee puntatore a next, conseguente scelta di non permettere liste innestate, eventuale operazione di flattening può essere fatta in puro PASTEL dal programmatore.
 	\item Foreach
 	\item Include a tempo di lexer, impedisce include condizionali che generano codice potenzialmente ambiguo con comportamento imprevedibile.
 	\item Interprete invece che compilatore
@@ -100,14 +100,12 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item La dichiarazione definisce un valore di default se non ne viene specificato uno
 	\item Il tipo di una variabile deve essere definito al momento della dichiarazione, e non può essere modificato. Questo consente di scrivere programmi più robusti e dal debug più semplice.
 	Per non limitare la potenza del linguaggio, le funzioni definite dall'utente possono restituire tipi di dati diversi. In questi casi si possono utilizzare le liste eterogenee per memorizzare i valori restituiti ed eseguire operazioni diverse in base al tipo. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}
-	\item 
-	\item Parola riservata invece che keyword
-	\item 
-	\item 
+	\item Valori di ritorno equivalgono all'ultima eval della lista di espressioni, evita interruzioni strane
+	\item Parole riservate invece che keyword
 	\item 
 	\item 
 	\item 
-	\item 
+	\item {\Large \textbf{text}}
 	\item 
 	\item 
 	\item 
@@ -117,6 +115,9 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item 
 	\item 
 	\item 
+	\item 
+	\item 
+
 \end{itemize}
 
 \lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Esempio di codice PASTEL in cui vengono utilizzate funzioni con tipo di ritorno variabile e dichiarazioni condizionali}, label={listing:conditional_declaration}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
@@ -347,7 +348,7 @@ in	"in"
 def	"def"
 \end{lstlisting}
 
-\begin{figure}
+\begin{figure}[t]
 	\centering
 	\resizebox{\columnwidth}{!}{
 	\includegraphics{sources/parser_simple}}
