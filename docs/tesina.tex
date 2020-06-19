@@ -87,7 +87,6 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item Eager evaluation
 	\item Scoping statico
 	\item Cicli condividono scope per ragioni di performance.
-	\item Campi di device accessibili ma non modificabili, evita modifiche a connessioni aperte. Niente aggiornamento selettivo, ma è consentito l'aggiornamento totale.
 	\item Liste eterogenee puntatore a next, conseguente scelta di non permettere liste innestate, eventuale operazione di flattening può essere fatta in puro PASTEL dal programmatore. È anche consentito l'accesso ad elementi della lista con i selettori tipici degli array.
 	\item Foreach, la variabile di controllo viene inizializzata all'avvio del ciclo, al termine viene eliminata e non è più referenziabile.
 	All'interno del ciclo può essere modificata (e.g. assegnamento)
@@ -105,16 +104,7 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item Valori di ritorno equivalgono all'ultima eval della lista di espressioni, evita interruzioni strane
 	\item Parole riservate invece che keyword
 	\item Niente tipi definiti dall'utente
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
+	\item Compatibilità Linux e Mac
 	\item 
 	\item 
 	\item 
@@ -158,33 +148,33 @@ I comandi iterativi invece sono:
 \item \texttt{while ( condition ) \{ instructions \}}
 \item \texttt{for ( var in list ) \{ instructions \} }
 \end{itemize}
-Nell'espressione \texttt{while} si itera indefinitivamente finché la condition è diversa da 0, nel \texttt{for} invece si itera per ogni elemento contenuto nella lista.
+Nell'espressione \texttt{while} si itera indefinitivamente finché la condition è diversa da 0, nel \texttt{for} invece si itera per ogni elemento contenuto nella lista.\\
 
-\textbf{Operazioni}
-Il linguaggio consente le seguenti operazioni[...] tabella~\ref{table:operatori}
+\textbf{Operazioni}\\
+Il linguaggio consente le seguenti operazioni: somma, sottrazione, moltiplicazione, divisione, and e or logici, e comparazioni ( ==, !=, >, >=, <, <=). Le combinazioni di tipi consentite per ogni operatore sono riassunte nella tabella~\ref{table:operatori}. Le comparazioni e gli operatori logici restituiscono sempre degli int, tutti gli altri operatori restituiscono un valore del tipo della colonna, tranne la moltiplicazione int * string equivalente a string * int. \\
 
 \begin{table}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline
 		V1\textbackslash V2 &        int         &    real     &  string  & address & device & list \\ \hline
-		        int         & + - * / OR AND CMP &             &    *     &         &        &      \\ \hline
+		        int         & + - * / or and CMP &             &    *     &         &        &      \\ \hline
 		       real         &                    & + - / * CMP &          &         &        &      \\ \hline
 		      string        &         *          &             & +    CMP &         &        &      \\ \hline
 		      address       &        + -         &             &          &   CMP   &        &      \\ \hline
 		      device        &                    &             &          &         &  CMP   &      \\ \hline
 		       list         &                    &             &          &         &        &  +   \\ \hline
 	\end{tabular}
-	\caption{Operazioni consentite dal linguaggio, sono da intendersi come V1 <operazione> V2. Con CMP si indicano le operazioni di comparazione ==, !=, >, >=, <, <=}
+	\caption{Operazioni consentite dal linguaggio, sono da intendersi come V1 <operatore> V2. Con CMP si indicano le operazioni di comparazione}
 	\label{table:operatori}
 \end{table}
 
 
-\textbf{Selettori}
-\\
-\textbf{Funzioni definite dall'utente}
-\\
-\textbf{Funzioni built-in}
+\textbf{Selettori}\\
+Il tipo device, come già accennato precedentemente, è un prodotto cartesiano tra \texttt{address} e \texttt{int}. Infatti un device è caratterizzato da un indirizzo IP e un numero di porta. Per potere accedere al singolo campo del record, vengono utilizzati i selettori \texttt{.address} e \texttt{.port}. I campi di un device sono accessibili con i suddetti selettori, ma non è consentito un aggiornamento selettivo, impedendo di modificare un device verso il quale è aperta una connessione. È comunque consentito l'aggiornamento totale. Per la creazione di un valore di tipo device si utilizza la seguente sintassi ``\texttt{<address>:<port>}''.\\
+
+\textbf{Funzioni}\\
+Il linguaggio PASTEL offre al programmatore un'ampia varietà di funzioni built-in, che verranno illustrate nella sezione \ref{subsection:fun}. Chiaramente è anche possibile estendere il linguaggio definendone di nuove tramite la sintassi ``\texttt{def nome\_funzione ( parametri\_formali ) \{ istruzioni \}}''.
 \\
 
 
@@ -249,7 +239,7 @@ In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti genera
 	%% LEXER
 \subsection{Lexer}
 
-Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio, i selettori e strutture di controllo.\\
+Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio, le direttive di preprocessing, i selettori e le strutture di controllo.\\
 
 \textbf{Tipi}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
@@ -378,7 +368,36 @@ def	"def"
 Per riuscire a scrivere qualsiasi simbolo all'interno delle stringhe, vengono utilizzati gli \texttt{state} di Flex.
 
 	%% FUNZIONALITÀ DEL LINGUAGGIO
-\subsection{Funzionalità del linguaggio}
+\subsection{Funzionalità del linguaggio}\label{subsection:fun}
+
+\begin{itemize}
+\item \texttt{console/1}
+\item \texttt{connect/1}
+\item \texttt{disconnect/1}
+\item \texttt{receive/1}
+\item \texttt{send/2}
+\item \texttt{isConnected/1}
+\item \texttt{insert/3}
+\item \texttt{remove/2}
+\item \texttt{length/1}
+\item \texttt{typeof/1}
+\item \texttt{s2i/1}
+\item \texttt{s2r/1}
+\item \texttt{s2d/1}
+\item \texttt{s2a/1}
+\item \texttt{s2l/1}
+\item \texttt{s2i/1}
+\item \texttt{toString/1}
+\item \texttt{strip/1}
+\item \texttt{split/2}
+\item \texttt{print/1}
+\item \texttt{sleep/1}
+\item \texttt{quit/1}
+\end{itemize}
+
+Il linguaggio è inoltre fornito di una modalità \texttt{debug}, attivabile scrivendo \texttt{debug} seguito da un numero diverso da 0 e disattivabile con \texttt{debug0}. Questa modalità consente di stampare a schermo una rappresentazione testuale dell'albero sintattico generato in fase di parsing dopo l'esecuzione delle operazioni. \\
+Un'importante funzionalità è la direttiva di inclusione, che fornisce uno strumento fondamentale per la programmazione in grande.
+
 
 	%% CASI D'USO
 \subsection{Casi d'uso}\label{subsection:casi-d_uso}
