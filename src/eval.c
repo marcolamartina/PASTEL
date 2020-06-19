@@ -92,6 +92,9 @@ struct val * eval(struct ast *a){
   /* name declaration */
   case 'D':
       s = insert_symbol(((struct symdecl *)a)->s);
+			if(!s){
+				return NULL;
+			}
       if(s->value->type != 'u'){
 		     yyerror("%s already has type '%c'", s->name,
                                              s->value->type);
