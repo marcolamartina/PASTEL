@@ -103,7 +103,7 @@ struct val * eval(struct ast *a){
           case 'i': s->value=new_int(0); break;
           case 'r': s->value=new_real(0.0); break;
           case 's': s->value=new_string(""); break;
-          case 'd': s->value=new_device(new_address("0.0.0.0"),new_int(0)); break;
+          case 'd': s->value=new_device(new_address("0.0.0.0"),new_int(1)); break;
           case 'a': s->value=new_address("0.0.0.0"); break;
           case 'l':
           default: s->value->type = ((struct symdecl *)a)->type ; break;
