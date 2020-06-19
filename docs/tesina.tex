@@ -20,6 +20,9 @@
 \tableofcontents
 \clearpage
 
+
+%% INTRODUZIONE
+
 \section{Introduzione}
 PASTEL è stato pensato come un linguaggio di scripting per gestire e coordinare le interazioni tra dispositivi IoT basati su TCP.\\
 L'utilizzo di PASTEL può essere vantaggioso in sistemi ciberfisici complessi che necessitano una conoscenza dello stato globale del sistema per coordinarsi. Infatti il sistema potrebbe includere dispositivi con risorse limitate e scarse capacità computazionali, che quindi non sono in grado di memorizzare lo stato del resto dei sensori ed effettuare decisioni complesse. 
@@ -28,11 +31,14 @@ Un altro contesto in cui PASTEL può essere utile è testare in modo replicabile
 
 Il resto della relazione è strutturato come segue: la sezione~\ref{section:stato-arte} illustra il contesto in cui si colloca il linguaggio proposto, nella sezione~\ref{section:descrizione} vengono analizzati i dettagli implementativi, nella sezione~\ref{section:caratteristiche-linguaggio} si illustrano le caratteristiche di PASTEL e degli esempi di applicazioni, infine nella sezione~\ref{section:conclusioni} vengono riepilogati i punti principali del lavoro svolto.
 
+
+%% STATO DELL'ARTE
+
 \section{Stato dell'arte}\label{section:stato-arte}
 
 I dispositivi IoT comunemente eseguono protocolli semplici come CoAP, REST e MQTT~\cite{tandale2017empirical}. 
 
-Constrained Application Protocol (CoAP) è un   protocollo di trasferimento web specializzato da utilizzare con nodi o reti con risorse limitate (ad es. reti a bassa potenza, senza trasferimento affidabile dei dati). I nodi hanno spesso microcontrollori  a 8 bit con piccole quantità di ROM e RAM, mentre reti con risorse limitate come IPv6 su Low-Power Wireless Personal Area  (6LoWPANs) hanno spesso tassi di errore dei pacchetti elevati e un tipico throughput di 10 s di kbit/s. Il protocollo è progettato per applicazioni  machine-to-machine (M2M) come smart energy e building automation.~\cite{shelby2014constrained}.
+Constrained Application Protocol (CoAP) è un   protocollo di trasferimento web specializzato da utilizzare con nodi o reti con risorse limitate (ad es. reti a bassa potenza, senza trasferimento affidabile dei dati). I nodi hanno spesso microcontrollori  a 8 bit con piccole quantità di ROM e RAM, mentre reti con risorse limitate come IPv6 su Low-Power Wireless Personal Area  (6LoWPANs) hanno spesso elevati tassi di errore dei pacchetti e un tipico throughput di 10 s di kbit/s. Il protocollo è progettato per applicazioni  machine-to-machine (M2M) come smart energy e building automation.~\cite{shelby2014constrained}.
 
 Representational State Transfer (REST) è uno tipo di architettura per i sistemi distribuiti. L'espressione representational state transfer e il suo acronimo, REST, furono introdotti nel 2000 nella tesi di dottorato di Roy Fielding, uno dei principali autori delle specifiche dell'Hypertext Transfer Protocol (HTTP), e vennero rapidamente adottati dalla comunità di sviluppatori Internet.
 Il termine REST rappresenta un sistema di trasmissione di dati su HTTP senza ulteriori livelli, quali ad esempio SOAP. I sistemi REST non prevedono il concetto di sessione, ovvero sono stateless.
@@ -52,7 +58,7 @@ Essendo questo il campo di applicazione principale, su questo si incentreranno d
 
 
 
-Il linguaggio proposto può essere pensato come un linguaggio per generare programmi che possano mandare e ricevere messaggi testuali, condizionati e iterati facilmente. Questo concept può essere pensato come l'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect, libes1995exploring} per reti di sensori wireless (WSN).
+PASTEL può essere pensato come un linguaggio per generare programmi che possano mandare e ricevere messaggi testuali tramite TCP, condizionati e iterati facilmente. Questo concept può essere pensato come l'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect, libes1995exploring} per reti di sensori wireless (WSN).
 
 Expect è un programma che "parla" con altri programmi interattivi secondo uno script. Seguendo lo script, Expect sa cosa ci si può aspettare da un programma e quale dovrebbe essere la risposta corretta. Un linguaggio interpretato fornisce ramificazioni e strutture di controllo di alto livello per dirigere il dialogo. Inoltre, l'utente può assumere il controllo e interagire direttamente quando lo desidera, in seguito restituendo il controllo allo script.
 
@@ -62,22 +68,95 @@ Tcl è stato uno dei primi linguaggi "dinamici" a diventare popolare, vedendo un
 
 Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di fornire uno strumento che permette di interfacciarsi con facilità e in modo affidabile con dispositivi IoT, con la possibilità di potere iterare le operazioni, manipolare i dati con estrema facilità e definire delle routine da potere effettuare in maniera condizionata.
 
+
+%% DESCRIZIONE DEL PROGETTO
+
 \section{Descrizione del progetto}\label{section:descrizione}
+
+ 	%% ANALISI DEI REQUISITI
 \subsection{Analisi dei requisiti}
+
+	%% SCELTE PROGETTUALI
 \subsection{Scelte progettuali}
+
+
+%% CARATTERISTICHE DEL LINGUAGGIO
+
 \section{Caratteristiche del linguaggio}\label{section:caratteristiche-linguaggio}
+
+	%% GRAMMATICA
 \subsection{Grammatica}
+
+	%% DESCRIZIONE DEL PARSER
 \subsection{Descrizione del parser}
-{[...]} Figura~\ref{fig:parser_simple} (In appendice il grafico completo)[...]
+{[...]} Parser di tipo LALR[...] parsing bottom-up, quindi è possibile gestire le produzioni con ricorsione a sinistra [...] utilizzando Bison per generare il parser e Flex per riconoscere i token nella fase di lexing~\cite{levine2009flex}
+
+Le regole di produzione in formato BNF[...]:
+
+\begin{lstlisting}
+<program>::= 
+	| <program> <stmt>
+	| <program> DEF NAME '(' <symlist> ')' '{' <list> '}'  
+
+<stmt>::= IF '(' <exp> ')' '{' <list> '}' 
+	| IF '(' <exp> ')' '{' <list> '}' ELSE '{' <list> '}'  
+	| WHILE '(' <exp> ')' '{' <list> '}'    
+	| FOR '(' NAME IN <exp> ')' '{' <list> '}'  
+	| <exp> ';'
+	| <decl> ';'
+
+<list>::=
+	| stmt <list> 
+
+<exp>::= '(' <exp> ')'         
+	| FUNC '(' <explist> ')' 
+	| VALUE              
+	| <exp> ':' <exp>         
+	| <exp> '+' <exp>         
+	| <exp> '-' <exp>         
+	| <exp> '*' <exp>          
+	| <exp> '/' <exp>          
+	| <exp> AND <exp>          
+	| <exp> OR <exp>           
+	| '-' <exp>
+	| NAME'[' <exp> ']'          
+	| NAME                 
+	| <exp> CMP <exp>          
+	| <exp> ADDR             
+	| <exp> PORT             
+	| NAME '(' explist ')' 
+
+<decl>::= TYPE NAME          
+	| NAME '=' <exp>                    
+	| NAME '[' <exp> ']' '=' <exp>
+	| TYPE NAME '=' <exp>     
+
+<explist>::=
+	| <exp>
+	| <exp> ',' <explist> 
+
+<symlist>::= 
+	| NAME       
+	| NAME ',' <symlist>
+\end{lstlisting}
+
+Le regole di produzione per \texttt{<exp>} sembrerebbero ambigue, infatti una stessa sequenza di operatori potrebbe essere rappresentata da più alberi di parsing. È generalmente possibile riscrivere la grammatica per eliminare l'ambiguità, però Bison mette a disposizione degli strumenti che permettono di specificare la precedenza degli operatori disambiguando la grammatica e scartando automaticamente gli alberi di parsing non validi, consentendo l'utilizzo di una grammatica più semplice e compatta.
+
+In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti generato da Bison su una versione ridotta della grammatica per fornire un'idea generale della struttura di un programma grammaticalmente corretto. Questa grammatica semplificata rimuove delle regole di produzione ricorsive per ridurre il numero di stati, migliorando la leggibilità. In appendice si riporta il grafo della grammatica completa.
+
+
 \begin{figure}
 	\centering
 	\resizebox{\columnwidth}{!}{
 	\includegraphics{sources/parser_simple}}
-	\caption{Grafico del FSA generato utilizzando  GNU Bison 3.5.4 XML Automaton Report su una struttura fortemente semplificata per facilitare la rappresentazione. La grammatica completa non presenta conflitti shift/reduce e reduce/reduce.}
+	\caption{Grafo del FSA generato utilizzando  GNU Bison 3.5.4 XML Automaton Report su una struttura fortemente semplificata per facilitare la rappresentazione. La grammatica completa non presenta conflitti shift/reduce e reduce/reduce.}
 	\label{fig:parser_simple}
 \end{figure}
 
+	%% CASI D'USO
 \subsection{Casi d'uso}\label{subsection:casi-d_uso}
+
+		%% NETWORK DISCOVERY
 \subsubsection{Network discovery}\label{subsubsection:net-disc}
 In una rete di sensori generalmente è necessario che ogni nodo sappia quali sono i suoi vicini e come raggiungerli, a questo scopo sono stati sviluppati un grande numero di protocolli~\cite{narten1998neighbor, kandhalu2010u, alsa2012secure}.
 
@@ -92,6 +171,7 @@ Per semplicità si assume che il calcolatore che esegue il programma abbia un ra
 
 \lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
 
+		%% PUBLISH-SUBSCRIBE
 \subsubsection{Publish-Subscribe}\label{subsubsection:pub-sub}
 
 Come visto precedentemente in~\cite{tandale2017empirical} il modello Publish-Subscribe è molto comune come protocollo di comunicazione nel campo IoT. Nel listato~\ref{listing:sub} mostriamo come PASTEL permetta con facilità di interrogare una lista di nodi per ottenere i topic a cui ogni nodo intende fare il subscribe, dopo questo step di configurazione è immediato poter mandare a tutti i nodi iscritti ad un topic un determinato messaggio.
@@ -110,6 +190,7 @@ Il programma si aspetta un input del tipo ``\texttt{<lista di topic> :TOPICS <me
 
 Lo schema di funzionamento illustrato può ovviamente essere ulteriormente raffinato impedendo l'iscrizione multipla ad uno stesso topic e aggiungendo controlli per evitare di inviare più volte uno stesso messaggio un nodo iscritto a più topic, o al nodo che ha originato il messaggio. Inoltre è possibile prevedere la possibilità di cancellare le iscrizioni o modificarle periodicamente.
 
+	%% RISULTATI OTTENUTI
 \subsection{Risultati ottenuti}\label{subsection:risultati}
 
 Il codice mostrato nelle sezioni~\ref{subsubsection:net-disc} e~\ref{subsubsection:pub-sub} mostra la potenzialità di essere integrato in un unico sistema software che, inserito in una rete, a partire dalla conoscenza di un singolo nodo, riesce a ricostruire la topologia della rete raggiungibile e gestire il funzionamento di un protocollo non banale del tipo publish-subscribe, dimostrando l'applicabilità del linguaggio proposto all'interno del contesto target. 
@@ -199,9 +280,12 @@ Tutto il codice utilizzato per i benchmarking è riportato nell'appendice.
 \end{figure}
 
 
+%% CONCLUSIONI
+
 \section{Conclusioni}\label{section:conclusioni}
 
 
+%% BIBLIOGRAFIA
 
 \clearpage
 \bibliographystyle{unsrt}
@@ -209,6 +293,10 @@ Tutto il codice utilizzato per i benchmarking è riportato nell'appendice.
 \addcontentsline{toc}{section}{Riferimenti bibliografici}
 
 \clearpage
+
+
+%% APPENDICE
+
 \section*{Appendice}\label{section:appendix}
 \addcontentsline{toc}{section}{Appendice}
 
