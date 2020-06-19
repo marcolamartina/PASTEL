@@ -80,13 +80,14 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 \subsection{Scelte progettuali}
 
 \begin{itemize}
-	\item Stringhe immutabili
+	\item Lookup dei simboli eval invece che lexer come il libro~\cite{levine2009flex}
+	\item Stringhe immutabili, singolo carattere non direttamente accessibile
+	\item Possibilità di dividerle in lista di "caratteri" (stringhe lugnghezza 1)
 	\item Passaggio di valori per copia
 	\item Scoping statico
 	\item Cicli condividono scope
-	\item 
-	\item 
-	\item 
+	\item Campi di device accessibili ma non modificabili, evita modifiche a connessioni aperte.
+	\item Liste eterogenee puntatore a next
 	\item 
 	\item 
 	\item 
