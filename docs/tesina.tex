@@ -85,7 +85,7 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item Possibilità di dividerle in lista di "caratteri" (stringhe lugnghezza 1)
 	\item Passaggio di valori per copia
 	\item Scoping statico
-	\item Cicli condividono scope
+	\item Cicli condividono scope per ragioni di performance.
 	\item Campi di device accessibili ma non modificabili, evita modifiche a connessioni aperte.
 	\item Liste eterogenee puntatore a next
 	\item Foreach
@@ -98,7 +98,9 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item Overloading di alcuni operatori e funzioni 
 	\item Controllo dei tipi dinamico, adatto a scripting e dati restituiti di natura variabile, potenzialmente eterogenea, quindi possibilità di controllo dei tipi. -> parametri formali non hanno vincoli sui tipi, l'onere è lasciato al programmatore.
 	\item La dichiarazione definisce un valore di default se non ne viene specificato uno
-	\item Dichiarazione implicita non consentita
+	\item Il tipo di una variabile deve essere definito al momento della dichiarazione, e non può essere modificato. Questo consente di scrivere programmi più robusti e dal debug più semplice.
+	Per non limitare la potenza del linguaggio, le funzioni definite dall'utente possono restituire tipi di dati diversi. In questi casi si possono utilizzare le liste eterogenee per memorizzare i valori restituiti ed eseguire operazioni diverse in base al tipo. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}
+	\item 
 	\item Parola riservata invece che keyword
 	\item 
 	\item 
@@ -115,8 +117,11 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item 
 	\item 
 	\item 
-	\item 
 \end{itemize}
+
+\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Esempio di codice PASTEL in cui vengono utilizzate funzioni con tipo di ritorno variabile e dichiarazioni condizionali}, label={listing:conditional_declaration}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
+]{../testfiles/conditional_declaration.pa}
+
 %% CARATTERISTICHE DEL LINGUAGGIO
 
 \section{Caratteristiche del linguaggio}\label{section:caratteristiche-linguaggio}

@@ -1,0 +1,32 @@
+def conditional_return(unknown_val){
+	string type = typeof(unknown_val);
+	if(type=="int"){
+		int result = unknown_val;
+	} else { if(type == "device"){
+		string result = toString(unknown_val);
+	} else {
+		quit("Unexpected type");
+	}}
+	result;
+}
+
+list mixedTypes = [ conditional_return(3), conditional_return(localhost:1) ];
+
+if(typeof(mixedTypes[0]) == "string"){
+	device first_val = s2d(mixedTypes[0]);
+	print("Found an address!");
+} else {
+	int first_val = mixedTypes[0];
+	print("Found an int!");
+}
+
+if(typeof(mixedTypes[1]) == "string"){
+	device second_val = s2d(mixedTypes[1]);
+	print("Found an address!");
+} else {
+	int second_val = mixedTypes[1];
+	print("Found an int!");
+}
+
+print(first_val);
+print(second_val);
