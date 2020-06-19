@@ -90,6 +90,7 @@ int popfile(void);
 "s2r"			    { yylval.fn = B_s2r; return FUNC; }
 "s2d"			    { yylval.fn = B_s2d; return FUNC; }
 "s2a"			    { yylval.fn = B_s2a; return FUNC; }
+"s2l"			    { yylval.fn = B_s2l; return FUNC; }
 "toString"		{ yylval.fn = B_toString; return FUNC; }
 "console"     { yylval.fn = B_console; return FUNC; }
 "strip"       { yylval.fn = B_strip; return FUNC; }

@@ -25,6 +25,7 @@ static void send_to_connection(struct val * device, struct val * string);
 static void list_remove(struct val * list, struct val * index);
 static void list_insert(struct val * list, struct val * value, struct val * index);
 static struct val * s2a(struct val * v);
+static struct val * s2l(struct val * v);
 static struct val * s2d(struct val * v);
 static struct val * s2r(struct val * v);
 static struct val * s2i(struct val * v);
@@ -164,7 +165,14 @@ struct val * callbuiltin(struct fncall *f) {
       result=s2a(v);
     }
     break;
-  case B_toString:
+  case B_s2l:
+    if (num_arg != 1) {
+      yyerror("Wrong argument number, expected 1, found %d", num_arg);
+    } else{
+      result=s2l(v);
+    }
+    break;
+   case B_toString:
     if (num_arg != 1) {
       yyerror("Wrong argument number, expected 1, found %d", num_arg);
     } else{
@@ -424,6 +432,27 @@ struct val * s2a(struct val * v){
   }
 }
 
+struct val * s2l(struct val * v){
+	struct val * result = new_int(0);
+	result->type = 'l';
+	result->next = NULL;
+
+	struct val * temp = result;
+
+  if(typeof_v(v)!='s'){
+    yyerror("s2a is defined only for string, found %c", typeof_v(v));
+		free_lost(result);
+    return NULL;
+  } else {
+			char temp_string[] = {'-','\0'};
+			for(int i = 0; i < strlen(v->string_val); i++){
+				temp_string[0]=v->string_val[i];
+				temp->next = new_string(temp_string);
+				temp = temp->next;
+			}
+			return result;
+  }
+}
 struct val * get_port(struct val * v){
   if(typeof_v(v)!='d'){
     yyerror("Attribute port is only for type device, found %c", typeof_v(v));

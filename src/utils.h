@@ -17,6 +17,7 @@ enum bifs {			/* built-in functions */
   B_s2r,
   B_s2d,
   B_s2a,
+  B_s2l,
   B_toString,
   B_console,
   B_split,
