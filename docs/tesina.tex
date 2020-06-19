@@ -1,5 +1,5 @@
 % !TeX spellcheck = it_IT
-\documentclass[]{article}
+\documentclass[10pt]{article}
 \usepackage{color, soul}
 \newcommand{\hlc}[2][yellow]{ {\sethlcolor{#1} \hl{#2}} }
 \usepackage[T1]{fontenc}
@@ -7,7 +7,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{listings}
 \usepackage{graphicx}
-
+\usepackage[italian]{babel}
 
 
 % Title Page
@@ -18,7 +18,7 @@
 \begin{document}
 \maketitle
 \tableofcontents
-
+\clearpage
 
 \section{Introduzione}
 PASTEL è stato pensato come un linguaggio di scripting per gestire e coordinare le interazioni tra dispositivi IoT basati su TCP.\\
@@ -26,7 +26,7 @@ L'utilizzo di PASTEL può essere vantaggioso in sistemi ciberfisici complessi ch
 
 Un altro contesto in cui PASTEL può essere utile è testare in modo replicabile il corretto comportamento interattivo di un sistema ciberfisico: il linguaggio proposto infatti può facilmente simulare l'output di molti sensori ed inviarlo agli attuatori.
 
-Il resto della \hl{tesina} è strutturato come segue: la sezione~\ref{section:stato-arte} illustra il contesto in cui si colloca il linguaggio proposto, nella sezione~\ref{section:descrizione} vengono analizzati i dettagli implementativi, nella sezione~\ref{section:caratteristiche-linguaggio} si illustrano le caratteristiche di PASTEL e degli esempi di applicazioni, infine nella sezione~\ref{section:conclusioni} vengono riepilogati i punti principali del lavoro svolto.
+Il resto della relazione è strutturato come segue: la sezione~\ref{section:stato-arte} illustra il contesto in cui si colloca il linguaggio proposto, nella sezione~\ref{section:descrizione} vengono analizzati i dettagli implementativi, nella sezione~\ref{section:caratteristiche-linguaggio} si illustrano le caratteristiche di PASTEL e degli esempi di applicazioni, infine nella sezione~\ref{section:conclusioni} vengono riepilogati i punti principali del lavoro svolto.
 
 \section{Stato dell'arte}\label{section:stato-arte}
 
@@ -45,7 +45,7 @@ MQTT è un protocollo di connettività machine-to-machine (M2M) / "Internet of T
 Il linguaggio proposto può facilmente essere utilizzato con il protocollo REST essendo basato su HTTP, un protocollo di livello applicazione che utilizza solo testo. CoAP, utilizzando UDP come protocollo di livello trasporto, non è compatibile con l'ambiente PASTEL. MQTT si appoggia al TCP, tuttavia è basato sull'invio di codice binario, quindi non è direttamente implementabile in PASTEL a meno di utilizzare particolari tecniche di encoding~\cite{josefsson2006base16}, in quel caso sarebbe certamente possibile, ma non è il tipo di applicazione verso cui è orientato il linguaggio.
 
 L'ambiente target principale è quello dei dispositivi in grado di eseguire codice simbolico~\cite{gaglio2017dc4cd}. L'utilizzo di codice simbolico (e.g. in dispositivi che eseguono un interprete FORTH) permette di generare in modo automatico istruzioni valide per tutti i dispositivi presi in considerazione, indipendentemente dall'architettura hardware sottostante.
-Inoltre, essendo possibile definire nuove parole su nodi già installati ( utilizzando quelle precedentemente definite) è possibile, a partire da delle primitive legate alle trasmissioni, abilitare tutti i nodi della rete all'esecuzione di protocolli arbitrari in una fase di inizializzazione in cui viene comunicato il codice necessario. 
+Inoltre, essendo possibile definire nuove parole su nodi già installati ( utilizzando quelle precedentemente definite) è possibile, a partire da delle primitive legate alle trasmissioni, abilitare tutti i nodi della rete all'esecuzione di protocolli arbitrari in una fase di inizializzazione in cui viene comunicato il codice simbolico necessario. 
 
 Con un approccio simbolico diventa anche possibile supportare protocolli normalmente basati su bytecode come MQTT nativamente~\cite{gaglio19interoperable}.
 Essendo questo il campo di applicazione principale, su questo si incentreranno di casi d'uso nella sezione \ref{subsection:casi-d_uso}.\\\\
