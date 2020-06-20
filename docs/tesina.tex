@@ -105,7 +105,6 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	\item Parole riservate invece che keyword
 	\item Niente tipi definiti dall'utente
 	\item Compatibilità Linux e Mac
-	\item accedere alla lista con le parentesi quadre
 	\item Niente salti~\cite{dijkstra1968letters}
 
 \end{itemize}
@@ -363,7 +362,7 @@ def	"def"
 	\label{fig:parser_simple}
 \end{figure}
 
-Per riuscire a scrivere qualsiasi simbolo all'interno delle stringhe, vengono utilizzati gli \texttt{state} di Flex.
+Per riuscire a scrivere qualsiasi simbolo all'interno delle stringhe, vengono utilizzati gli \texttt{state} di Flex. Le costanti \texttt{TRUE} e \texttt{FALSE} corrispondono semplicemente a 1 e 0, mentre \texttt{NL} rappresenta il carattere di ritorno a capo
 
 	%% FUNZIONALITÀ DEL LINGUAGGIO
 \subsection{Funzionalità del linguaggio}\label{subsection:fun}
