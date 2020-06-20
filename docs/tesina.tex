@@ -73,7 +73,7 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 
 \section{Descrizione del progetto}\label{section:descrizione}
 
-Il linguaggio PASTEL nasce con lo scopo di agevolare la programmazione di software che si occupano di gestire dispositivi in ambiente IoT. Viene proposto un interprete per il linguaggio PASTEL, piuttosto che un compilatore, sia per la minore complessità implementativa, che per favorire l'interattività delle operazioni che vengono normalmente svolte in questo contesto. \hl{Per raggiungere questo obiettivo} e per dare la possibilità al programmatore di effettuare tutte le manipolazioni ai dati del caso, vi sono quattro tipi primitivi, ovvero \texttt{ int, real, string} e \texttt{address}. La possibilità di poter definire nuovi tipi non è consentita, per non dover appesantire inutilmente il linguaggio, poiché nel contesto in cui viene utilizzato, non è un requisito fondamentale. 
+Il linguaggio PASTEL nasce con lo scopo di agevolare la programmazione di software che si occupano di gestire dispositivi in ambiente IoT. Viene proposto un interprete per il linguaggio PASTEL, piuttosto che un compilatore, sia per la minore complessità implementativa, che per favorire l'interattività delle operazioni che vengono normalmente svolte in questo contesto. Per dare la possibilità al programmatore di effettuare tutte le manipolazioni ai dati del caso, vi sono quattro tipi primitivi, ovvero \texttt{ int, real, string} e \texttt{address}. La possibilità di poter definire nuovi tipi non è consentita, per non dover appesantire inutilmente il linguaggio, poiché nel contesto in cui viene utilizzato, non è un requisito fondamentale. 
 
 Il tipo \texttt{address} è il tipo che caratterizza il linguaggio poiché è grazie al suo utilizzo che sono semplificate molte operazioni che un linguaggio da utilizzare in ambiente IoT deve supportare. 
 
@@ -100,7 +100,7 @@ Non è presente la definizione degli array, la cui introduzione nel linguaggio s
 Vi è un grande vantaggio nell'utilizzo delle liste, ovvero la possibilità di iterare per ogni elemento della lista tramite il costrutto \texttt{foreach}. La variabile di controllo viene inizializzata all'avvio del ciclo, al termine viene eliminata e non è più referenziabile. Inoltre all'interno del ciclo può essere modificata (e.g. tramite assegnamento).
 
 Per quanto riguarda le funzioni, è possibile sia utilizzare delle funzioni già presenti nel linguaggio, trattate nelle sezione ~ref{subsection:fun}, ma è anche possibile definirne di nuove. I nomi delle funzioni built-in sono parole riservate e quindi non è possibile ridefinirle. Anche quelle definite dall'utente per semplicità implementativa non sono ridefinibili e non è consentito definire una funzione all'interno della definizione di un'altra funzione. Non è 
-richiesta la definizione del tipo dei parametri formali, l'onere di gestire la coerenza dei tipi è lasciato al programmatore, che ha quindi la possibilità di creare funzioni che \hl{prescindano} dai tipi dei parametri formali. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}. Inoltre i parametri alle funzioni sono passati per copia e la valutazione di eventuali espressioni passate come parametri reali viene effettuata al momento della chiamata alla funzione, non quando i parametri formali vengono utilizzati nel corpo della funzione(eager evaluation).
+richiesta la definizione del tipo dei parametri formali, l'onere di gestire la coerenza dei tipi è lasciato al programmatore, che ha quindi la possibilità di creare funzioni che non sono vincolate dai tipi dei parametri formali. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}. Inoltre i parametri alle funzioni sono passati per copia e la valutazione di eventuali espressioni passate come parametri reali viene effettuata al momento della chiamata alla funzione, non quando i parametri formali vengono utilizzati nel corpo della funzione(eager evaluation).
 
 Il tipo di una variabile deve essere definito al momento della dichiarazione, e non è consentita la modifica. Questo consente di scrivere programmi più robusti e dal debug più semplice. Inoltre al momento della dichiarazione, alla variabile viene assegnato un valore di default per evitare inconsistenze sui dati.
 
@@ -108,13 +108,12 @@ Per non limitare la potenza del linguaggio, le funzioni definite dall'utente pos
 
 I valori di ritorno delle funzioni corrispondono all'ultimo valore calcolato all'interno della funzione, senza bisogno di esplicitare direttamente cosa la funzione debba restituire. Questo evita salti e interruzioni dell'esecuzione che peggiorano la leggibilità del codice~\cite{dijkstra1968letters}.
 
-\begin{itemize}
-	\item Lookup dei simboli in eval invece che nel lexer come il libro~\cite{levine2009flex}
-	\item Scoping statico
-	\item Cicli condividono scope per ragioni di performance.
-	\item Include a tempo di lexer, impedisce include condizionali che generano codice potenzialmente ambiguo con comportamento imprevedibile.
-	\item Possibilità di variabili globali, quindi la dichiarazione implicita non è consentita
-\end{itemize}
+Esiste la possibilità di passare file di input (con estensione \texttt{.pa}) all'interprete in modo da eseguire i sorgenti. Dopo di ciò viene restituito il controllo all'interprete. Un altro modo per includere file sorgente è quella di utilizzare la direttiva di inclusione, eseguita in fase di lexing per non rendere possibili include condizionali, potenzialmente ambigui e con comportamento imprevedibile.
+
+Le variabili sono definite con scope limitato alla funzione in cui vengono dichiarate. Una funzione può accedere a tutti i simboli definiti in scope più ampi, ma per discriminare i riferimenti a variabili locali dai riferimenti a variabili di scope più ampio, non viene consentita la dichiarazione implicita delle variabili, quindi la ricerca nelle tabelle dei simboli avviene nel momento in cui le espressioni vengono valutate (scoping dinamico), e non durante il lexing, differentemente dall'implementazione suggerita dal libro di testo~\cite{levine2009flex}. Se una variabile viene definita fuori da una funzione avrà scope globale e la sua vita terminerà alla chiusura dell'interprete.
+
+I cicli iterativi condividono lo scope della funzione in cui vengono eseguiti per ragioni di performance, definire quindi una variabile all'interno di un ciclo porta ad una condizione di errore, poiché dalla seconda iterazione la variabile risulterà già definita.\\
+
 
 \lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Esempio di codice PASTEL in cui vengono utilizzate funzioni con tipo di ritorno variabile e dichiarazioni condizionali}, label={listing:conditional_declaration}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
 ]{../testfiles/conditional_declaration.pa}
@@ -431,7 +430,7 @@ L'algoritmo termina automaticamente nonappena l'ultimo dei nodi noti interrogato
 
 Per semplicità si assume che il calcolatore che esegue il programma abbia un range di comunicazione molto superiore ai nodi della rete, e che possa quindi raggiungerli in un singolo hop, una strategia più generale dovrebbe ovviamente prevedere la costruzione di messaggi di routing.
 
-\lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
+\lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente network\_discovery.pa}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
 
 		%% PUBLISH-SUBSCRIBE
 \subsubsection{Publish-Subscribe}\label{subsubsection:pub-sub}
@@ -439,7 +438,7 @@ Per semplicità si assume che il calcolatore che esegue il programma abbia un ra
 Come visto precedentemente in~\cite{tandale2017empirical} il modello Publish-Subscribe è molto comune come protocollo di comunicazione nel campo IoT. Nel listato~\ref{listing:sub} mostriamo come PASTEL permetta con facilità di interrogare una lista di nodi per ottenere i topic a cui ogni nodo intende fare il subscribe, dopo questo step di configurazione è immediato poter mandare a tutti i nodi iscritti ad un topic un determinato messaggio.
 
 
-\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:sub}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente subscriber.pa}, label={listing:sub}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
  ]{../testfiles/subscriber.pa}
 
 
@@ -447,7 +446,7 @@ Con questo framework diventa estremamente facile per un nodo comunicare un messa
 
 Il programma si aspetta un input del tipo ``\texttt{<lista di topic> :TOPICS <messaggio>}'', la parte di messaggio che precede ``\texttt{:TOPICS}'' è interpretata come una lista di topic separati da virgole, il messaggio che segue quel tag, invece, verrà inviato a tutti i nodi che si sono precedentemente iscritti ad almeno uno di quei topic.
 
-\lstinputlisting[firstline=1, lastline=29, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente di \lstname}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+\lstinputlisting[firstline=1, lastline=29, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente publisher.pa}, label={listing:pub}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
 ]{../testfiles/publisher.pa}
 
 Lo schema di funzionamento illustrato può ovviamente essere ulteriormente raffinato impedendo l'iscrizione multipla ad uno stesso topic e aggiungendo controlli per evitare di inviare più volte uno stesso messaggio un nodo iscritto a più topic, o al nodo che ha originato il messaggio. Inoltre è possibile prevedere la possibilità di cancellare le iscrizioni o modificarle periodicamente.
@@ -546,15 +545,15 @@ Tutto il codice utilizzato per i benchmarking è riportato nell'appendice.
 
 \section{Conclusioni}\label{section:conclusioni}
 
-Il linguaggio sviluppato [...] affrontare tematiche trattate nel corso [...] , considerando i tempi di sviluppo, i test effettuati mostrano performance soddisfacenti.
-
-Visti i tempi di sviluppo limitati, PASTEL non possiede tutte le funzionalità che ci si aspetta da un linguaggio di programmazione general purpose, e sono presenti molte direzioni verso cui si potrebbe potenziare il linguaggio. In conclusione segue una breve disamina di alcune feature che potrebbero arricchire il linguaggio. 
+La progettazione del linguaggio PASTEL ha permesso di affrontare le tematiche trattate nel corso di \textit{Linguaggi e traduttori} e di applicare molti dei concetti teorici discussi durante le lezioni. Nonostante i tempi di sviluppo ridotti, i test effettuati mostrano performance soddisfacenti.
+Gli strumenti Flex e Bison hanno agevolato la realizzazione di un linguaggio relativamente complesso e completo, riducendo la mole di codice da dovere sviluppare.
+Visti i tempi di realizzazione limitati, PASTEL non possiede tutte le funzionalità che ci si aspetta da un linguaggio di programmazione general purpose, e sono presenti molte direzioni verso cui si potrebbe potenziare il linguaggio. In conclusione segue una breve disamina di alcune features che potrebbero arricchire il linguaggio. 
 \begin{itemize}
-	\item Lettura e scrittura da file
-	\item Al momento per potere effettuare interazioni con l'utente, quando un programma viene eseguito leggendolo da un file, è necessario ricorrere a \texttt{console/1}. Sarebbe certamente più agevole consentire l'utilizzo dello standard input.
+	\item Lettura e scrittura da file, per consentire ad esempio la scrittura di log dei device 
+	\item Al momento per potere effettuare interazioni con l'utente, quando un programma viene eseguito leggendolo da un file, è necessario ricorrere a \texttt{console}. Sarebbe certamente più agevole consentire l'utilizzo dello standard input.
 	\item PASTEL non è utilizzabile su sistemi operativi Windows perché, interfacciarsi alle socket, Windows utilizza un'API differente da Linux e macOS. Un linguaggio maturo dovrebbe avere implementazioni per tutti i maggiori sistemi operativi.
 	\item Gli indirizzi gestiti sono solo quelli IPv4, potrebbe essere aggiunto il supporto al protocollo IPv6.
-	\item Le chiamate a \texttt{receive/1} sono letture bloccanti. Un dispositivo malfunzionante però potrebbe non rispondere mai ai messaggi inviati, fermando l'esecuzione del programma. Per permettere la scrittura di programmi più robusti si potrebbe introdurre letture da socket non bloccanti~\cite{hall2001beej} specificando un timeout.
+	\item Le chiamate a \texttt{receive} sono letture bloccanti. Un dispositivo malfunzionante però potrebbe non rispondere mai ai messaggi inviati, fermando l'esecuzione del programma. Per permettere la scrittura di programmi più robusti si potrebbe introdurre letture da socket non bloccanti~\cite{hall2001beej} specificando un timeout.
 	\item Nell'ambito IoT, oltre al TCP, esistono molti protocolli per il trasporto affidabile dei dati basati su UDP~\cite{masirap2016evaluation}, supportare anche UDP quindi renderebbe il linguaggio più flessibile e potente.
 \end{itemize}
 
