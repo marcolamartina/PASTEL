@@ -428,6 +428,11 @@ struct val * s2a(struct val * v){
     yyerror("s2a is defined only for string, found %c", typeof_v(v));
     return NULL;
   } else {
+		struct sockaddr_in device_addr; /* needed only for inet_pton */
+		if(inet_pton(AF_INET, (!strcmp(v->string_val,"localhost")?"127.0.0.1":v->string_val), &device_addr.sin_addr)<=0){   
+			yyerror("Invalid address/ Address not supported");
+			return new_address("0.0.0.0"); ;
+    }
     return new_address(v->string_val);
   }
 }
