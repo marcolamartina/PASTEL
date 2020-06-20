@@ -73,16 +73,12 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 
 \section{Descrizione del progetto}\label{section:descrizione}
 
- 	%% ANALISI DEI REQUISITI
-\subsection{Analisi dei requisiti}
-
-	%% SCELTE PROGETTUALI
-\subsection{Scelte progettuali}
+Il linguaggio proposto nasce con lo scopo di agevolare la programmazione di piccoli software che si occupano di gestire dispositivi in ambiente IoT. Per raggiungere questo obiettivo e per dare la possibilità al programmatore di effettuare tutte le manipolazioni ai dati del caso, vi sono  4 tipi primitivi, ovvero \texttt{ int, real, string} e \texttt{address}. La possibilità di poter definire nuovi tipi non è consentita, per non dover appesantire inutilmente il linguaggio, poiché nel contesto in cui viene utilizzato, non è un requisito fondamentale. Il tipo \texttt{address} è il tipo che caratterizza il linguaggio poiché è grazie al suo utilizzo che sono semplificate molte operazioni che un linguaggio da utilizzare in ambiente IoT deve supportare. Essendo inoltre che PASTEL si pone in un contesto in cui i dati mandati tra i device sono delle stringhe di caratteri, non poteva che essere presente il tipo stringa. La separazione tra int e real è stata pensata per evitare problemi dovuti all'imprecisione della rappresentazione in virgola mobile~\cite{benz2012dynamic}. I 
 
 \begin{itemize}
 	\item Lookup dei simboli in eval invece che nel lexer come il libro~\cite{levine2009flex}
 	\item Stringhe tipo primitivo immutabile, singolo carattere non direttamente accessibile. 
-	\item Possibilità di dividerle in lista di "caratteri" (stringhe lugnghezza 1)
+	\item Possibilità di dividerle in lista di "caratteri" (stringhe lunghezza 1)
 	\item associazione tra parametri reali e formali per copia
 	\item Eager evaluation
 	\item Scoping statico
@@ -103,7 +99,7 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 	Per non limitare la potenza del linguaggio, le funzioni definite dall'utente possono restituire tipi di dati diversi (circa overloading indipendente dal contesto). In questi casi si possono utilizzare le liste eterogenee per memorizzare i valori restituiti ed eseguire operazioni diverse in base al tipo. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}
 	\item Valori di ritorno equivalgono all'ultima eval della lista di espressioni, evita interruzioni strane
 	\item Parole riservate invece che keyword
-	\item Niente tipi definiti dall'utente
+	\item FATTO Niente tipi definiti dall'utente
 	\item Compatibilità Linux e Mac
 	\item Niente salti~\cite{dijkstra1968letters}
 

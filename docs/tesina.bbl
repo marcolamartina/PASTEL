@@ -66,6 +66,11 @@ Ashok~P Nadkarni.
 \newblock {\em The Tcl Programming Language: A Comprehensive Guide}.
 \newblock CreateSpace Independent Publishing Platform, 2017.
 
+\bibitem{benz2012dynamic}
+Florian Benz, Andreas Hildebrandt, and Sebastian Hack.
+\newblock A dynamic program analysis to find floating-point accuracy problems.
+\newblock {\em ACM SIGPLAN Notices}, 47(6):453--462, 2012.
+
 \bibitem{levine2009flex}
 John Levine.
 \newblock {\em Flex \& Bison: Text Processing Tools}.

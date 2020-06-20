@@ -1,48 +1,48 @@
-This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
-Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+This is BibTeX, Version 0.99d (TeX Live 2020)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: tesina.aux
 The style file: unsrt.bst
 Database file #1: tesina.bib
 Warning--empty journal in shelby2014constrained
-You've used 19 entries,
+You've used 20 entries,
             1791 wiz_defined-function locations,
-            543 strings with 6170 characters,
-and the built_in function-call counts, 4028 in all, are:
-= -- 350
-> -- 152
+            550 strings with 6340 characters,
+and the built_in function-call counts, 4281 in all, are:
+= -- 374
+> -- 163
 < -- 5
-+ -- 60
-- -- 41
-* -- 206
-:= -- 599
-add.period$ -- 53
-call.type$ -- 19
-change.case$ -- 15
++ -- 64
+- -- 44
+* -- 228
+:= -- 639
+add.period$ -- 56
+call.type$ -- 20
+change.case$ -- 16
 chr.to.int$ -- 0
-cite$ -- 20
-duplicate$ -- 209
-empty$ -- 435
-format.name$ -- 41
-if$ -- 939
+cite$ -- 21
+duplicate$ -- 218
+empty$ -- 459
+format.name$ -- 44
+if$ -- 993
 int.to.chr$ -- 0
-int.to.str$ -- 19
-missing$ -- 20
-newline$ -- 94
-num.names$ -- 18
-pop$ -- 92
+int.to.str$ -- 20
+missing$ -- 21
+newline$ -- 99
+num.names$ -- 19
+pop$ -- 93
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 115
+skip$ -- 118
 stack$ -- 0
-substring$ -- 210
-swap$ -- 60
+substring$ -- 235
+swap$ -- 61
 text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 1
-while$ -- 36
-width$ -- 21
-write$ -- 192
+while$ -- 39
+width$ -- 22
+write$ -- 203
 (There was 1 warning)
