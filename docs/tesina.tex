@@ -370,30 +370,41 @@ Per riuscire a scrivere qualsiasi simbolo all'interno delle stringhe, vengono ut
 In PASTEL è presente un'ampia gamma di funzioni che possono essere utilizzate per gestire le connessioni dei devices, manipolare i dati ed eseguire funzioni di sistema. Vengono di seguito elencate e descritte tutte le funzioni. Per indicare il numero di argomenti richiesti da ogni funzione, viene adoperata una notazione Prolog-like.
 \begin{itemize}
 \item \texttt{console/1} effettua una chiamata di sistema per aprire una finestra di terminale su cui viene eseguito il programma \texttt{netcat} in modalità server, in ascolto sulla porta del device specificato come argomento. Lo scopo di questa funzione è facilitare le operazioni di testing, permettendo di simulare il comportamento di un dispositivo fisico; un altro possibile impiego è consentire all'utente l'inserimento di dati in maniera interattiva. Questa funzione è parametrizzata in base al sistema operativo (Linux o macOS) poiché i due sistemi operativi usano diverse convenzioni. In altri sistemi operativi questa funzione non è supportata.
-\item \texttt{connect/1} attiva una connessione TCP verso il \texttt{device} passato come parametro
-\item \texttt{disconnect/1} termina la connessione TCP precedentemente creata verso il \texttt{device} passato come parametro
-\item \texttt{receive/1} tenta di ricevere una stringa dal device passato come parametro e restituendola come valore di ritorno
-\item \texttt{send/2} manda al \texttt{device} passato come primo parametro della funzione e verso cui è già attiva una connessione TCP, la stringa contenuta nel secondo parametro
-\item \texttt{isConnected/1} restituisce un il valore \texttt{1} se c'è una connessione attiva verso il \texttt{device} passato come parametro, altrimenti restituisce \texttt{0}
-\item \texttt{insert/3} inserisce nella lista passata come primo parametro, l'elemento contenuto nel secondo parametro, nella posizione specificata dal terzo parametro. Quindi se si vuole fare un inserimento in testa, basta usare \texttt{insert(nome\_lista, elemento, 0)}, per aggiungere in coda invece si può sfruttare la funzione \texttt{length} e quindi usare \texttt{insert(nome\_lista, elemento, length(nome\_lista))}
-\item \texttt{remove/2} rimuove nella lista passata come primo parametro, l'elemnto nella posizione specificata dal secondo parametro. Se si vuole eliminare il primo elemento della lista si può usare \texttt{remove(nome\_lista, 0)}, se si vuole eliminare l'ultimo si può ricorrere alla funzione \texttt{length} e quindi usare \texttt{remove(nome\_lista, length(nome\_lista))}
-\item \texttt{length/1} restituisce un valore di tipo \texttt{int} che rappresenta il numero degli elementi contenuti nella lista passata alla funzione come parametro
-\item \texttt{typeof/1} restituisce una stringa rappresentante il tipo del valore passato come parametro
-\item \texttt{s2i/1} restituisce un valore di tipo \texttt{int} a partire da un valore di tipo \texttt{string} passato come parametro. Restituisce un errore nel caso in cui l'operazione non fosse consentita 
-\item \texttt{s2r/1} restituisce un valore di tipo \texttt{real} a partire da un valore di tipo \texttt{string} passato come parametro. Restituisce un errore nel caso in cui l'operazione non fosse consentita 
-\item \texttt{s2d/1} restituisce un valore di tipo \texttt{device} a partire da un valore di tipo \texttt{string} passato come parametro. Restituisce un errore nel caso in cui l'operazione non fosse consentita  
-\item \texttt{s2a/1} restituisce un valore di tipo \texttt{address} a partire da un valore di tipo \texttt{string} passato come parametro. Restituisce un errore nel caso in cui l'operazione non fosse consentita 
-\item \texttt{s2l/1} restituisce un valore di tipo \texttt{list} a partire da un valore di tipo \texttt{string} passato come parametro. La lista ottenuta conterrà tutti i singoli caratteri contenuti nella stringa di input. Restituisce un errore nel caso in cui l'operazione non fosse consentita
-\item \texttt{toString/1} restituisce un valore di tipo \texttt{string} a partire da un parametro di un qualsiasi tipo. Nel caso in cui si voglia convertire in stringa una lista, viene creata una stringa formata dall'elenco degli elementi che fanno parte della lista separati da virgole e racchiusi da parentesi quadre, ovvero ``\texttt{[ el\_1 , el\_2 , ... , el\_n ]}''. Nel caso di un tipo \texttt{device}, viene creata una stringa così formata ``\texttt{<address>:<port>}'' 
-\item \texttt{strip/1} restituisce una stringa ottenuta da quella passata come parametro rimuovendo i caratteri di carriage return, line feed, tabulazioni e spazi a inizio e fine stringa.
-\item \texttt{split/2} restituisce un valore di tipo \texttt{list}, contenente tutte le sottostringhe della stringa passata come primo parametro ottenute splittandola con la stringa passata come secondo parametro
-\item \texttt{print/1} serve a stampare a schermo il risultato della funzione \texttt{toString} del parametro, seguito da un ritorno a capo
-\item \texttt{sleep/1} effettua una chiamata di sistema per sospendere il processo per un numero di secondi passato come parametro
-\item \texttt{quit/1} effettua una chiamata di sistema per terminare l'esecuzione dell'interprete. Il parametro, se di tipo \texttt{int}, serve per specificare un valore di ritorno del programma o, se di tipo \texttt{string}, per stampare una stringa a fine esecuzione
+\item \texttt{connect/1} attiva una connessione TCP verso il \texttt{device} passato come parametro. Se il tentativo di connessione ha successo, una chiamata a \texttt{isConnected/1} sullo stesso device restituirà un valore diverso da 0 (TRUE), in caso contrario verrà stampato un messaggio di errore sullo standard error, e chiamate a \texttt{isConnected/1} restituiranno FALSE.
+\item \texttt{disconnect/1} termina la connessione TCP precedentemente creata verso il \texttt{device} passato come parametro. Se non c'è una connessione attiva verso il device, verrà stampato un messaggio di errore sullo standard error.
+\item \texttt{receive/1} tenta di ricevere una stringa dal device passato come parametro e restituendola come valore di ritorno. Se non è presente una connessione attiva verso il device, verrà stampato un messaggio di errore sullo standard error. 
+\item \texttt{send/2} manda al \texttt{device} passato come primo parametro della funzione e verso cui è già attiva una connessione TCP, la stringa passata come secondo parametro
+\item \texttt{isConnected/1} restituisce un valore non nullo se c'è una connessione attiva verso il \texttt{device} passato come parametro, altrimenti restituisce \texttt{0}
+\item \texttt{length/1} restituisce un valore di tipo \texttt{int} che rappresenta il numero degli elementi contenuti nella lista passata alla funzione come parametro.
+\item \texttt{insert/3} inserisce nella lista passata come primo parametro l'elemento contenuto nel secondo parametro, nella posizione specificata dal terzo parametro. Quindi se si vuole fare un inserimento in testa, basta usare \texttt{insert(nome\_lista, elemento, 0)}, per aggiungere in coda invece si può sfruttare la funzione \texttt{length} e quindi usare \texttt{insert(nome\_lista, elemento, length(nome\_lista))}. 
+Se, data una lista \texttt{l}, \texttt{length(l)=N1} e viene eseguita \texttt{insert(l,x,N2)} con \texttt{N2>N1}, verrà stampato un messaggio di errore sullo standard error, non essendo consentiti elementi di una lista non inizializzati.
+\item \texttt{remove/2} rimuove dalla lista passata come primo parametro, l'elemento nella posizione specificata dal secondo parametro. Se si vuole eliminare il primo elemento della lista si può usare \texttt{remove(nome\_lista, 0)}, se si vuole eliminare l'ultimo si può ricorrere alla funzione \texttt{length} e quindi usare \texttt{remove(nome\_lista, length(nome\_lista)-1)}. Tentare di rimuovere un elemento in una posizione negativa, o oltre la fine della lista, comporta un messaggio di errore.\\
+Si noti che le funzioni \texttt{insert/3} e \texttt{remove/2} modificano direttamente la lista passata come primo argomento, non ne restituiscono una copia con le modifiche specificate, queste funzioni hanno quindi effetti collaterali ed è necessario prestare attenzione quando si adoperano.
+\item \texttt{typeof/1} restituisce una stringa rappresentante il tipo del valore passato come parametro.
+\item \texttt{s2i/1} restituisce un valore di tipo \texttt{int} a partire da un valore di tipo \texttt{string} passato come parametro. Stampa un messaggio di errore nel caso in cui la stringa non rappresenti un valore intero in base 10.
+\item \texttt{s2r/1} restituisce un valore di tipo \texttt{real} a partire da un valore di tipo \texttt{string} passato come parametro. Stampa un messaggio di errore nel caso in cui la stringa non rappresenti un numero reale. 
+\item \texttt{s2a/1} restituisce un valore di tipo \texttt{address} a partire da un valore di tipo \texttt{string} passato come parametro. Stampa un messaggio di errore nel caso in cui la stringa non rappresenti un indirizzo IP valido.  
+\item \texttt{s2d/1} restituisce un valore di tipo \texttt{device} a partire da un valore di tipo \texttt{string} passato come parametro.
+Se la stringa non rappresenta una combinazione valida di indirizzo IP e numero di porta separati dal simbolo \texttt{`:'} viene stampato un messaggio di errore.  
+\item \texttt{s2l/1} restituisce un valore di tipo \texttt{list} a partire da un valore di tipo \texttt{string} passato come parametro. La lista restiuita conterrà i singoli caratteri che formano la stringa di input. Restituisce un errore nel caso in cui l'argomento di input non sia una stringa.\\
+L'operazione inversa non è fornita come una funzione standard perché, come mostrato nella seguente implementazione \textit{naïve}, è nativamente implementabile in PASTEL:
+\begin{verbatim}
+  def join_chars(split_string){
+    string joined_string = "";
+    for(char in split_string){ joined_string = joined_string + char; }
+    joined_string;
+  }
+\end{verbatim}
+\item \texttt{toString/1} restituisce un valore di tipo \texttt{string} a partire da un parametro di un qualsiasi tipo. Nella conversione di una lista in stringa, viene restituita una stringa formata dall'elenco degli elementi che fanno parte della lista separati da virgole e racchiusi da parentesi quadre, ovvero ``\texttt{[ el\_1 , el\_2 , ... , el\_n ]}''.
+\item \texttt{strip/1} restituisce una stringa ottenuta da quella passata come parametro rimuovendo i caratteri di carriage return, line feed, tabulazioni, e spazi a inizio e fine stringa.
+\item \texttt{split/2} restituisce un valore di tipo \texttt{list}, contenente tutte le sottostringhe della stringa passata come primo parametro ottenute considerando come divisore dei campi la stringa passata come secondo parametro.
+\item \texttt{print/1} stampa a schermo il risultato della funzione \texttt{toString} del parametro, seguito da un ritorno a capo.
+\item \texttt{sleep/1} effettua una chiamata di sistema per sospendere il processo per il numero di secondi passato come parametro.
+\item \texttt{quit/1} effettua una chiamata di sistema per terminare l'esecuzione dell'interprete. Il parametro, se di tipo \texttt{int}, serve per specificare un valore di ritorno del programma o, se di tipo \texttt{string}, per stampare una stringa a fine esecuzione.
 \end{itemize}
 
 Il linguaggio è inoltre fornito di una modalità \texttt{debug}, attivabile scrivendo \texttt{debug} seguito da un numero diverso da 0 e disattivabile con \texttt{debug0}. Questa modalità consente di stampare a schermo una rappresentazione testuale dell'albero sintattico generato in fase di parsing dopo l'esecuzione delle operazioni. \\
-Un'importante funzionalità è la direttiva di inclusione, che fornisce uno strumento fondamentale per la programmazione in grande.
+Un'altra importante funzionalità è la direttiva di inclusione, che fornisce uno strumento fondamentale per la programmazione in grande.
 
 
 	%% CASI D'USO
@@ -478,7 +489,7 @@ Come si può vedere dalla tabella~\ref{table:performance} e in figura~\ref{fig:p
 
 \begin{figure}
 	\centering
-	\resizebox{0.7\columnwidth}{!}{
+	\resizebox{\columnwidth}{!}{
 		\includegraphics{sources/performance-graph}}
 	\caption{Performance dell'interprete}
 	\label{fig:performance-graph}
@@ -488,7 +499,7 @@ Una possibile spiegazione per questa peculiarità è che l'invio di messaggi è 
 
 Questo dato sembra anche giustificare la scelta di sviluppare un linguaggio di scripting interpretato invece che un linguaggio compilato, visto che l'ambito di applicazione principale sarà legato all'invio di messaggi nella rete, e non elaborate manipolazioni dei dati.
 
-Il tempo totale dell'implementazione ricorsiva è il maggiore di tutti\footnote{Su 10000 messaggi l'esecuzione è stata interrotta prematuramente dall'esaurimento della memoria a disposizione}, nonostante il numero di scope da creare sia lo stesso delle chiamate a funzione iterative, infatti, le ricerche dei simboli nello stack delle chimate a funzione diventano progressivamente più costose all'aumento delle chiamate ricorsive.
+Il tempo totale dell'implementazione ricorsiva è il maggiore di tutti\footnote{Su 10000 messaggi l'esecuzione del programma ricorsivo è stata interrotta prematuramente dall'esaurimento della memoria a disposizione}, nonostante il numero di scope da creare sia lo stesso delle chiamate a funzione iterative, infatti, le ricerche dei simboli nello stack delle chimate a funzione diventano progressivamente più costose all'aumento delle chiamate ricorsive.
 
 \begin{table}[htbp]
 	\centering
@@ -517,7 +528,7 @@ Tutto il codice utilizzato per i benchmarking è riportato nell'appendice.
 
 \begin{figure}
 	\centering
-	\resizebox{0.7\columnwidth}{!}{
+	\resizebox{\columnwidth}{!}{
 		\includegraphics{sources/pvp.pdf}}
 	\caption{Confronto delle performance di PASTEL e Python}
 	\label{fig:performance-comparison}
@@ -528,6 +539,7 @@ Tutto il codice utilizzato per i benchmarking è riportato nell'appendice.
 
 \section{Conclusioni}\label{section:conclusioni}
 
+Introdurre letture da socket non bloccanti~\cite{hall2001beej}, UDP.
 
 %% BIBLIOGRAFIA
 

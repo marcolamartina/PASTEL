@@ -10,8 +10,8 @@ data_2 = [    10, 1.350, 0.17, 1.339, 0.32;
             1000, 1.305, 0.19, 1.340, 0.33;
            10000, 1.508, 0.35, 2.115, 0.56];
 %%
-h=figure();
-subplot(1,2,1)
+h=figure('Position', [10 10 800 600]);
+subplot(2,1,1)
 loglog(data(:,1)',data(:,2)','-o');
 hold on
 grid on
@@ -22,7 +22,7 @@ xlabel("Numero di messaggi");
 ylabel("Tempo (s)");
 title("Tempo totale");
 hold off
-subplot(1,2,2);
+subplot(2,1,2);
 loglog(data(:,1)',data(:,3)','-o');
 hold on
 grid on
@@ -39,7 +39,7 @@ pos = get(h,'Position');
 set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(h,'performance-graph','-dpdf','-r0')
 %%
-j=figure();
+j=figure('Position', [10 10 1200 600]);
 subplot(2,2,1)
 loglog(data(:,1)',data(:,4)','-o');
 hold on
