@@ -233,6 +233,15 @@ Le regole di produzione per \texttt{<exp>} sembrerebbero ambigue, infatti una st
 
 In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti generato da Bison su una versione ridotta della grammatica per fornire un'idea generale della struttura di un programma grammaticalmente corretto. Questa grammatica semplificata rimuove delle regole di produzione ricorsive per ridurre il numero di stati, migliorando la leggibilità. In appendice si riporta il grafo della grammatica completa.\\\\
 
+
+\begin{figure}[b]
+	\centering
+	\resizebox{\columnwidth}{!}{
+		\includegraphics{sources/parser_simple}}
+	\caption{Grafo del FSA generato utilizzando  GNU Bison 3.5.4 XML Automaton Report su una struttura fortemente semplificata per facilitare la rappresentazione. La grammatica completa non presenta conflitti shift/reduce e reduce/reduce.}
+	\label{fig:parser_simple}
+\end{figure}
+
 	%% LEXER
 \subsection{Lexer}
 
@@ -353,14 +362,6 @@ for	"for"
 in	"in"
 def	"def"
 \end{lstlisting}
-
-\begin{figure}[t]
-	\centering
-	\resizebox{\columnwidth}{!}{
-	\includegraphics{sources/parser_simple}}
-	\caption{Grafo del FSA generato utilizzando  GNU Bison 3.5.4 XML Automaton Report su una struttura fortemente semplificata per facilitare la rappresentazione. La grammatica completa non presenta conflitti shift/reduce e reduce/reduce.}
-	\label{fig:parser_simple}
-\end{figure}
 
 Per riuscire a scrivere qualsiasi simbolo all'interno delle stringhe, vengono utilizzati gli \texttt{state} di Flex. Le costanti \texttt{TRUE} e \texttt{FALSE} corrispondono semplicemente a 1 e 0, mentre \texttt{NL} rappresenta il carattere di ritorno a capo
 
@@ -562,6 +563,7 @@ Introdurre letture da socket non bloccanti~\cite{hall2001beej}, UDP.
 	Grafico del FSA generato utilizzando GNU Bison 3.5.4 XML Automaton Report.
 \end{center}
 
+\clearpage
 
 \lstinputlisting[frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Codice per inviare messagi su connessioni separate in un loop.}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
 ]{../testfiles/benchmarks/send_messages_loop.pa}
