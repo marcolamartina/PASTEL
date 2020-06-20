@@ -39,7 +39,18 @@ struct val * sum(struct val * a, struct val * b){
       }
 			temp += htonl(b->int_val);
 			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
-		} else {
+		} else if(typeof_v(b)=='a' && typeof_v(a)=='i'){
+      result->type = 'a';
+			int temp ;
+			result->string_val = malloc(sizeof(char)*15);
+      if(!strcmp(b->string_val,"localhost")){
+        inet_pton(AF_INET, "127.0.0.1", &temp);
+      } else {
+        inet_pton(AF_INET, b->string_val, &temp);
+      }
+			temp += htonl(a->int_val);
+			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
+    } else {
 				yyerror("addiction of incompatible types (%c+%c)", typeof_v(a), typeof_v(b));
 		}
   }
@@ -95,7 +106,15 @@ struct val * sub(struct val * a, struct val * b){
 			inet_pton(AF_INET, a->string_val, &temp);
 			temp -= htonl(b->int_val);
 			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
-		} else {
+		} else if (typeof_v(b)=='a' && typeof_v(a)=='i'){
+      result->type = 'a';
+			int temp ;
+			result->string_val = malloc(sizeof(char)*15);
+
+			inet_pton(AF_INET, b->string_val, &temp);
+			temp -= htonl(a->int_val);
+			inet_ntop(AF_INET, &temp, result->string_val, sizeof(char)*15);
+    } else {
     	yyerror("subtraction of incompatible types (%c-%c)", typeof_v(a), typeof_v(b));
 		}
   }

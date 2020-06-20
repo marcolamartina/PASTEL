@@ -61,7 +61,7 @@ Essendo questo il campo di applicazione principale, su questo si incentreranno d
 
 PASTEL può essere pensato come un linguaggio per generare programmi che possano mandare e ricevere messaggi testuali tramite TCP, condizionati e iterati facilmente. Questo concept può essere pensato come l'equivalente di \texttt{expect}~\cite{libes1991expect, libes1990expect, libes1995exploring} per reti di sensori wireless (WSN).
 
-Expect è un programma che "parla" con altri programmi interattivi secondo uno script. Seguendo lo script, Expect sa cosa ci si può aspettare da un programma e quale dovrebbe essere la risposta corretta. Un linguaggio interpretato fornisce ramificazioni e strutture di controllo di alto livello per dirigere il dialogo. Inoltre, l'utente può assumere il controllo e interagire direttamente quando lo desidera, in seguito restituendo il controllo allo script.
+\texttt{expect} è un programma che "parla" con altri programmi interattivi secondo uno script. Seguendo lo script, \texttt{expect} sa cosa ci si può aspettare da un programma e quale dovrebbe essere la risposta corretta. Un linguaggio interpretato fornisce ramificazioni e strutture di controllo di alto livello per dirigere il dialogo. Inoltre, l'utente può assumere il controllo e interagire direttamente quando lo desidera, in seguito restituendo il controllo allo script.
 
 Il tool \texttt{expect} è basato sul linguaggio Tcl. Tcl fornisce il controllo per il flusso (ad esempio, if, for, break), la valutazione delle espressioni e diverse altre funzioni come la ricorsione, definizione delle procedure, ecc.. 
 
@@ -85,7 +85,7 @@ La separazione tra \texttt{int} e \texttt{real} è stata pensata per evitare pro
 Il tipo \texttt{device} è un tipo composto da \texttt{address} e \texttt{int}, poiché un device è caratterizzato dal suo indirizzo IP e da un numero di porta, dato che il linguaggio poggia le sue basi sul protocollo TCP/IP. 
 
 Il tipo \texttt{list} viene pensato per rendere facili ed intuitive le operazioni di iterazione. Questo tipo di dato infatti caratterizza liste eterogenee che possono contenere elementi di qualsiasi tipo, tranne un'altra lista. Non è consentito infatti l'uso di liste innestate. È però possibile scrivere una funzione in PASTEL, come quella riportata di seguito, per fare un inserimento con flattening, potendo così inserire gli elementi di una lista all'interno di un'altra. 
-
+\clearpage
 \begin{verbatim}
   def flat_insert(a,b,pos){
     int i = 0;
@@ -141,11 +141,12 @@ I tipi composti sono invece:
 \item \texttt{list}, tipo ricorsivo 
 \end{itemize}
 
+\clearpage
 \textbf{Strutture di controllo}
 Il linguaggio fornisce la possibilità di usare sia comandi condizionali che comandi iterativi. I comandi condizionali sono i classici:
 \begin{itemize}
-\item \texttt{if ( condition ) \{ instractions \}}
-\item \texttt{if ( condition ) \{ instractions \} else \{ instractions \}}
+\item \texttt{if ( condition ) \{ instructions \}}
+\item \texttt{if ( condition ) \{ instructions \} else \{ instructions \}}
 \end{itemize}
 I comandi iterativi invece sono:
 \begin{itemize}
@@ -155,14 +156,14 @@ I comandi iterativi invece sono:
 Nell'espressione \texttt{while} si itera indefinitivamente finché la condition è diversa da 0, nel \texttt{for} invece si itera per ogni elemento contenuto nella lista.\\
 
 \textbf{Operazioni}\\
-Il linguaggio consente le seguenti operazioni: somma, sottrazione, moltiplicazione, divisione, and e or logici, e comparazioni ( ==, !=, >, >=, <, <=). Le combinazioni di tipi consentite per ogni operatore sono riassunte nella tabella~\ref{table:operatori}. Le comparazioni e gli operatori logici restituiscono sempre degli int, tutti gli altri operatori restituiscono un valore del tipo della colonna, tranne la moltiplicazione int * string equivalente a string * int. \\
+Il linguaggio consente le seguenti operazioni: somma, sottrazione, moltiplicazione, divisione, and e or logici, e comparazioni ( ==, !=, >, >=, <, <=). Le combinazioni di tipi consentite per ogni operatore sono riassunte nella tabella~\ref{table:operatori}. Le comparazioni e gli operatori logici restituiscono sempre degli int, tutti gli altri operatori restituiscono un valore del tipo della colonna, tranne la moltiplicazione \texttt{int * string} equivalente a \texttt{string * int}. \\
 
 \begin{table}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline
 		V1\textbackslash V2 &        int         &    real     &  string  & address & device & list \\ \hline
-		        int         & + - * / or and CMP &             &    *     &         &        &      \\ \hline
+		        int         & + - * / or and CMP &             &    *     &   + -      &        &      \\ \hline
 		       real         &                    & + - / * CMP &          &         &        &      \\ \hline
 		      string        &         *          &             & +    CMP &         &        &      \\ \hline
 		      address       &        + -         &             &          &   CMP   &        &      \\ \hline
@@ -238,8 +239,7 @@ Riportiamo di seguito le regole di produzione in formato BNF del linguaggio prop
 
 Le regole di produzione per \texttt{<exp>} sembrerebbero ambigue, infatti una stessa sequenza di operatori potrebbe essere rappresentata da più alberi di parsing. È generalmente possibile riscrivere la grammatica per eliminare l'ambiguità, però Bison mette a disposizione degli strumenti che permettono di specificare la precedenza degli operatori disambiguando la grammatica e scartando automaticamente gli alberi di parsing non validi, consentendo l'utilizzo di una grammatica più semplice e compatta.
 
-In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti generato da Bison su una versione ridotta della grammatica per fornire un'idea generale della struttura di un programma grammaticalmente corretto. Questa grammatica semplificata rimuove delle regole di produzione ricorsive per ridurre il numero di stati, migliorando la leggibilità. In appendice si riporta il grafo della grammatica completa.\\\\
-
+In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti generato da Bison su una versione ridotta della grammatica per fornire un'idea generale della struttura di un programma grammaticalmente corretto. Questa grammatica semplificata rimuove delle regole di produzione ricorsive per ridurre il numero di stati, migliorando la leggibilità. In appendice si riporta il grafo della grammatica completa.\\
 
 \begin{figure}
 	\centering
@@ -252,7 +252,7 @@ In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti genera
 	%% LEXER
 \subsection{Lexer}
 
-Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio, le direttive di preprocessing, i selettori e le strutture di controllo. Queste espressioni regolari sono state utilizzate anche per creare un package di syntax highlighting per l'editor di testo ``Atom'' disponibile open-source online: \textcolor{blue}{\underline{\url{https://atom.io/packages/language-PASTEL}}}\\
+Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio, le direttive di preprocessing, i selettori e le strutture di controllo. Queste espressioni regolari sono state utilizzate anche per creare un package di syntax highlighting per l'editor di testo ``Atom'' disponibile open-source online: \textcolor{blue}{\underline{\url{https://atom.io/packages/language-PASTEL}}}\\\\
 
 \textbf{Tipi}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
@@ -422,7 +422,7 @@ Per verificare l'applicabilità del linguaggio nel contesto target sono state ef
 \subsubsection{Network discovery}\label{subsubsection:net-disc}
 In una rete di sensori generalmente è necessario che ogni nodo sappia quali sono i suoi vicini e come raggiungerli, a questo scopo sono stati sviluppati un grande numero di protocolli~\cite{narten1998neighbor, kandhalu2010u, alsa2012secure}.
 
-In questo caso d'uso mostriamo come, con un codice relativamente compatto, a partire dalla conoscienza dell'indirizzo di un singolo nodo indicato con \texttt{root}, sia possibile ricostruire la topologia della porzione di rete connessa al nodo \texttt{root}.\\
+In questo caso d'uso mostriamo come, con un codice relativamente compatto, a partire dalla conoscenza dell'indirizzo di un singolo nodo indicato con \texttt{root}, sia possibile ricostruire la topologia della porzione di rete connessa al nodo \texttt{root}.\\
 Nel codice mostrato in~\ref{listing:net-disc} ogni nodo viene interrogato per ottenere la lista dei suoi vicini tramite la procedura \texttt{find\_neighbours}. Tutti i vicini del nodo che non sono già stati individuati precedentemente vengono aggiunti ad una lista di nodi noti.
 
 Ogni nodo comunica la lista dei suoi vicini restituiendo in formato testuale indirizzo IP e numero di porta ai quali sono raggiungibili, separando i vari nodi con delle virgole. Il linguaggio PASTEL mette a disposizione funzioni bultin che permettono in modo estremamente semplice, a partire dai dati forniti in questo formato, di ottenere una lista PASTEL e convertire tutte le stringhe in device utilizzabili all'interno del programma.
@@ -458,7 +458,7 @@ Lo schema di funzionamento illustrato può ovviamente essere ulteriormente raffi
 Il codice mostrato nelle sezioni~\ref{subsubsection:net-disc} e~\ref{subsubsection:pub-sub} mostra la potenzialità di essere integrato in un unico sistema software che, inserito in una rete, a partire dalla conoscenza di un singolo nodo, riesce a ricostruire la topologia della rete raggiungibile e gestire il funzionamento di un protocollo non banale del tipo publish-subscribe, dimostrando l'applicabilità del linguaggio proposto all'interno del contesto target. 
 
 Per testare la scalabilità dell'implementazione del linguaggio abbiamo misurato il tempo impiegato per inviare un numero crescente di messaggi.\\
-Un'invio di messaggio si riassume nelle seguenti operazioni:
+Un invio di messaggio si riassume nelle seguenti operazioni:
 \begin{enumerate}
 	\item Si stabilisce una connessione.
 	\item{Si verifica che la connessione abbia avuto successo.}
@@ -492,7 +492,7 @@ Il tempo impiegato è misurato utilizzando il programma di sistema \texttt{time}
 	\label{table:performance}
 \end{table}
 
-Come si può vedere dalla tabella~\ref{table:performance} e in figura~\ref{fig:performance-graph} (si noti che gli assi sono in scala logaritmica), l'implementazione con la chiamata a funzione è quella con mediamente più veloce, anche se ha un tempo netto leggermente maggiore dell'implementazione puramente ricorsiva, anche se resta comparabile.
+Come si può vedere dalla tabella~\ref{table:performance} e in figura~\ref{fig:performance-graph} (si noti che gli assi sono in scala logaritmica), l'implementazione con la chiamata a funzione è quella mediamente più veloce, anche se ha un tempo netto leggermente maggiore dell'implementazione puramente ricorsiva, anche se resta comparabile.
 
 \begin{figure}
 	\centering
@@ -506,7 +506,7 @@ Una possibile spiegazione per questa peculiarità è che l'invio di messaggi è 
 
 Questo dato sembra anche giustificare la scelta di sviluppare un linguaggio di scripting interpretato invece che un linguaggio compilato, visto che l'ambito di applicazione principale sarà legato all'invio di messaggi nella rete, e non elaborate manipolazioni dei dati.
 
-Il tempo totale dell'implementazione ricorsiva è il maggiore di tutti\footnote{Su 10000 messaggi l'esecuzione del programma ricorsivo è stata interrotta prematuramente dall'esaurimento della memoria a disposizione}, nonostante il numero di scope da creare sia lo stesso delle chiamate a funzione iterative, infatti, le ricerche dei simboli nello stack delle chimate a funzione diventano progressivamente più costose all'aumento delle chiamate ricorsive.
+Il tempo totale dell'implementazione ricorsiva è il maggiore di tutti\footnote{Su 10000 messaggi l'esecuzione del programma ricorsivo è stata interrotta prematuramente dall'esaurimento della memoria a disposizione}, nonostante il numero di scope da creare sia lo stesso delle chiamate a funzione iterative, infatti, le ricerche dei simboli nello stack delle chiamate a funzione diventano progressivamente più costose all'aumento delle chiamate ricorsive.
 
 \begin{table}[htbp]
 	\centering
