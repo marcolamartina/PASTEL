@@ -105,4 +105,12 @@ time(1) - linux man page.
 Brain~Beej Hall.
 \newblock Beej’s guide to network programming: using internet sockets, 2001.
 
+\bibitem{masirap2016evaluation}
+Madzirin Masirap, Mohd~Harith Amaran, Yusnani~Mohd Yussoff, Ruhani Ab~Rahman,
+  and Habibah Hashim.
+\newblock Evaluation of reliable udp-based transport protocols for internet of
+  things (iot).
+\newblock In {\em 2016 IEEE Symposium on Computer Applications \& Industrial
+  Electronics (ISCAIE)}, pages 200--205. IEEE, 2016.
+
 \end{thebibliography}

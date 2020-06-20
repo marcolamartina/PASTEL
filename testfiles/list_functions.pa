@@ -1,5 +1,3 @@
-print("list_function");
-
 def append(_list, item){
 	insert(_list, item, length(_list));
 }
@@ -12,4 +10,25 @@ def inList(item, _list){
 		}
 	}
 	found;
+}
+
+def flat_insert(a,b,pos){
+	if(typeof(b)=="list" and typeof(a)=="list"){
+		int i = 0;
+		for(item in b){
+			insert(a,item,pos+i);
+			i=i+1;	
+		}
+	} else {
+		print("The arguments must be functions");
+	}
+	a;
+}
+
+def join_chars(split_string){
+	string joined_string = "";
+	for(char in split_string){ 
+		joined_string = joined_string + toString(char); 
+	}
+	joined_string;
 }

@@ -495,7 +495,7 @@ Come si può vedere dalla tabella~\ref{table:performance} e in figura~\ref{fig:p
 
 \begin{figure}
 	\centering
-	\resizebox{\columnwidth}{!}{
+	\resizebox{0.8\columnwidth}{!}{
 		\includegraphics{sources/performance-graph}}
 	\caption{Performance dell'interprete}
 	\label{fig:performance-graph}
@@ -545,8 +545,17 @@ Tutto il codice utilizzato per i benchmarking è riportato nell'appendice.
 
 \section{Conclusioni}\label{section:conclusioni}
 
-Il linguaggio sviluppato [...] affrontare tematiche trattate nel corso [...] performance
-Introdurre letture da socket non bloccanti~\cite{hall2001beej}, UDP.
+Il linguaggio sviluppato [...] affrontare tematiche trattate nel corso [...] , considerando i tempi di sviluppo, i test effettuati mostrano performance soddisfacenti.
+
+Visti i tempi di sviluppo limitati, PASTEL non possiede tutte le funzionalità che ci si aspetta da un linguaggio di programmazione general purpose, e sono presenti molte direzioni verso cui si potrebbe potenziare il linguaggio. In conclusione segue una breve disamina di alcune feature che potrebbero arricchire il linguaggio. 
+\begin{itemize}
+	\item Lettura e scrittura da file
+	\item Al momento per potere effettuare interazioni con l'utente, quando un programma viene eseguito leggendolo da un file, è necessario ricorrere a \texttt{console/1}. Sarebbe certamente più agevole consentire l'utilizzo dello standard input.
+	\item PASTEL non è utilizzabile su sistemi operativi Windows perché, interfacciarsi alle socket, Windows utilizza un'API differente da Linux e macOS. Un linguaggio maturo dovrebbe avere implementazioni per tutti i maggiori sistemi operativi.
+	\item Gli indirizzi gestiti sono solo quelli IPv4, potrebbe essere aggiunto il supporto al protocollo IPv6.
+	\item Le chiamate a \texttt{receive/1} sono letture bloccanti. Un dispositivo malfunzionante però potrebbe non rispondere mai ai messaggi inviati, fermando l'esecuzione del programma. Per permettere la scrittura di programmi più robusti si potrebbe introdurre letture da socket non bloccanti~\cite{hall2001beej} specificando un timeout.
+	\item Nell'ambito IoT, oltre al TCP, esistono molti protocolli per il trasporto affidabile dei dati basati su UDP~\cite{masirap2016evaluation}, supportare anche UDP quindi renderebbe il linguaggio più flessibile e potente.
+\end{itemize}
 
 %% BIBLIOGRAFIA
 \clearpage
@@ -554,19 +563,17 @@ Introdurre letture da socket non bloccanti~\cite{hall2001beej}, UDP.
 \bibliography{tesina}
 \addcontentsline{toc}{section}{Riferimenti bibliografici}
 
-\clearpage
-
 
 %% APPENDICE
 
 \section*{Appendice}\label{section:appendix}
 \addcontentsline{toc}{section}{Appendice}
 
-\begin{center}
+\begin{center}[b]
 	\centering
 	\resizebox{\columnwidth}{!}{
 		\includegraphics{sources/parser}}\\
-	Grafico del FSA generato utilizzando GNU Bison 3.5.4 XML Automaton Report.
+	Grafico del FSA generato utilizzando GNU Bison 3.5.4 XML Automaton Report. L'immagine è in formato vettoriale, quindi è possibile ingrandire a piacere.
 \end{center}
 
 \clearpage
