@@ -8,6 +8,7 @@
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage[italian]{babel}
+\usepackage[hidelinks]{hyperref}
 
 
 % Title Page
@@ -251,7 +252,7 @@ In figura~\ref{fig:parser_simple} viene riportato l'automa a stati finiti genera
 	%% LEXER
 \subsection{Lexer}
 
-Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio, le direttive di preprocessing, i selettori e le strutture di controllo.\\
+Per quanto riguarda la struttura del lexer, vengono utilizzate delle regex per matchare gli identificatori di ogni tipo del linguaggio, i valori consentiti per ogni tipo, i nomi delle variabili, costanti proprie del linguaggio, l'inserimento di commenti, simboli per la comparazione, operazioni consentite sui tipi, i simboli consentiti, le funzioni built-in del linguaggio, le direttive di preprocessing, i selettori e le strutture di controllo. Queste espressioni regolari sono state utilizzate anche per creare un package di syntax highlighting per l'editor di testo ``Atom'' disponibile open-source online: \textcolor{blue}{\underline{\url{https://atom.io/packages/language-PASTEL}}}\\
 
 \textbf{Tipi}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
