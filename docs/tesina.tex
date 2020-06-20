@@ -73,36 +73,46 @@ Alla luce di quanto detto, con questo linguaggio ci prefiggiamo l'obiettivo di f
 
 \section{Descrizione del progetto}\label{section:descrizione}
 
-Il linguaggio proposto nasce con lo scopo di agevolare la programmazione di piccoli software che si occupano di gestire dispositivi in ambiente IoT. Per raggiungere questo obiettivo e per dare la possibilità al programmatore di effettuare tutte le manipolazioni ai dati del caso, vi sono  4 tipi primitivi, ovvero \texttt{ int, real, string} e \texttt{address}. La possibilità di poter definire nuovi tipi non è consentita, per non dover appesantire inutilmente il linguaggio, poiché nel contesto in cui viene utilizzato, non è un requisito fondamentale. Il tipo \texttt{address} è il tipo che caratterizza il linguaggio poiché è grazie al suo utilizzo che sono semplificate molte operazioni che un linguaggio da utilizzare in ambiente IoT deve supportare. Essendo inoltre che PASTEL si pone in un contesto in cui i dati mandati tra i device sono delle stringhe di caratteri, non poteva che essere presente il tipo stringa. La separazione tra int e real è stata pensata per evitare problemi dovuti all'imprecisione della rappresentazione in virgola mobile~\cite{benz2012dynamic}. I 
+Il linguaggio PASTEL nasce con lo scopo di agevolare la programmazione di piccoli software che si occupano di gestire dispositivi in ambiente IoT. Viene proposto un interprete per il linguaggio PASTEL, piuttosto che un compilatore, sia per la minore complessità, ma anche per favorire l'interattività delle operazioni che vengono normalmente svolte in questo contesto. Per raggiungere questo obiettivo e per dare la possibilità al programmatore di effettuare tutte le manipolazioni ai dati del caso, vi sono quattro tipi primitivi, ovvero \texttt{ int, real, string} e \texttt{address}. La possibilità di poter definire nuovi tipi non è consentita, per non dover appesantire inutilmente il linguaggio, poiché nel contesto in cui viene utilizzato, non è un requisito fondamentale. 
+
+Il tipo \texttt{address} è il tipo che caratterizza il linguaggio poiché è grazie al suo utilizzo che sono semplificate molte operazioni che un linguaggio da utilizzare in ambiente IoT deve supportare. 
+
+Essendo inoltre che PASTEL si pone in un contesto in cui i dati mandati tra i device sono delle stringhe di caratteri, non poteva che essere presente il tipo \texttt{string}. Le stringhe vengono trattate come un tipo primitivo immutabile e non è consentito l'accesso diretto al singolo carattere. Per potere ottenere i singoli caratteri, può però essere utilizzata la funzione \texttt{s2l} che restituisce un valore di tipo \texttt{list}, ovvero una lista dei singoli caratteri (rappresentati come stringhe di lunghezza 1) della stringa data in input alla funzione. 
+
+La separazione tra \texttt{int} e \texttt{real} è stata pensata per evitare problemi dovuti all'imprecisione della rappresentazione in virgola mobile~\cite{benz2012dynamic}. 
+
+Il tipo \texttt{device} è un tipo composto da \texttt{address} e \texttt{int}, poiché un device è caratterizzato dal suo indirizzo IP e da un numero di porta, essendo che il linguaggio poggia le sue basi sul protocollo TCP/IP. 
+
+Il tipo \texttt{list} viene pensato per rendere estremamente facili e intuitive le operazioni di iterazione. Questo tipo infatti caratterizza liste eterogenee che possono contenere elementi di qualsiasi tipo, tranne un'altra lista. Non è consentito infatti l'uso di liste innestate. È però possibile scrivere una funzione, riportata di seguito, per fare un inserimento con flattening, potendo così inserire gli elementi di una lista all'interno di un'altra. 
+
+\begin{verbatim}
+  def flat_insert(a,b,pos){
+    int i = 0;
+    for(item in b){
+        insert(a,item,pos+i);
+        i=i+1;   
+    }
+    a;
+}
+\end{verbatim}
+
+Non è presente la definizione degli array, la cui introduzione nel linguaggio sarebbe risultata ridondante poiché tutte le operazioni che si possono fare con gli array possono essere fatte con le liste. È infatti consentita la possibilità di accedere agli elementi della lista tramite la loro posizione, con la seguente sintassi \texttt{nome\_lista[index]}. Vi è un grande vantaggio nell'utilizzo delle liste, ovvero la possibilità di iterare per ogni elemento della lista tramite il costrutto \texttt{foreach}. La variabile di controllo viene inizializzata all'avvio del ciclo, al termine viene eliminata e non è più referenziabile. Inoltre all'interno del ciclo può essere modificata (e.g. tramite assegnamento).
+
+Per quanto riguarda le funzioni, è possibile sia utilizzare delle funzioni già presenti nel linguaggio, trattate nelle sezione ~ref{subsection:fun}, ma è anche possibile definirne di nuove. I nomi delle funzioni built-in sono parole riservate e quindi non è possibile ridefinirle. Anche quelle definite dall'utente per semplicità implementativa non sono ridefinibili e non è consentito definire una funzione all'interno della definizione di un'altra funzione. Non è 
+richiesta la definizione del tipo dei parametri formali, l'onere di gestirli è lasciato al programmatore, che ha quindi la possibilità di creare funzioni che prescindano dai tipi dei parametri formali. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}. Inoltre i parametri alle funzioni sono passati per copia. 
+
+Il tipo di una variabile deve essere definito al momento della dichiarazione, e non può essere modificato. Questo consente di scrivere programmi più robusti e dal debug più semplice. Inoltre al momento della dichiarazione, alla variabile viene assegnato un valore di default per evitare inconsistenze di dati. A tal proposito, la valutazione di operazioni viene effettuata al momento dell'assegnazione (eager evaluation).
+
+Per non limitare la potenza del linguaggio, le funzioni definite dall'utente possono restituire tipi di dati diversi (una forma primitiva di overloading indipendente dal contesto). In questi casi si possono utilizzare le liste eterogenee per memorizzare i valori restituiti ed eseguire operazioni diverse in base al tipo, come precedentemente dimostrato nel listato~\ref{listing:conditional_declaration}. 
+
+I valori di ritorno delle funzioni corrispondono all'ultimo valore calcolato all'interno della funzione, senza bisogno di esplicitare direttamente cosa la funzione debba ritornare. Questo evita salti e interruzioni dell'esecuzione~\cite{dijkstra1968letters}.
 
 \begin{itemize}
 	\item Lookup dei simboli in eval invece che nel lexer come il libro~\cite{levine2009flex}
-	\item Stringhe tipo primitivo immutabile, singolo carattere non direttamente accessibile. 
-	\item Possibilità di dividerle in lista di "caratteri" (stringhe lunghezza 1)
-	\item associazione tra parametri reali e formali per copia
-	\item Eager evaluation
 	\item Scoping statico
 	\item Cicli condividono scope per ragioni di performance.
-	\item Liste eterogenee puntatore a next, conseguente scelta di non permettere liste innestate, eventuale operazione di flattening può essere fatta in puro PASTEL dal programmatore. È anche consentito l'accesso ad elementi della lista con i selettori tipici degli array.
-	\item Foreach, la variabile di controllo viene inizializzata all'avvio del ciclo, al termine viene eliminata e non è più referenziabile.
-	All'interno del ciclo può essere modificata (e.g. assegnamento)
 	\item Include a tempo di lexer, impedisce include condizionali che generano codice potenzialmente ambiguo con comportamento imprevedibile.
-	\item Interprete invece che compilatore
-	\item Niente funzioni dentro altre funzioni
-	\item Funzioni non ridefinibili 
 	\item Possibilità di variabili globali, quindi la dichiarazione implicita non è consentita
-	\item Funzione "console" per facilità di testing e, potenzialmente, interazione con l'utente.
-	\item Overloading di alcuni operatori e funzioni 
-	\item Controllo dei tipi dinamico, adatto a scripting e dati restituiti di natura variabile, potenzialmente eterogenea, quindi possibilità di controllo dei tipi. -> parametri formali non hanno vincoli sui tipi, l'onere è lasciato al programmatore.
-	\item La dichiarazione definisce un valore di default se non ne viene specificato uno
-	\item Il tipo di una variabile deve essere definito al momento della dichiarazione, e non può essere modificato. Questo consente di scrivere programmi più robusti e dal debug più semplice.
-	Per non limitare la potenza del linguaggio, le funzioni definite dall'utente possono restituire tipi di dati diversi (circa overloading indipendente dal contesto). In questi casi si possono utilizzare le liste eterogenee per memorizzare i valori restituiti ed eseguire operazioni diverse in base al tipo. Un esempio è mostrato nel listato~\ref{listing:conditional_declaration}
-	\item Valori di ritorno equivalgono all'ultima eval della lista di espressioni, evita interruzioni strane
-	\item Parole riservate invece che keyword
-	\item FATTO Niente tipi definiti dall'utente
-	\item Compatibilità Linux e Mac
-	\item Niente salti~\cite{dijkstra1968letters}
-
 \end{itemize}
 
 \lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Esempio di codice PASTEL in cui vengono utilizzate funzioni con tipo di ritorno variabile e dichiarazioni condizionali}, label={listing:conditional_declaration}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
