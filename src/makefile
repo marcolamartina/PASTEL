@@ -13,6 +13,7 @@ compiler-lex.c : $(Flex_src)
 	mv lex.yy.c $@
 
 pastel : parser.tab.c compiler-lex.c *.c
+	if [ ! -d ../bin ]; then mkdir ../bin; fi
 	if [ "$(OS_NAME)" = "linux" ]; then gcc -g -lfl $^ -o pastel -lm; else gcc -g -ll $^ -o pastel ; fi
 	mv parser.tab.c ../bin/;
 	mv compiler-lex.c ../bin/;
