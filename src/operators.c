@@ -201,15 +201,20 @@ struct val * change_sign(struct val * a){
 }
 
 static int compare_address(char * a, char * b){
-  int result;
-  if(!strcmp(a,"localhost") && !strcmp(b,"127.0.0.1")){
-    result=0;
-  } else if (!strcmp(b,"localhost") && !strcmp(a,"127.0.0.1")){
-    result=0;
+  int a_int, b_int;
+  if(!strcmp(a,"localhost")){
+		inet_pton(AF_INET, "127.0.0.1", &a_int);
   } else {
-    result=strcmp(a,b);
-  }
-  return result;
+		inet_pton(AF_INET, a, &a_int);
+	}
+
+  if(!strcmp(b,"localhost")){
+		inet_pton(AF_INET, "127.0.0.1", &b_int);
+  } else {
+		inet_pton(AF_INET, b, &b_int);
+	}
+
+  return ntohl(a_int)-ntohl(b_int);
 }
 
 double compare(struct val * a, struct val * b){
