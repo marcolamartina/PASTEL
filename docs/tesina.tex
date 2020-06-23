@@ -115,7 +115,7 @@ Le variabili sono definite con scope limitato alla funzione in cui vengono dichi
 
 I cicli iterativi condividono lo scope della funzione in cui vengono eseguiti per ragioni di performance, definire quindi una variabile all'interno di un ciclo porta ad una condizione di errore, poiché dalla seconda iterazione la variabile risulterà già definita.\\
 
-
+\clearpage
 \lstinputlisting[firstline=1, lastline=62, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Esempio di codice PASTEL in cui vengono utilizzate funzioni con tipo di ritorno variabile e dichiarazioni condizionali}, label={listing:conditional_declaration}, breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}
 ]{../testfiles/conditional_declaration.pa}
 
@@ -126,7 +126,7 @@ I cicli iterativi condividono lo scope della funzione in cui vengono eseguiti pe
 	%% GRAMMATICA
 \subsection{Grammatica}
 
-\textbf{Tipi}
+ \quad\textbf{Tipi}\\
 Il linguaggio PASTEL possiede sia tipi primitivi che composti. I tipi primitivi sono:
 \begin{itemize}
 \item \texttt{int}, utilizzato per rappresentare i numeri interi
@@ -142,7 +142,7 @@ I tipi composti sono invece:
 \end{itemize}
 
 \clearpage
-\textbf{Strutture di controllo}
+\textbf{Strutture di controllo}\\
 Il linguaggio fornisce la possibilità di usare sia comandi condizionali che comandi iterativi. I comandi condizionali sono i classici:
 \begin{itemize}
 \item \texttt{if ( condition ) \{ instructions \}}
@@ -203,25 +203,27 @@ Riportiamo di seguito le regole di produzione in formato BNF del linguaggio prop
 	| <decl> ';'
 
 <list>::=
-	| stmt <list> 
+	| <stmt> <list> 
 
 <exp>::= '(' <exp> ')'         
 	| FUNC '(' <explist> ')' 
-	| VALUE              
+	| NAME '(' <explist> ')' 
+	| VALUE           
+	| '[' <explist> ']'   
 	| <exp> ':' <exp>         
 	| <exp> '+' <exp>         
 	| <exp> '-' <exp>         
 	| <exp> '*' <exp>          
 	| <exp> '/' <exp>          
 	| <exp> AND <exp>          
-	| <exp> OR <exp>           
+	| <exp> OR <exp> 
+	| <exp> CMP <exp>             
 	| '-' <exp>
 	| NAME'[' <exp> ']'          
-	| NAME                 
-	| <exp> CMP <exp>          
+	| NAME                        
 	| <exp> ADDR             
 	| <exp> PORT             
-	| NAME '(' explist ')' 
+
 
 <decl>::= TYPE NAME          
 	| NAME '=' <exp>                    
@@ -283,7 +285,7 @@ newline	"NL"
 true	"TRUE"
 false	"FALSE"
 \end{lstlisting}
-
+\clearpage
 \textbf{Commenti}
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{{$\hookrightarrow$}\space}]
 inline	"\\".*
@@ -431,7 +433,7 @@ L'algoritmo termina automaticamente nonappena l'ultimo dei nodi noti interrogato
 
 Per semplicità si assume che il calcolatore che esegue il programma abbia un range di comunicazione molto superiore ai nodi della rete, e che possa quindi raggiungerli in un singolo hop, una strategia più generale dovrebbe ovviamente prevedere la costruzione di messaggi di routing.
 
-\lstinputlisting[firstline=3, lastline=41, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente network\_discovery.pa}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
+\lstinputlisting[firstline=1, lastline=48, frame=single, numbers=left, stepnumber=1, captionpos=b, caption={Sorgente network\_discovery.pa}, label={listing:net-disc}, breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]{../testfiles/network_discovery.pa}
 
 		%% PUBLISH-SUBSCRIBE
 \subsubsection{Publish-Subscribe}\label{subsubsection:pub-sub}
@@ -496,7 +498,7 @@ Come si può vedere dalla tabella~\ref{table:performance} e in figura~\ref{fig:p
 
 \begin{figure}
 	\centering
-	\resizebox{0.8\columnwidth}{!}{
+	\resizebox{0.7\columnwidth}{!}{
 		\includegraphics{sources/performance-graph}}
 	\caption{Performance dell'interprete}
 	\label{fig:performance-graph}
