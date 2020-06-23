@@ -10,7 +10,7 @@ for (d in known_devices){
 		reply= receive(d);
 		disconnect(d);
 		if(reply !=""){
-			post = split(reply, ":TOPICS");
+			post = split(reply, ":TOPICS"); // expected t1,t2 :TOPICS msg
 			topics = split(post[0],",");
 			message = strip(post[1]);
 			for ( t in topics ){
@@ -21,7 +21,7 @@ for (d in known_devices){
 				}else{if(strip(t)=="t3") {
 					topicPost(topic3, message+NL) ;
 				}}}
-			}	
+			}
 		}
 	} else {
 		print("Couldn't connect to " + toString(d));
