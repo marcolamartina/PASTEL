@@ -12,6 +12,19 @@ def inList(item, _list){
 	found;
 }
 
+def range(start, stop, step){
+	if((start > stop and step > 0) or (start < stop and step < 0)) {
+		quit("empty range");
+	}
+	list l = [ start ];
+	start = start + step;
+	while( ((start - stop) * step) < 0 ){
+		l = l + [start];
+		start = start + step;
+	}
+	l;
+}
+
 def flat_insert(a,b,pos){
 	if(typeof(b)=="list" and typeof(a)=="list"){
 		int i = 0;
